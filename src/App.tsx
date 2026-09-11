@@ -6,7 +6,9 @@ import {
   AIRecommendationRequest,
   AIRecommendationResult,
   Coordinates,
-  NotificationItem
+  NotificationItem,
+  UserProfile,
+  DEFAULT_USERS
 } from './types';
 import { INITIAL_VENUES, CAMPUS_CENTER } from './data/campusVenues';
 import { INITIAL_BOOKINGS } from './data/sampleBookings';
@@ -14,13 +16,13 @@ import { rankVenues } from './utils/aiRecommender';
 import { Navbar } from './components/Navbar';
 import { Sidebar, NavTab } from './components/Sidebar';
 import { LandingHero } from './components/LandingHero';
+import { LoginPage } from './components/LoginPage';
 import { DashboardView } from './components/DashboardView';
 import { AIRecommendationsView } from './components/AIRecommendationsView';
 import { ExplainableAIModal } from './components/ExplainableAIModal';
 import { CampusMapView } from './components/CampusMapView';
 import { LiveNavigationView } from './components/LiveNavigationView';
 import { MyBookingsView } from './components/MyBookingsView';
-import { QRCodeModal } from './components/QRCodeModal';
 import { AnalyticsView } from './components/AnalyticsView';
 import { DemandForecastView } from './components/DemandForecastView';
 import { AdminApprovalView } from './components/AdminApprovalView';
@@ -28,15 +30,38 @@ import { BookingModal } from './components/BookingModal';
 import { NotificationsDrawer } from './components/NotificationsDrawer';
 import { SettingsView } from './components/SettingsView';
 
-const LOCAL_STORAGE_KEY_VENUES = 'campusspace_venues_v1';
-const LOCAL_STORAGE_KEY_BOOKINGS = 'campusspace_bookings_v1';
-const LOCAL_STORAGE_KEY_ROLE = 'campusspace_role_v1';
+const LOCAL_STORAGE_KEY_VENUES = 'campusspace_venues_v2';
+const LOCAL_STORAGE_KEY_BOOKINGS = 'campusspace_bookings_v2';
+const LOCAL_STORAGE_KEY_USER = 'campusspace_user_v2';
 
 export const App: React.FC = () => {
   // Navigation & Screen States
   const [isLandingPage, setIsLandingPage] = useState<boolean>(false);
+  const [isLoginPage, setIsLoginPage] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [currentRole, setCurrentRole] = useState<UserRole>('organizer');
+
+  // User Profile State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_USER);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return DEFAULT_USERS['organizer'];
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_USER, JSON.stringify(currentUser));
+      setCurrentRole(currentUser.role);
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+    }
+  }, [currentUser]);
 
   // Persistence: Venues & Bookings
   const [venues, setVenues] = useState<Venue[]>(() => {
@@ -77,23 +102,23 @@ export const App: React.FC = () => {
     {
       id: 'n1',
       title: 'AI Recommendation Ready',
-      message: 'Found 3 high-fit venues for your upcoming National AI Hackathon.',
+      message: 'Found high-fit venues for your upcoming tech symposium.',
       type: 'info',
       timestamp: '5m ago',
       read: false
     },
     {
       id: 'n2',
-      title: 'Check-in Reminder',
-      message: 'Dr. Kalam Auditorium booking completed with 100% verified attendance.',
+      title: 'Low-Risk Auto Approval',
+      message: 'Weekly robotics club meeting auto-approved under standard policy.',
       type: 'success',
-      timestamp: '2h ago',
+      timestamp: '1h ago',
       read: false
     },
     {
       id: 'n3',
-      title: 'Ghost Booking Release Warning',
-      message: 'Smart door scanner armed: unverified rooms release after 15 min.',
+      title: 'Capacity Utilization Insight',
+      message: 'Peak demand expected this Friday in Engineering Block venues.',
       type: 'warning',
       timestamp: 'Yesterday',
       read: true
@@ -110,22 +135,22 @@ export const App: React.FC = () => {
 
   // AI Recommendation engine state
   const [lastRequest, setLastRequest] = useState<AIRecommendationRequest | null>({
-    eventType: 'Hackathon',
-    attendance: 180,
-    date: '2026-09-15',
-    startTime: '09:00',
-    endTime: '18:00',
-    requiredFacilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Power Outlets']
+    eventType: 'Seminar',
+    attendance: 120,
+    date: '2026-09-18',
+    startTime: '10:00',
+    endTime: '12:00',
+    requiredFacilities: ['Projector', 'Air conditioning', 'Wi-Fi']
   });
 
   const [recommendations, setRecommendations] = useState<AIRecommendationResult[]>(() => {
     return rankVenues(INITIAL_VENUES, {
-      eventType: 'Hackathon',
-      attendance: 180,
-      date: '2026-09-15',
-      startTime: '09:00',
-      endTime: '18:00',
-      requiredFacilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Power Outlets'],
+      eventType: 'Seminar',
+      attendance: 120,
+      date: '2026-09-18',
+      startTime: '10:00',
+      endTime: '12:00',
+      requiredFacilities: ['Projector', 'Air conditioning', 'Wi-Fi'],
       userLocation: CAMPUS_CENTER
     });
   });
@@ -137,7 +162,6 @@ export const App: React.FC = () => {
     venue: Venue;
     matchScore?: number;
   } | null>(null);
-  const [qrModalBooking, setQrModalBooking] = useState<Booking | null>(null);
   const [navigationTargetVenue, setNavigationTargetVenue] = useState<Venue | null>(null);
 
   // Toast alert banner
@@ -154,48 +178,41 @@ export const App: React.FC = () => {
     const results = rankVenues(venues, fullReq);
     setRecommendations(results);
     setActiveTab('recommendations');
-    showToast(`AI Match Complete: Ranked ${results.length} venues for your ${req.eventType}`);
-  };
-
-  // Check-in simulator (to demonstrate anti-ghost booking)
-  const handleSimulateCheckIn = (bookingId: string) => {
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id === bookingId) {
-          return {
-            ...b,
-            checkedIn: true,
-            checkedInAt: new Date().toISOString()
-          };
-        }
-        return b;
-      })
-    );
-
-    // Update venue status to booked
-    const b = bookings.find((item) => item.id === bookingId);
-    if (b) {
-      setVenues((prev) =>
-        prev.map((v) => (v.id === b.venueId ? { ...v, status: 'booked' } : v))
-      );
-    }
-
-    showToast('✓ Check-in Verified! Door unlocked & venue confirmed active.');
+    showToast(`AI Match Complete: Ranked ${results.length} venues with suitability analysis`);
   };
 
   // Admin Approval / Rejection Handlers
   const handleApproveBooking = (bookingId: string) => {
     setBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? { ...b, status: 'confirmed' } : b))
+      prev.map((b) => (b.id === bookingId ? { ...b, status: 'Approved' } : b))
     );
-    showToast(`Request #${bookingId} approved by Campus Administration.`);
+    showToast(`Booking #${bookingId} has been Approved.`);
   };
 
   const handleRejectBooking = (bookingId: string) => {
     setBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? { ...b, status: 'cancelled' } : b))
+      prev.map((b) => (b.id === bookingId ? { ...b, status: 'Rejected' } : b))
     );
-    showToast(`Request #${bookingId} rejected.`);
+    showToast(`Booking #${bookingId} has been Rejected.`);
+  };
+
+  const handleCancelBooking = (bookingId: string) => {
+    setBookings((prev) =>
+      prev.map((b) => (b.id === bookingId ? { ...b, status: 'Cancelled' } : b))
+    );
+    showToast(`Booking #${bookingId} cancelled.`);
+  };
+
+  // Venue Add / Edit Handler
+  const handleSaveVenue = (savedVenue: Venue) => {
+    setVenues((prev) => {
+      const exists = prev.some((v) => v.id === savedVenue.id);
+      if (exists) {
+        return prev.map((v) => (v.id === savedVenue.id ? savedVenue : v));
+      }
+      return [savedVenue, ...prev];
+    });
+    showToast(`Venue "${savedVenue.name}" saved successfully.`);
   };
 
   // Reset demo state
@@ -207,19 +224,49 @@ export const App: React.FC = () => {
     showToast('Demo data successfully restored to factory preset.');
   };
 
+  // Auth Handlers
+  const handleLogin = (user: UserProfile) => {
+    setCurrentUser(user);
+    setCurrentRole(user.role);
+    setIsLoginPage(false);
+    setIsLandingPage(false);
+    if (user.role === 'admin') {
+      setActiveTab('admin');
+    } else {
+      setActiveTab('dashboard');
+    }
+    showToast(`Welcome back, ${user.name}!`);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsLoginPage(true);
+    showToast('Signed out of CampusSpace.');
+  };
+
+  if (isLoginPage) {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onBackToApp={() => setIsLoginPage(false)}
+      />
+    );
+  }
+
   if (isLandingPage) {
     return (
       <LandingHero
         onEnterApp={(role) => {
           setCurrentRole(role);
           setIsLandingPage(false);
-          setActiveTab('dashboard');
+          setActiveTab(role === 'admin' ? 'admin' : 'dashboard');
         }}
+        onOpenLogin={() => setIsLoginPage(true)}
       />
     );
   }
 
-  const pendingApprovalsCount = bookings.filter((b) => b.status === 'pending').length;
+  const pendingApprovalsCount = bookings.filter((b) => b.status === 'Pending').length;
 
   return (
     <div className="min-h-screen bg-[#070e1e] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
@@ -245,6 +292,10 @@ export const App: React.FC = () => {
           showToast('Campus GPS locked: Central Plaza (19.1334, 72.9133)');
         }}
         isSimulatingLocation={isSimulatingLocation}
+        currentUser={currentUser}
+        onOpenLogin={() => setIsLoginPage(true)}
+        onLogout={handleLogout}
+        onOpenLanding={() => setIsLandingPage(true)}
       />
 
       {/* Main Body with Sidebar + Tab Content */}
@@ -254,6 +305,9 @@ export const App: React.FC = () => {
           onTabChange={setActiveTab}
           currentRole={currentRole}
           pendingApprovalsCount={pendingApprovalsCount}
+          currentUser={currentUser}
+          onOpenLogin={() => setIsLoginPage(true)}
+          onLogout={handleLogout}
         />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-8">
@@ -267,7 +321,7 @@ export const App: React.FC = () => {
                 setActiveTab('map');
               }}
               onQuickBookVenue={(v) => {
-                setBookingModalVenue({ venue: v, matchScore: 92 });
+                setBookingModalVenue({ venue: v, matchScore: 95 });
               }}
             />
           )}
@@ -306,13 +360,7 @@ export const App: React.FC = () => {
           {activeTab === 'bookings' && (
             <MyBookingsView
               bookings={bookings}
-              onOpenQRModal={setQrModalBooking}
-              onCancelBooking={(id) => {
-                setBookings((prev) =>
-                  prev.map((b) => (b.id === id ? { ...b, status: 'cancelled' } : b))
-                );
-                showToast('Booking cancelled.');
-              }}
+              onCancelBooking={handleCancelBooking}
               onNavigateToBookingVenue={(venueId) => {
                 const found = venues.find((v) => v.id === venueId);
                 if (found) {
@@ -342,6 +390,8 @@ export const App: React.FC = () => {
               venues={venues}
               onApproveBooking={handleApproveBooking}
               onRejectBooking={handleRejectBooking}
+              onCancelBooking={handleCancelBooking}
+              onSaveVenue={handleSaveVenue}
             />
           )}
 
@@ -386,18 +436,13 @@ export const App: React.FC = () => {
           onClose={() => setBookingModalVenue(null)}
           onConfirmBooking={(newBooking) => {
             setBookings([newBooking, ...bookings]);
-            showToast(`Reservation confirmed for ${newBooking.venueName}! Smart Pass generated.`);
-            setQrModalBooking(newBooking);
+            setBookingModalVenue(null);
+            if (newBooking.status === 'Auto-approved') {
+              showToast(`✓ Booking Auto-Approved for ${newBooking.venueName}!`);
+            } else {
+              showToast(`Reservation submitted for Admin Approval.`);
+            }
           }}
-        />
-      )}
-
-      {/* QR Pass Modal */}
-      {qrModalBooking && (
-        <QRCodeModal
-          booking={qrModalBooking}
-          onClose={() => setQrModalBooking(null)}
-          onSimulateCheckIn={handleSimulateCheckIn}
         />
       )}
 

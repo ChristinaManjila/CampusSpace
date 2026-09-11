@@ -3,9 +3,10 @@ import { UserRole } from '../types';
 
 interface LandingHeroProps {
   onEnterApp: (role: UserRole) => void;
+  onOpenLogin?: () => void;
 }
 
-export const LandingHero: React.FC<LandingHeroProps> = ({ onEnterApp }) => {
+export const LandingHero: React.FC<LandingHeroProps> = ({ onEnterApp, onOpenLogin }) => {
   return (
     <div className="min-h-screen bg-[#070e1e] text-white flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
       {/* Top Banner Header */}
@@ -17,6 +18,15 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onEnterApp }) => {
           <span className="text-2xl font-black tracking-tight text-white">CampusSpace</span>
         </div>
         <div className="flex items-center gap-3">
+          {onOpenLogin && (
+            <button
+              onClick={onOpenLogin}
+              className="text-xs font-semibold px-4 py-2 rounded-xl text-cyan-300 hover:text-white border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 transition flex items-center gap-1.5"
+            >
+              <span>🔑</span>
+              <span>Portal Sign In</span>
+            </button>
+          )}
           <button
             onClick={() => onEnterApp('student')}
             className="text-xs font-semibold px-4 py-2 rounded-xl text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 transition"
@@ -62,6 +72,15 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onEnterApp }) => {
           >
             Explore Demo (Organizer) →
           </button>
+          {onOpenLogin && (
+            <button
+              onClick={onOpenLogin}
+              className="px-7 py-4 rounded-2xl bg-gradient-to-r from-slate-900 to-[#0e1c36] hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 hover:text-white font-semibold text-base transition flex items-center gap-2 shadow-lg shadow-cyan-500/10"
+            >
+              <span>🔑</span>
+              <span>Campus Portal Login</span>
+            </button>
+          )}
           <button
             onClick={() => onEnterApp('admin')}
             className="px-7 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 font-semibold text-base text-slate-200 transition"

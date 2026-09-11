@@ -1,2001 +1,2842 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CampusSpace — AI-Powered Campus Venue Management & Optimization</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Fonts: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<title>MACE Smart Campus OS</title>
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              navy: '#070e1e',
-              deep: '#0b1329',
-              card: '#0e1c36',
-              cyan: '#00f2fe',
-              blue: '#0ea5e9'
-            }
-          },
-          animation: {
-            fadeIn: 'fadeIn 0.25s ease-out forwards',
-            slideUp: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-          },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0' },
-              '100%': { opacity: '1' },
-            },
-            slideUp: {
-              '0%': { opacity: '0', transform: 'translateY(16px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        }
-      }
-    };
-  </script>
+:root{
+    --bg:#07111f;
+    --panel:#0d1b2a;
+    --panel2:#13243a;
+    --text:#f4f7fb;
+    --muted:#8fa4bd;
+    --primary:#4fa3ff;
+    --green:#2ed573;
+    --yellow:#feca57;
+    --red:#ff6b6b;
+    --purple:#a78bfa;
+}
 
-  <style>
-    /* Custom scrollbars & map adjustments */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #070e1e;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
-    }
-    .leaflet-container {
-      background: #091224 !important;
-      font-family: 'Inter', sans-serif !important;
-    }
-    .custom-campus-pin, .user-location-pin, .user-pin, .dest-pin {
-      background: transparent;
-      border: none;
-    }
-  </style>
+body{
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    background:
+        radial-gradient(circle at top right,#16315b 0%,transparent 30%),
+        radial-gradient(circle at bottom left,#112f35 0%,transparent 28%),
+        var(--bg);
+    color:var(--text);
+    min-height:100vh;
+}
 
-  <!-- React 18 & Babel Standalone -->
-  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.24.4/babel.min.js"></script>
+button,input,select,textarea{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* LOGIN */
+
+#loginPage{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:25px;
+}
+
+.loginShell{
+    width:min(1050px,100%);
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:30px;
+    background:rgba(8,20,36,.85);
+    backdrop-filter:blur(20px);
+    box-shadow:0 30px 90px rgba(0,0,0,.45);
+}
+
+.loginHero{
+    padding:65px;
+    min-height:620px;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    background:
+      linear-gradient(135deg,rgba(46,213,115,.18),transparent 40%),
+      linear-gradient(315deg,rgba(79,163,255,.2),transparent 45%);
+}
+
+.badge{
+    width:max-content;
+    background:rgba(79,163,255,.13);
+    border:1px solid rgba(79,163,255,.35);
+    color:#8fc8ff;
+    padding:8px 14px;
+    border-radius:30px;
+    font-size:13px;
+    margin-bottom:20px;
+}
+
+.loginHero h1{
+    font-size:56px;
+    line-height:1;
+    margin-bottom:22px;
+}
+
+.gradientText{
+    background:linear-gradient(90deg,#6db6ff,#56efb2);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.loginHero p{
+    max-width:560px;
+    line-height:1.7;
+    color:var(--muted);
+    font-size:17px;
+}
+
+.heroStats{
+    display:flex;
+    gap:15px;
+    margin-top:35px;
+    flex-wrap:wrap;
+}
+
+.heroStat{
+    padding:15px 18px;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:16px;
+}
+
+.heroStat strong{
+    display:block;
+    font-size:22px;
+}
+
+.heroStat span{
+    font-size:12px;
+    color:var(--muted);
+}
+
+.loginCard{
+    padding:55px 42px;
+    background:rgba(4,12,24,.7);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.loginCard h2{
+    font-size:30px;
+    margin-bottom:8px;
+}
+
+.loginCard>p{
+    color:var(--muted);
+    margin-bottom:25px;
+}
+
+.roleSwitcher{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    padding:6px;
+    background:#071421;
+    border-radius:14px;
+    margin-bottom:22px;
+}
+
+.roleBtn{
+    padding:12px;
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    border-radius:10px;
+    font-weight:700;
+}
+
+.roleBtn.active{
+    background:#173350;
+    color:white;
+}
+
+.inputGroup{
+    margin-bottom:16px;
+}
+
+.inputGroup label{
+    display:block;
+    font-size:13px;
+    color:#aec0d3;
+    margin-bottom:7px;
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea{
+    width:100%;
+    padding:14px 15px;
+    border:1px solid #243952;
+    background:#091727;
+    color:white;
+    border-radius:12px;
+    outline:none;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus{
+    border-color:var(--primary);
+}
+
+.primaryBtn{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:12px;
+    background:linear-gradient(90deg,#258dff,#24d68c);
+    color:white;
+    font-weight:800;
+    margin-top:5px;
+}
+
+#errorMsg{
+    color:#ff8787;
+    font-size:13px;
+    min-height:20px;
+    margin-top:12px;
+}
+
+/* MAIN APP */
+
+#app{
+    min-height:100vh;
+}
+
+header{
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    background:rgba(5,15,27,.82);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid rgba(255,255,255,.07);
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-weight:800;
+}
+
+.logoMark{
+    height:40px;
+    width:40px;
+    border-radius:13px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,#2395ff,#25d991);
+}
+
+.logoText span{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:500;
+}
+
+.headerRight{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.roleChip{
+    padding:7px 12px;
+    border-radius:30px;
+    background:#102b43;
+    color:#8dccff;
+    font-size:12px;
+    font-weight:700;
+}
+
+.logoutBtn{
+    border:1px solid #34475a;
+    background:transparent;
+    color:#dce8f4;
+    padding:8px 14px;
+    border-radius:10px;
+}
+
+.layout{
+    display:grid;
+    grid-template-columns:220px 1fr;
+}
+
+.sidebar{
+    min-height:calc(100vh - 72px);
+    padding:25px 14px;
+    border-right:1px solid rgba(255,255,255,.06);
+    background:rgba(6,16,28,.6);
+}
+
+.navButton{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#9eb2c7;
+    text-align:left;
+    padding:13px 14px;
+    margin:4px 0;
+    border-radius:12px;
+}
+
+.navButton:hover,
+.navButton.active{
+    color:white;
+    background:#11273d;
+}
+
+.main{
+    padding:30px;
+    overflow:hidden;
+}
+
+.pageTitle{
+    margin-bottom:25px;
+}
+
+.pageTitle h1{
+    font-size:32px;
+}
+
+.pageTitle p{
+    color:var(--muted);
+    margin-top:7px;
+}
+
+/* DASHBOARD */
+
+.statsGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:28px;
+}
+
+.statCard,
+.card{
+    background:rgba(14,31,49,.8);
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:18px;
+}
+
+.statCard{
+    padding:20px;
+}
+
+.statIcon{
+    font-size:25px;
+    margin-bottom:16px;
+}
+
+.statCard h3{
+    font-size:28px;
+}
+
+.statCard p{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:5px;
+}
+
+.card{
+    padding:22px;
+    margin-bottom:20px;
+}
+
+.cardTitle{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.cardTitle h2{
+    font-size:20px;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:1.35fr .65fr;
+    gap:20px;
+}
+
+/* MAP */
+
+.mapContainer{
+    height:560px;
+    position:relative;
+    overflow:hidden;
+    border-radius:22px;
+    background:
+      linear-gradient(rgba(12,33,43,.94),rgba(12,33,43,.94)),
+      url("mace-map.png") center/cover;
+    border:1px solid #21434c;
+}
+
+.mapGrid{
+    position:absolute;
+    inset:0;
+    opacity:.18;
+    background-image:
+    linear-gradient(#62dba7 1px,transparent 1px),
+    linear-gradient(90deg,#62dba7 1px,transparent 1px);
+    background-size:45px 45px;
+}
+
+.road{
+    position:absolute;
+    height:16px;
+    background:#44515a;
+    border:3px solid #596771;
+    border-radius:20px;
+    transform-origin:left center;
+}
+
+.road1{
+    width:65%;
+    left:8%;
+    top:52%;
+    transform:rotate(-12deg);
+}
+
+.road2{
+    width:38%;
+    left:45%;
+    top:45%;
+    transform:rotate(53deg);
+}
+
+.road3{
+    width:37%;
+    left:30%;
+    top:26%;
+    transform:rotate(20deg);
+}
+
+.venuePin{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    border:0;
+    background:#122b40;
+    color:white;
+    border:2px solid #50e4a2;
+    border-radius:15px;
+    padding:9px 12px;
+    box-shadow:0 8px 22px rgba(0,0,0,.4);
+    font-size:12px;
+    font-weight:800;
+}
+
+.venuePin:hover{
+    transform:translate(-50%,-50%) scale(1.08);
+}
+
+.venuePin.busy{
+    border-color:var(--yellow);
+}
+
+.venuePin.closed{
+    border-color:var(--red);
+    opacity:.75;
+}
+
+.mapLegend{
+    position:absolute;
+    left:16px;
+    bottom:16px;
+    background:rgba(3,10,17,.88);
+    border-radius:14px;
+    padding:12px 15px;
+    font-size:12px;
+    color:#b5c5d6;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    display:inline-block;
+    border-radius:50%;
+    margin-right:5px;
+}
+
+.green{background:var(--green);}
+.yellow{background:var(--yellow);}
+.red{background:var(--red);}
+
+/* VENUE CARDS */
+
+.filters{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.filters input,
+.filters select{
+    padding:11px 13px;
+    border-radius:10px;
+    border:1px solid #263b50;
+    color:white;
+    background:#0b1a2a;
+}
+
+.venueGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:17px;
+}
+
+.venueCard{
+    background:#0d2032;
+    border:1px solid #21384e;
+    border-radius:17px;
+    padding:18px;
+    transition:.2s;
+}
+
+.venueCard:hover{
+    transform:translateY(-4px);
+    border-color:#3c6183;
+}
+
+.venueTop{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.venueCard h3{
+    font-size:17px;
+}
+
+.venueBlock{
+    color:#79baff;
+    font-size:12px;
+    margin-top:5px;
+}
+
+.status{
+    height:max-content;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.status.available{
+    background:rgba(46,213,115,.12);
+    color:#62e699;
+}
+
+.status.unavailable{
+    background:rgba(255,107,107,.12);
+    color:#ff8989;
+}
+
+.venueMeta{
+    display:flex;
+    gap:14px;
+    margin:17px 0;
+    color:#b0c3d7;
+    font-size:13px;
+}
+
+.facilities{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.facility{
+    background:#132b41;
+    color:#aec6dc;
+    padding:5px 8px;
+    border-radius:7px;
+    font-size:10px;
+}
+
+.smallBtn{
+    border:0;
+    background:#1f89ef;
+    color:white;
+    font-weight:700;
+    border-radius:9px;
+    padding:9px 12px;
+}
+
+.smallBtn.secondary{
+    background:#183047;
+}
+
+.smallBtn.approve{
+    background:#168953;
+}
+
+.smallBtn.reject{
+    background:#a83b47;
+}
+
+/* AI RECOMMENDER */
+
+.aiPanel{
+    max-width:820px;
+}
+
+.formGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.checkGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.check{
+    padding:10px;
+    border:1px solid #263c52;
+    border-radius:10px;
+    color:#bcd0e4;
+    font-size:13px;
+}
+
+.recommendation{
+    margin-top:25px;
+    border:1px solid #285373;
+    background:
+        linear-gradient(135deg,rgba(40,145,255,.10),rgba(38,211,139,.08));
+    border-radius:18px;
+    padding:22px;
+}
+
+.score{
+    font-size:38px;
+    font-weight:900;
+    color:#68e3ad;
+}
+
+.reason{
+    color:#adc0d3;
+    line-height:1.7;
+    margin-top:10px;
+}
+
+/* TABLE */
+
+.tableWrap{
+    overflow:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:780px;
+}
+
+th{
+    color:#7e98b1;
+    text-align:left;
+    font-size:11px;
+    padding:12px;
+    border-bottom:1px solid #294057;
+}
+
+td{
+    padding:14px 12px;
+    border-bottom:1px solid #1d3247;
+    font-size:13px;
+}
+
+/* MODAL */
+
+.modalOverlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    display:grid;
+    place-items:center;
+    z-index:500;
+    padding:20px;
+}
+
+.modal{
+    width:min(600px,100%);
+    max-height:90vh;
+    overflow:auto;
+    background:#0c1c2d;
+    border:1px solid #29415a;
+    border-radius:22px;
+    padding:25px;
+}
+
+.closeModal{
+    float:right;
+    border:0;
+    background:transparent;
+    color:white;
+    font-size:25px;
+}
+
+/* MOBILE */
+
+@media(max-width:950px){
+    .loginShell{
+        grid-template-columns:1fr;
+    }
+    .loginHero{
+        min-height:auto;
+        padding:45px;
+    }
+    .loginHero h1{
+        font-size:40px;
+    }
+    .layout{
+        grid-template-columns:1fr;
+    }
+    .sidebar{
+        min-height:auto;
+        display:flex;
+        overflow:auto;
+        position:sticky;
+        top:72px;
+        z-index:90;
+        padding:8px;
+    }
+    .navButton{
+        white-space:nowrap;
+        width:auto;
+    }
+    .statsGrid{
+        grid-template-columns:repeat(2,1fr);
+    }
+    .grid2{
+        grid-template-columns:1fr;
+    }
+    .venueGrid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:650px){
+    .main{
+        padding:18px;
+    }
+    .statsGrid,
+    .venueGrid,
+    .formGrid,
+    .checkGrid{
+        grid-template-columns:1fr;
+    }
+    header{
+        padding:0 14px;
+    }
+    .logoText{
+        font-size:13px;
+    }
+}
+</style>
 </head>
-<body class="bg-[#070e1e] text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-cyan-500 selection:text-black">
-  <div id="root"></div>
-
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-
-    // --- DATA & CONSTANTS ---
-    const CAMPUS_CENTER = { lat: 19.1334, lng: 72.9133, name: 'Central Campus Plaza' };
-
-    const INITIAL_VENUES = [
-      {
-        id: 'venue-1',
-        name: 'Seminar Hall A',
-        building: 'Academic Block 1',
-        category: 'hall',
-        capacity: 200,
-        floor: '1st Floor',
-        coordinates: { lat: 19.1338, lng: 72.9125 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Stage', 'Microphones', 'Power Outlets', 'Whiteboard', 'Wheelchair Accessibility'],
-        status: 'available',
-        energyRating: 'A',
-        historicalSuitability: { Hackathon: 96, Seminar: 98, Workshop: 92, Conference: 95, 'Club Meeting': 85, 'Cultural Event': 70, 'Sports Event': 10, Examination: 88, Exhibition: 78 },
-        cancellationRate: 2.1,
-        historicalAverageOccupancy: 86,
-        description: 'Tiered auditorium-style seating with dual 4K laser projectors, balanced acoustic wall panels, and high-density gigabit Wi-Fi 6 access points.',
-        image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Moderate',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-2',
-        name: 'Dr. Kalam Grand Auditorium',
-        building: 'Main Convention Complex',
-        category: 'auditorium',
-        capacity: 850,
-        floor: 'Ground Floor',
-        coordinates: { lat: 19.1347, lng: 72.9142 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Stage', 'Microphones', 'Recording Equipment', 'Wheelchair Accessibility', 'Parking'],
-        status: 'available',
-        energyRating: 'A+',
-        historicalSuitability: { Conference: 99, 'Cultural Event': 98, Hackathon: 88, Seminar: 90, Exhibition: 82, Workshop: 65, 'Club Meeting': 40, 'Sports Event': 15, Examination: 90 },
-        cancellationRate: 1.2,
-        historicalAverageOccupancy: 91,
-        description: 'Premier campus auditorium featuring a full theatrical proscenium stage, multi-track live audio recording, theatrical DMX lighting, and VIP holding rooms.',
-        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'High-Energy Allowed',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-3',
-        name: 'Conference Hall C',
-        building: 'Management & Humanities Complex',
-        category: 'hall',
-        capacity: 120,
-        floor: '2nd Floor',
-        coordinates: { lat: 19.1322, lng: 72.9118 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Microphones', 'Whiteboard', 'Power Outlets', 'Wheelchair Accessibility'],
-        status: 'available',
-        energyRating: 'A',
-        historicalSuitability: { Conference: 94, Workshop: 90, Seminar: 88, 'Club Meeting': 86, Hackathon: 76, Examination: 82, 'Cultural Event': 50, 'Sports Event': 0, Exhibition: 60 },
-        cancellationRate: 3.4,
-        historicalAverageOccupancy: 78,
-        description: 'Executive boardroom style with ergonomic leather swivel chairs, individual table mic consoles, and smart digital whiteboard sync.',
-        image: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Quiet',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-4',
-        name: 'Turing Advanced Computing Lab',
-        building: 'Computer Science Department',
-        category: 'lab',
-        capacity: 90,
-        floor: '3rd Floor',
-        coordinates: { lat: 19.1352, lng: 72.9112 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Lab Equipment', 'Power Outlets', 'Whiteboard'],
-        status: 'booked',
-        currentEvent: 'ACM Code Sprint (until 8:00 PM)',
-        energyRating: 'B',
-        historicalSuitability: { Hackathon: 98, Workshop: 95, Examination: 92, 'Club Meeting': 80, Seminar: 70, Conference: 60, 'Cultural Event': 10, 'Sports Event': 0, Exhibition: 72 },
-        cancellationRate: 4.0,
-        historicalAverageOccupancy: 94,
-        description: 'Equipped with 90 high-spec Linux/RTX workstations, redundant 10 Gbps fiber backbone, localized cooling, and isolated dev sandboxes.',
-        image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Quiet',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-5',
-        name: 'Central Library Collaborative Hall',
-        building: 'Central Digital Library',
-        category: 'commons',
-        capacity: 160,
-        floor: 'Ground & Mezzanine',
-        coordinates: { lat: 19.1328, lng: 72.9148 },
-        facilities: ['Wi-Fi', 'Air Conditioning', 'Power Outlets', 'Whiteboard', 'Wheelchair Accessibility'],
-        status: 'available',
-        energyRating: 'A+',
-        historicalSuitability: { 'Club Meeting': 92, Workshop: 85, Seminar: 75, Examination: 90, Hackathon: 68, Exhibition: 60, Conference: 50, 'Cultural Event': 15, 'Sports Event': 0 },
-        cancellationRate: 1.5,
-        historicalAverageOccupancy: 82,
-        description: 'Open-concept study and brainstorming lounge with modular dry-erase partitions, soft seating, and silent zones for deep work.',
-        image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Quiet',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-6',
-        name: 'Ramanujan Tech & Maker Studio',
-        building: 'Innovation & Incubation Hub',
-        category: 'lab',
-        capacity: 75,
-        floor: 'Ground Floor',
-        coordinates: { lat: 19.1343, lng: 72.9165 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Lab Equipment', 'Power Outlets', 'Whiteboard', 'Parking'],
-        status: 'pending',
-        currentEvent: 'Robotics Team Demo (Pending Admin Approval)',
-        energyRating: 'B',
-        historicalSuitability: { Workshop: 98, Hackathon: 94, Exhibition: 91, 'Club Meeting': 88, Seminar: 74, Conference: 62, 'Cultural Event': 30, 'Sports Event': 5, Examination: 65 },
-        cancellationRate: 3.8,
-        historicalAverageOccupancy: 79,
-        description: 'Rapid prototyping lab featuring 3D printers, laser cutters, electronics testing oscilloscopes, and heavy-duty power drops.',
-        image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Moderate',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-7',
-        name: 'Open Air Amphitheatre & Greens',
-        building: 'Student Activity Center Grounds',
-        category: 'outdoor',
-        capacity: 1200,
-        floor: 'Grounds',
-        coordinates: { lat: 19.1315, lng: 72.9138 },
-        facilities: ['Stage', 'Microphones', 'Power Outlets', 'Wheelchair Accessibility', 'Parking'],
-        status: 'available',
-        energyRating: 'A+',
-        historicalSuitability: { 'Cultural Event': 99, Exhibition: 95, 'Sports Event': 85, Conference: 70, 'Club Meeting': 60, Seminar: 40, Hackathon: 30, Workshop: 25, Examination: 10 },
-        cancellationRate: 6.5,
-        historicalAverageOccupancy: 62,
-        description: 'Stepped natural grass amphitheatre bordered by shade trees with outdoor sound reinforcement and high-capacity electrical distribution.',
-        image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'High-Energy Allowed',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-8',
-        name: 'Indoor Arena & Multi-Sport Complex',
-        building: 'Sports Center',
-        category: 'sports',
-        capacity: 600,
-        floor: 'Ground Floor',
-        coordinates: { lat: 19.1310, lng: 72.9155 },
-        facilities: ['Stage', 'Microphones', 'Wheelchair Accessibility', 'Parking', 'Power Outlets'],
-        status: 'available',
-        energyRating: 'B',
-        historicalSuitability: { 'Sports Event': 99, 'Cultural Event': 85, Exhibition: 88, Hackathon: 60, Conference: 50, Seminar: 30, Workshop: 20, 'Club Meeting': 35, Examination: 80 },
-        cancellationRate: 2.8,
-        historicalAverageOccupancy: 73,
-        description: 'Polished teakwood court accommodating international badminton, basketball, and mega campus gatherings with spectator bleachers.',
-        image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'High-Energy Allowed',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-9',
-        name: 'Executive Senate Chamber',
-        building: 'Administrative Tower',
-        category: 'hall',
-        capacity: 65,
-        floor: '4th Floor',
-        coordinates: { lat: 19.1340, lng: 72.9105 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Microphones', 'Recording Equipment', 'Wheelchair Accessibility'],
-        status: 'available',
-        energyRating: 'A',
-        historicalSuitability: { Conference: 95, Seminar: 90, 'Club Meeting': 75, Workshop: 65, Hackathon: 20, 'Cultural Event': 15, 'Sports Event': 0, Examination: 50, Exhibition: 30 },
-        cancellationRate: 0.8,
-        historicalAverageOccupancy: 69,
-        description: 'Distinguished round-table facility with dual broadcast PTZ cameras, encrypted video conferencing, and presidential lectern.',
-        image: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Quiet',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-10',
-        name: 'Smart Classroom B-204',
-        building: 'Academic Block 2',
-        category: 'classroom',
-        capacity: 80,
-        floor: '2nd Floor',
-        coordinates: { lat: 19.1348, lng: 72.9128 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Power Outlets', 'Whiteboard', 'Wheelchair Accessibility'],
-        status: 'available',
-        energyRating: 'A',
-        historicalSuitability: { Workshop: 94, Examination: 98, 'Club Meeting': 90, Seminar: 86, Hackathon: 78, Conference: 70, 'Cultural Event': 25, 'Sports Event': 0, Exhibition: 50 },
-        cancellationRate: 3.1,
-        historicalAverageOccupancy: 88,
-        description: 'Modern hybrid learning lecture room with motorized dual projection, ceiling boundary microphones, and rolling swivel tablet chairs.',
-        image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Moderate',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-11',
-        name: 'Innovation Pitch Stage',
-        building: 'Innovation Hub',
-        category: 'hall',
-        capacity: 150,
-        floor: '1st Floor',
-        coordinates: { lat: 19.1345, lng: 72.9168 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Stage', 'Microphones', 'Power Outlets', 'Recording Equipment', 'Wheelchair Accessibility'],
-        status: 'available',
-        energyRating: 'A',
-        historicalSuitability: { Hackathon: 95, Exhibition: 96, Conference: 92, Workshop: 90, Seminar: 88, 'Club Meeting': 84, 'Cultural Event': 65, 'Sports Event': 5, Examination: 60 },
-        cancellationRate: 2.3,
-        historicalAverageOccupancy: 81,
-        description: 'Silicon-valley style stadium tiered theater with high-contrast LED video wall, presenter confidence monitors, and sponsor demo booths.',
-        image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'Moderate',
-        wheelchairAccessible: true
-      },
-      {
-        id: 'venue-12',
-        name: 'Student Hub Hall',
-        building: 'Student Center',
-        category: 'commons',
-        capacity: 250,
-        floor: '1st Floor',
-        coordinates: { lat: 19.1320, lng: 72.9132 },
-        facilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Stage', 'Microphones', 'Power Outlets', 'Wheelchair Accessibility'],
-        status: 'booked',
-        currentEvent: 'Robotics Workshop Series (until 9:30 PM)',
-        energyRating: 'B',
-        historicalSuitability: { 'Club Meeting': 98, Hackathon: 92, Workshop: 90, 'Cultural Event': 88, Seminar: 82, Exhibition: 85, Conference: 75, Examination: 70, 'Sports Event': 40 },
-        cancellationRate: 4.8,
-        historicalAverageOccupancy: 89,
-        description: 'Flexible active student center with collapsible partition walls, staging blocks, sound board, and direct access to campus cafeteria.',
-        image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-        noiseLevel: 'High-Energy Allowed',
-        wheelchairAccessible: true
-      }
-    ];
-
-    const INITIAL_BOOKINGS = [
-      {
-        id: 'BK-2026-881',
-        venueId: 'venue-1',
-        venueName: 'Seminar Hall A',
-        building: 'Academic Block 1',
-        eventName: 'National AI Hackathon Kickoff & Ideation',
-        eventType: 'Hackathon',
-        organizerName: 'Pooja Hegde (Tech Council)',
-        organizerEmail: 'pooja.h@campus.edu',
-        organizerRole: 'organizer',
-        attendance: 180,
-        date: '2026-09-12',
-        startTime: '09:00',
-        endTime: '17:00',
-        status: 'confirmed',
-        qrCodeToken: 'CS-QR-881-SEMINARA-2026',
-        checkedIn: false,
-        requestedFacilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Power Outlets', 'Microphones'],
-        notes: 'Requires continuous 1 Gbps Wi-Fi for 40 competing teams.',
-        matchScore: 94
-      },
-      {
-        id: 'BK-2026-882',
-        venueId: 'venue-6',
-        venueName: 'Ramanujan Tech & Maker Studio',
-        building: 'Innovation Hub',
-        eventName: 'Autonomous Drone Swarm Demonstration',
-        eventType: 'Workshop',
-        organizerName: 'Aarav Patel (Robotics Club)',
-        organizerEmail: 'aarav.robotics@campus.edu',
-        organizerRole: 'student',
-        attendance: 65,
-        date: '2026-09-13',
-        startTime: '14:00',
-        endTime: '18:00',
-        status: 'pending',
-        qrCodeToken: 'CS-QR-882-RAMANUJAN-PEND',
-        checkedIn: false,
-        requestedFacilities: ['Lab Equipment', 'Power Outlets', 'Projector', 'Wi-Fi'],
-        notes: 'Indoor flight test requires safety clearance and net setup.',
-        matchScore: 92
-      },
-      {
-        id: 'BK-2026-879',
-        venueId: 'venue-2',
-        venueName: 'Dr. Kalam Grand Auditorium',
-        building: 'Main Convention Complex',
-        eventName: 'Annual Distinguished Alumnus Lecture',
-        eventType: 'Conference',
-        organizerName: 'Prof. Ramesh K. (Dean Alumni)',
-        organizerEmail: 'ramesh.alumni@campus.edu',
-        organizerRole: 'organizer',
-        attendance: 720,
-        date: '2026-09-08',
-        startTime: '10:00',
-        endTime: '13:00',
-        status: 'completed',
-        qrCodeToken: 'CS-QR-879-KALAM-COMPLETED',
-        checkedIn: true,
-        requestedFacilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Stage', 'Microphones', 'Recording Equipment'],
-        matchScore: 98
-      }
-    ];
-
-    const HOURLY_UTILIZATION = [
-      { hour: '08:00', occupancyRate: 28 },
-      { hour: '09:00', occupancyRate: 64 },
-      { hour: '10:00', occupancyRate: 88 },
-      { hour: '11:00', occupancyRate: 94 },
-      { hour: '12:00', occupancyRate: 72 },
-      { hour: '13:00', occupancyRate: 48 },
-      { hour: '14:00', occupancyRate: 82 },
-      { hour: '15:00', occupancyRate: 91 },
-      { hour: '16:00', occupancyRate: 89 },
-      { hour: '17:00', occupancyRate: 76 },
-      { hour: '18:00', occupancyRate: 68 },
-      { hour: '19:00', occupancyRate: 54 },
-      { hour: '20:00', occupancyRate: 35 },
-      { hour: '21:00', occupancyRate: 18 }
-    ];
-
-    const VENUE_CATEGORY_UTILIZATION = [
-      { category: 'Seminar Halls', utilization: 87, bookedHours: 340, ghostBookingsPrevented: 42 },
-      { category: 'Auditoriums', utilization: 79, bookedHours: 198, ghostBookingsPrevented: 18 },
-      { category: 'Tech & Maker Labs', utilization: 92, bookedHours: 412, ghostBookingsPrevented: 64 },
-      { category: 'Smart Classrooms', utilization: 84, bookedHours: 510, ghostBookingsPrevented: 88 },
-      { category: 'Outdoor / Amphitheatre', utilization: 61, bookedHours: 145, ghostBookingsPrevented: 12 },
-      { category: 'Sports Complex', utilization: 73, bookedHours: 230, ghostBookingsPrevented: 15 }
-    ];
-
-    const DEMAND_FORECAST = [
-      {
-        week: 'Week 1 (Sep 14 - 20)',
-        period: 'Regular Academic & Club Auditions',
-        demandScore: 78,
-        peakDays: ['Wednesday', 'Friday'],
-        riskLevel: 'Moderate',
-        predictedPeakVenues: ['Seminar Hall A', 'Student Hub', 'Ramanujan Lab'],
-        aiRecommendationTip: 'Book Wednesday evening slots before Monday 5 PM to guarantee availability.'
-      },
-      {
-        week: 'Week 2 (Sep 21 - 27)',
-        period: 'Mid-Semester Examinations',
-        demandScore: 96,
-        peakDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-        riskLevel: 'Critical Rush',
-        predictedPeakVenues: ['Smart Classrooms', 'Auditorium B', 'Central Library Hall'],
-        aiRecommendationTip: 'High exam demand. Non-academic bookings restricted between 8 AM - 4 PM.'
-      },
-      {
-        week: 'Week 3 (Sep 28 - Oct 4)',
-        period: 'Post-Exam Hackathon & Tech Fest Week',
-        demandScore: 92,
-        peakDays: ['Friday', 'Saturday', 'Sunday'],
-        riskLevel: 'High Rush',
-        predictedPeakVenues: ['Turing Computing Lab', 'Auditorium Complex', 'Innovation Stage'],
-        aiRecommendationTip: 'Mega hackathon scheduled. Reserve secondary seminar halls early.'
-      },
-      {
-        week: 'Week 4 (Oct 5 - 11)',
-        period: 'Post-Fest Maintenance & Study Transition',
-        demandScore: 48,
-        peakDays: ['Tuesday'],
-        riskLevel: 'Low (Ideal for Large Bookings)',
-        predictedPeakVenues: ['Conference Hall C', 'Central Library'],
-        aiRecommendationTip: 'Optimal window for heavy departmental workshops and multi-day conferences.'
-      }
-    ];
-
-    // --- UTILITIES ---
-    function calculateDistanceMeters(coord1, coord2) {
-      const R = 6371e3;
-      const φ1 = (coord1.lat * Math.PI) / 180;
-      const φ2 = (coord2.lat * Math.PI) / 180;
-      const Δφ = ((coord2.lat - coord1.lat) * Math.PI) / 180;
-      const Δλ = ((coord2.lng - coord1.lng) * Math.PI) / 180;
-      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return Math.round(R * c);
-    }
-
-    function calculateWalkingMinutes(meters) {
-      return Math.max(1, Math.round(meters / 80));
-    }
-
-    function rankVenues(venues, request) {
-      const userLoc = request.userLocation || CAMPUS_CENTER;
-
-      const results = venues.map((venue) => {
-        const distanceMeters = calculateDistanceMeters(userLoc, venue.coordinates);
-        const walkingMinutes = calculateWalkingMinutes(distanceMeters);
-
-        // Capacity Fit
-        let capacityScore = 0;
-        if (venue.capacity < request.attendance) {
-          capacityScore = Math.max(0, Math.round((venue.capacity / request.attendance) * 35));
-        } else {
-          const ratio = request.attendance / venue.capacity;
-          if (ratio >= 0.7 && ratio <= 0.95) capacityScore = 100;
-          else if (ratio > 0.95) capacityScore = 90;
-          else if (ratio >= 0.4) capacityScore = Math.round(75 + ratio * 20);
-          else capacityScore = Math.max(30, Math.round(ratio * 150));
-        }
-
-        // Facilities Match
-        let facilityScore = 100;
-        const missing = [];
-        if (request.requiredFacilities && request.requiredFacilities.length > 0) {
-          const matched = request.requiredFacilities.filter(rf => venue.facilities.includes(rf));
-          facilityScore = Math.round((matched.length / request.requiredFacilities.length) * 100);
-          request.requiredFacilities.forEach(rf => {
-            if (!venue.facilities.includes(rf)) missing.push(rf);
-          });
-        }
-
-        // Availability
-        let availabilityScore = venue.status === 'available' ? 100 : venue.status === 'pending' ? 65 : 20;
-
-        // Proximity
-        const proximityScore = Math.max(40, Math.min(100, Math.round(100 - (distanceMeters / 1000) * 50)));
-
-        // Historical
-        const historicalScore = (venue.historicalSuitability && venue.historicalSuitability[request.eventType]) || 75;
-
-        // Reliability
-        const reliabilityScore = Math.max(50, Math.round(100 - venue.cancellationRate * 5));
-
-        let weighted = capacityScore * 0.25 + facilityScore * 0.25 + availabilityScore * 0.20 + historicalScore * 0.15 + proximityScore * 0.10 + reliabilityScore * 0.05;
-
-        if (venue.capacity < request.attendance) weighted = Math.min(weighted, 54);
-        if (venue.status === 'booked') weighted = Math.min(weighted, 48);
-
-        const matchScore = Math.max(18, Math.min(99, Math.round(weighted)));
-
-        const whyRecommended = [
-          `Capacity fits your event (${request.attendance} requested in ${venue.capacity}-seat hall)`,
-          `All essential requested facilities verified in venue specifications`,
-          `Venue is available during your requested schedule window`,
-          `Past ${request.eventType} organizers gave ${historicalScore}% suitability score`,
-          `Consistently low cancellation rate (${venue.cancellationRate}%)`,
-          `Short walking distance (${distanceMeters}m, ~${walkingMinutes} min walk)`
-        ];
-        if (venue.wheelchairAccessible) {
-          whyRecommended.push('Wheelchair ramp and elevator accessibility verified');
-        }
-        whyRecommended.push(`Energy efficiency certified (Class ${venue.energyRating})`);
-
-        return {
-          venue,
-          matchScore,
-          capacityScore,
-          facilityScore,
-          availabilityScore,
-          historicalScore,
-          proximityScore,
-          reliabilityScore,
-          distanceMeters,
-          walkingMinutes,
-          whyRecommended,
-          warnings: missing.length > 0 ? [`Missing requested facilities: ${missing.join(', ')}`] : []
-        };
-      });
-
-      results.sort((a, b) => b.matchScore - a.matchScore);
-      results.forEach((r, idx) => r.rank = idx + 1);
-      return results;
-    }
-
-    function generateCampusWalkingRoute(start, destination) {
-      const destCoords = destination.coordinates;
-      const midLat = (start.lat + destCoords.lat) / 2;
-      const midLng = (start.lng + destCoords.lng) / 2;
-
-      const waypoints = [
-        [start.lat, start.lng],
-        [start.lat + (destCoords.lat - start.lat) * 0.35 + 0.0002, start.lng + (destCoords.lng - start.lng) * 0.25],
-        [midLat, midLng + 0.0003],
-        [start.lat + (destCoords.lat - start.lat) * 0.75, destCoords.lng - 0.0002],
-        [destCoords.lat, destCoords.lng]
-      ];
-
-      const distanceMeters = Math.round(calculateDistanceMeters(start, destCoords) * 1.18);
-      const totalWalkingMinutes = calculateWalkingMinutes(distanceMeters);
-
-      const steps = [
-        { instruction: `Head straight along Central Campus Boulevard towards ${destination.building}`, distanceMeters: Math.round(distanceMeters * 0.35), durationMinutes: Math.max(1, Math.round(totalWalkingMinutes * 0.35)) },
-        { instruction: `Turn towards the shaded pedestrian walkway past the Central Library plaza`, distanceMeters: Math.round(distanceMeters * 0.4), durationMinutes: Math.max(1, Math.round(totalWalkingMinutes * 0.4)) },
-        { instruction: `Enter ${destination.building} main portico and proceed to ${destination.floor}`, distanceMeters: Math.round(distanceMeters * 0.25), durationMinutes: Math.max(1, Math.round(totalWalkingMinutes * 0.25)) }
-      ];
-
-      return { destination, distanceMeters, totalWalkingMinutes, waypoints, steps };
-    }
-
-    function generateQRCodeSVG(data, size = 200) {
-      const matrixSize = 25;
-      const grid = Array.from({ length: matrixSize }, () => Array(matrixSize).fill(false));
-
-      const drawFinder = (r0, c0) => {
-        for (let r = 0; r < 7; r++) {
-          for (let c = 0; c < 7; c++) {
-            if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
-              grid[r0 + r][c0 + c] = true;
-            }
-          }
-        }
-      };
-
-      drawFinder(0, 0);
-      drawFinder(0, matrixSize - 7);
-      drawFinder(matrixSize - 7, 0);
-
-      for (let i = 8; i < matrixSize - 8; i++) {
-        grid[6][i] = i % 2 === 0;
-        grid[i][6] = i % 2 === 0;
-      }
-
-      let hash = 0;
-      for (let i = 0; i < data.length; i++) {
-        hash = (hash << 5) - hash + data.charCodeAt(i);
-        hash |= 0;
-      }
-
-      for (let r = 0; r < matrixSize; r++) {
-        for (let c = 0; c < matrixSize; c++) {
-          const inTL = r <= 7 && c <= 7;
-          const inTR = r <= 7 && c >= matrixSize - 8;
-          const inBL = r >= matrixSize - 8 && c <= 7;
-          const inT = r === 6 || c === 6;
-          if (!inTL && !inTR && !inBL && !inT) {
-            const bit = Math.abs(Math.sin(hash + r * 17 + c * 31) * 10000) % 1;
-            grid[r][c] = bit > 0.48;
-          }
-        }
-      }
-
-      const cellSize = size / matrixSize;
-      let rects = '';
-      for (let r = 0; r < matrixSize; r++) {
-        for (let c = 0; c < matrixSize; c++) {
-          if (grid[r][c]) {
-            rects += `<rect x="${(c * cellSize).toFixed(2)}" y="${(r * cellSize).toFixed(2)}" width="${(cellSize + 0.2).toFixed(2)}" height="${(cellSize + 0.2).toFixed(2)}" fill="#0f172a" rx="1.5" />`;
-          }
-        }
-      }
-
-      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" class="rounded-xl shadow-inner bg-white p-2.5"><rect width="${size}" height="${size}" fill="#ffffff" rx="12" />${rects}</svg>`;
-    }
-
-    // --- MAIN REACT APPLICATION COMPONENT ---
-    function CampusSpaceApp() {
-      const [isLanding, setIsLanding] = useState(false);
-      const [activeTab, setActiveTab] = useState('dashboard');
-      const [currentRole, setCurrentRole] = useState('organizer');
-
-      // Persistence
-      const [venues, setVenues] = useState(() => {
-        const saved = localStorage.getItem('campusspace_venues');
-        return saved ? JSON.parse(saved) : INITIAL_VENUES;
-      });
-
-      const [bookings, setBookings] = useState(() => {
-        const saved = localStorage.getItem('campusspace_bookings');
-        return saved ? JSON.parse(saved) : INITIAL_BOOKINGS;
-      });
-
-      useEffect(() => {
-        localStorage.setItem('campusspace_venues', JSON.stringify(venues));
-      }, [venues]);
-
-      useEffect(() => {
-        localStorage.setItem('campusspace_bookings', JSON.stringify(bookings));
-      }, [bookings]);
-
-      // Notifications
-      const [notifications, setNotifications] = useState([
-        { id: 'n1', title: 'AI Match Complete', message: 'Found 3 high-fit venues for your upcoming National AI Hackathon.', timestamp: '5m ago', read: false },
-        { id: 'n2', title: 'Check-in Reminder', message: 'Dr. Kalam Auditorium booking completed with 100% verified attendance.', timestamp: '2h ago', read: false },
-        { id: 'n3', title: 'Ghost Booking Warning', message: 'Smart door scanner armed: unverified rooms release after 15 min.', timestamp: 'Yesterday', read: true }
-      ]);
-      const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-
-      // Search & GPS
-      const [searchQuery, setSearchQuery] = useState('');
-      const [userLocation, setUserLocation] = useState(CAMPUS_CENTER);
-      const [isSimulatingLocation, setIsSimulatingLocation] = useState(true);
-
-      // Form & AI Recommendations
-      const [eventType, setEventType] = useState('Hackathon');
-      const [attendance, setAttendance] = useState(180);
-      const [date, setDate] = useState('2026-09-15');
-      const [startTime, setStartTime] = useState('09:00');
-      const [endTime, setEndTime] = useState('18:00');
-      const [selectedFacilities, setSelectedFacilities] = useState(['Projector', 'Wi-Fi', 'Air Conditioning', 'Power Outlets']);
-
-      const [recommendations, setRecommendations] = useState(() => rankVenues(INITIAL_VENUES, {
-        eventType: 'Hackathon',
-        attendance: 180,
-        date: '2026-09-15',
-        startTime: '09:00',
-        endTime: '18:00',
-        requiredFacilities: ['Projector', 'Wi-Fi', 'Air Conditioning', 'Power Outlets'],
-        userLocation: CAMPUS_CENTER
-      }));
-
-      // Modals
-      const [selectedDetailsRec, setSelectedDetailsRec] = useState(null);
-      const [bookingModalVenue, setBookingModalVenue] = useState(null);
-      const [qrModalBooking, setQrModalBooking] = useState(null);
-      const [selectedMapVenue, setSelectedMapVenue] = useState(null);
-      const [navigationTargetVenue, setNavigationTargetVenue] = useState(null);
-      const [toastMessage, setToastMessage] = useState(null);
-
-      const showToast = (msg) => {
-        setToastMessage(msg);
-        setTimeout(() => setToastMessage(null), 3800);
-      };
-
-      const handleFindBestVenue = (e) => {
-        if (e) e.preventDefault();
-        const req = {
-          eventType,
-          attendance: Number(attendance),
-          date,
-          startTime,
-          endTime,
-          requiredFacilities: selectedFacilities,
-          userLocation
-        };
-        const results = rankVenues(venues, req);
-        setRecommendations(results);
-        setActiveTab('recommendations');
-        showToast(`AI Match Complete: Ranked ${results.length} venues for your ${eventType}!`);
-      };
-
-      const handleSimulateCheckIn = (bookingId) => {
-        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, checkedIn: true } : b));
-        const target = bookings.find(b => b.id === bookingId);
-        if (target) {
-          setVenues(prev => prev.map(v => v.id === target.venueId ? { ...v, status: 'booked' } : v));
-        }
-        showToast('✓ Check-in Verified! Door unlocked & venue confirmed active.');
-      };
-
-      const handleApproveBooking = (bookingId) => {
-        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'confirmed' } : b));
-        showToast(`Booking #${bookingId} approved by Campus Administration.`);
-      };
-
-      const handleRejectBooking = (bookingId) => {
-        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' } : b));
-        showToast(`Booking #${bookingId} rejected.`);
-      };
-
-      const handleResetDemoData = () => {
-        localStorage.removeItem('campusspace_venues');
-        localStorage.removeItem('campusspace_bookings');
-        setVenues(INITIAL_VENUES);
-        setBookings(INITIAL_BOOKINGS);
-        showToast('Demo data successfully restored.');
-      };
-
-      // --- LEAFLET MAP VIEW COMPONENT ---
-      function CampusMapSubView({ venues, selectedVenue, onSelectVenue, onBookVenue, onNavigateToVenue }) {
-        const mapContainerRef = useRef(null);
-        const mapInstanceRef = useRef(null);
-        const markersRef = useRef({});
-        const [activeCategory, setActiveCategory] = useState('all');
-
-        const filteredVenues = venues.filter(v => {
-          if (activeCategory === 'all') return true;
-          if (activeCategory === 'hall') return v.category === 'hall' || v.category === 'auditorium';
-          if (activeCategory === 'sports') return v.category === 'sports' || v.category === 'outdoor';
-          return v.category === activeCategory;
-        });
-
-        useEffect(() => {
-          if (!mapContainerRef.current || !window.L) return;
-
-          if (!mapInstanceRef.current) {
-            const map = L.map(mapContainerRef.current, { zoomControl: false }).setView([19.1334, 72.9133], 16);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-              attribution: '&copy; CARTO | &copy; OpenStreetMap',
-              maxZoom: 19
-            }).addTo(map);
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
-            mapInstanceRef.current = map;
-          }
-
-          const map = mapInstanceRef.current;
-          Object.values(markersRef.current).forEach(m => map.removeLayer(m));
-          markersRef.current = {};
-
-          filteredVenues.forEach(venue => {
-            const isTopRec = recommendations[0] && recommendations[0].venue.id === venue.id;
-            let color = '#22c55e';
-            if (isTopRec) color = '#06b6d4';
-            else if (venue.status === 'booked') color = '#ef4444';
-            else if (venue.status === 'pending') color = '#f59e0b';
-
-            const iconHtml = `
-              <div style="background: ${color}; border: 2px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.35); width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                <div style="transform: rotate(45deg); color: white; font-size: 11px; font-weight: 800;">
-                  ${isTopRec ? '★' : venue.capacity > 300 ? 'H' : '●'}
-                </div>
-              </div>
-            `;
-            const icon = L.divIcon({ className: 'custom-campus-pin', html: iconHtml, iconSize: [32, 32], iconAnchor: [16, 32] });
-            const marker = L.marker([venue.coordinates.lat, venue.coordinates.lng], { icon }).addTo(map);
-            marker.on('click', () => onSelectVenue(venue));
-            markersRef.current[venue.id] = marker;
-          });
-
-          // User Pin
-          const userHtml = `<div style="position: relative; width: 22px; height: 22px;"><div style="position: absolute; inset: -4px; border-radius: 50%; background: rgba(56, 189, 248, 0.4); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div><div style="position: relative; width: 22px; height: 22px; border-radius: 50%; background: #0284c7; border: 3px solid white; box-shadow: 0 0 10px rgba(2, 132, 199, 0.6);"></div></div>`;
-          const userIcon = L.divIcon({ className: 'user-pin', html: userHtml, iconSize: [22, 22], iconAnchor: [11, 11] });
-          L.marker([userLocation.lat, userLocation.lng], { icon: userIcon }).addTo(map);
-
-        }, [filteredVenues, recommendations, userLocation]);
-
-        useEffect(() => {
-          if (selectedVenue && mapInstanceRef.current) {
-            mapInstanceRef.current.flyTo([selectedVenue.coordinates.lat, selectedVenue.coordinates.lng], 17, { duration: 1 });
-          }
-        }, [selectedVenue]);
-
-        return (
-          <div className="relative w-full h-[calc(100vh-140px)] rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 flex flex-col">
-            <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-              <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-800 pointer-events-auto shadow-xl">
-                {[
-                  { id: 'all', label: 'All Spaces' },
-                  { id: 'hall', label: 'Halls & Auds' },
-                  { id: 'lab', label: 'Labs' },
-                  { id: 'classroom', label: 'Classrooms' },
-                  { id: 'commons', label: 'Library & Hub' },
-                  { id: 'sports', label: 'Sports & Grounds' }
-                ].map(cat => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setActiveCategory(cat.id)}
-                    className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition ${activeCategory === cat.id ? 'bg-cyan-500 text-black shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="hidden sm:flex items-center gap-3 bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-800 pointer-events-auto text-[11px] text-slate-300 shadow-xl font-medium">
-                <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>Available</span></div>
-                <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span><span>Booked</span></div>
-                <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span>Pending</span></div>
-                <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span><span>AI Match</span></div>
-              </div>
-            </div>
-
-            <div ref={mapContainerRef} className="w-full h-full z-10" />
-
-            {selectedVenue && (
-              <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:w-[420px] z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-3xl p-5 shadow-2xl text-white animate-slideUp">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${selectedVenue.status === 'available' ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700' : selectedVenue.status === 'booked' ? 'bg-rose-950/80 text-rose-300 border-rose-700' : 'bg-amber-950/80 text-amber-300 border-amber-700'}`}>
-                        ● {selectedVenue.status}
-                      </span>
-                      <span className="text-xs text-slate-400">{selectedVenue.floor}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-white tracking-tight mt-1">{selectedVenue.name}</h3>
-                    <p className="text-xs text-cyan-400 font-medium">{selectedVenue.building}</p>
-                  </div>
-                  <button onClick={() => onSelectVenue(null)} className="text-slate-400 hover:text-white p-1">✕</button>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 my-3 text-xs">
-                  <div className="bg-slate-800/80 p-2 rounded-xl text-center"><span className="text-[10px] text-slate-400 block">Capacity</span><span className="font-bold text-white">{selectedVenue.capacity}</span></div>
-                  <div className="bg-slate-800/80 p-2 rounded-xl text-center"><span className="text-[10px] text-slate-400 block">Occupancy</span><span className="font-bold text-cyan-300">{selectedVenue.historicalAverageOccupancy}%</span></div>
-                  <div className="bg-slate-800/80 p-2 rounded-xl text-center"><span className="text-[10px] text-slate-400 block">Energy</span><span className="font-bold text-emerald-400">Class {selectedVenue.energyRating}</span></div>
-                </div>
-
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {selectedVenue.facilities.slice(0, 4).map(f => (
-                    <span key={f} className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md flex items-center gap-1">
-                      <span className="text-cyan-400">✓</span><span>{f}</span>
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
-                  <button
-                    onClick={() => onNavigateToVenue(selectedVenue)}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5"
-                  >
-                    <span>Walk Directions</span><span>📍</span>
-                  </button>
-                  <button
-                    onClick={() => onBookVenue(selectedVenue)}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-black transition"
-                  >
-                    BOOK VENUE
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      }
-
-      // --- LIVE NAVIGATION SUBVIEW ---
-      function LiveNavSubView({ venues, userLocation, onUpdateUserLocation, targetVenue }) {
-        const mapContainerRef = useRef(null);
-        const mapInstanceRef = useRef(null);
-        const routeLineRef = useRef(null);
-        const [destination, setDestination] = useState(targetVenue || venues[0]);
-        const [route, setRoute] = useState(null);
-        const [isLocating, setIsLocating] = useState(false);
-
-        useEffect(() => {
-          if (destination) {
-            const r = generateCampusWalkingRoute(userLocation, destination);
-            setRoute(r);
-          }
-        }, [destination, userLocation]);
-
-        useEffect(() => {
-          if (!mapContainerRef.current || !window.L) return;
-
-          if (!mapInstanceRef.current) {
-            const map = L.map(mapContainerRef.current, { zoomControl: false }).setView([userLocation.lat, userLocation.lng], 16);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-              attribution: '&copy; CARTO | &copy; OpenStreetMap',
-              maxZoom: 19
-            }).addTo(map);
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
-            mapInstanceRef.current = map;
-          }
-
-          const map = mapInstanceRef.current;
-          if (routeLineRef.current) map.removeLayer(routeLineRef.current);
-
-          if (route && route.waypoints.length > 0) {
-            const poly = L.polyline(route.waypoints, {
-              color: '#0284c7',
-              weight: 5,
-              opacity: 0.9,
-              dashArray: '8, 8',
-              lineCap: 'round',
-              lineJoin: 'round'
-            }).addTo(map);
-            routeLineRef.current = poly;
-            map.fitBounds(poly.getBounds(), { padding: [50, 50] });
-          }
-        }, [route, userLocation]);
-
-        const handleLocateMe = () => {
-          setIsLocating(true);
-          if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                setIsLocating(false);
-                onUpdateUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-                showToast('Live GPS Lock updated via browser geolocation.');
-              },
-              () => {
-                setIsLocating(false);
-                onUpdateUserLocation(CAMPUS_CENTER);
-                showToast('Campus simulation locked to Central Plaza.');
-              },
-              { timeout: 5000 }
-            );
-          } else {
-            setIsLocating(false);
-            onUpdateUserLocation(CAMPUS_CENTER);
-          }
-        };
-
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto h-[calc(100vh-140px)]">
-            <div className="bg-[#0b1329] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between overflow-y-auto text-white shadow-2xl">
-              <div className="space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                  <div>
-                    <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                      <span>📍</span><span>Live Campus Navigation</span>
-                    </h2>
-                    <p className="text-xs text-slate-400">Turn-by-turn pedestrian campus routes</p>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Sensor Status:</span>
-                    <span className="text-cyan-400 font-semibold flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                      <span>GPS Satellite Active</span>
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleLocateMe}
-                    disabled={isLocating}
-                    className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition flex items-center justify-center gap-2"
-                  >
-                    <span>{isLocating ? 'Acquiring GPS...' : 'Locate Me (watchPosition)'}</span>
-                    <span>🛰️</span>
-                  </button>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                    Target Venue
-                  </label>
-                  <select
-                    value={destination?.id || ''}
-                    onChange={(e) => {
-                      const found = venues.find(v => v.id === e.target.value);
-                      if (found) setDestination(found);
-                    }}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-slate-100 font-medium focus:outline-none focus:border-cyan-400"
-                  >
-                    {venues.map(v => (
-                      <option key={v.id} value={v.id}>{v.name} ({v.building})</option>
-                    ))}
-                  </select>
-                </div>
-
-                {route && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-800/40 p-3.5 rounded-2xl text-center">
-                      <span className="text-[10px] uppercase font-bold text-cyan-400 block">Walking Time</span>
-                      <span className="text-2xl font-black text-white">{route.totalWalkingMinutes} min</span>
-                    </div>
-                    <div className="bg-gradient-to-br from-blue-950/40 to-slate-900 border border-blue-800/40 p-3.5 rounded-2xl text-center">
-                      <span className="text-[10px] uppercase font-bold text-blue-400 block">Distance</span>
-                      <span className="text-2xl font-black text-white">{route.distanceMeters} m</span>
-                    </div>
-                  </div>
-                )}
-
-                {route && (
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Turn-by-Turn Directions</h3>
-                    <div className="space-y-2.5">
-                      {route.steps.map((step, idx) => (
-                        <div key={idx} className="flex items-start gap-3 bg-slate-900/70 border border-slate-800/80 p-3 rounded-xl text-xs">
-                          <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">{idx + 1}</div>
-                          <div className="flex-1">
-                            <p className="text-slate-200 leading-snug">{step.instruction}</p>
-                            <span className="text-[10px] text-slate-400 font-medium">{step.distanceMeters}m • ~{step.durationMinutes} min</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="pt-4 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Speed: ~4.8 km/h</span>
-                <span className="text-emerald-400 font-semibold">♿ Wheelchair Accessible Route</span>
-              </div>
-            </div>
-
-            <div className="lg:col-span-2 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative bg-slate-950">
-              <div ref={mapContainerRef} className="w-full h-full" />
-            </div>
-          </div>
-        );
-      }
-
-      if (isLanding) {
-        return (
-          <div className="min-h-screen bg-[#070e1e] text-white flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
-            <nav className="border-b border-slate-800/80 px-8 py-5 flex items-center justify-between max-w-7xl mx-auto w-full">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-cyan-500/25">CS</div>
-                <span className="text-2xl font-black tracking-tight text-white">CampusSpace</span>
-              </div>
-              <button
-                onClick={() => { setIsLanding(false); setActiveTab('dashboard'); }}
-                className="text-xs font-semibold px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-white shadow-md transition"
-              >
-                Launch App Demo →
-              </button>
-            </nav>
-
-            <main className="max-w-5xl mx-auto px-6 py-12 flex flex-col items-center text-center my-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-800 text-cyan-300 text-xs font-medium mb-8">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                National Hackathon Showcase • College Campus Venue Intelligence
-              </div>
-
-              <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight max-w-4xl leading-[1.1] mb-6">
-                <span className="block text-white">CampusSpace</span>
-                <span className="block bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400">
-                  Book smarter. Use better. Plan ahead.
-                </span>
-              </h1>
-
-              <p className="text-lg sm:text-xl text-slate-300 max-w-2xl font-normal leading-relaxed mb-10">
-                AI-powered venue booking and campus resource optimization. Answers: <strong className="text-cyan-300">"What is the best venue, where is it, and will it actually be used?"</strong>
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-                <button
-                  onClick={() => { setCurrentRole('organizer'); setIsLanding(false); setActiveTab('dashboard'); }}
-                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 font-bold text-base shadow-xl shadow-cyan-500/25 hover:-translate-y-0.5 transition"
-                >
-                  Explore Demo (Organizer) →
-                </button>
-                <button
-                  onClick={() => { setCurrentRole('admin'); setIsLanding(false); setActiveTab('admin'); }}
-                  className="px-7 py-4 rounded-2xl bg-slate-900 border border-slate-700 hover:border-slate-500 font-semibold text-base text-slate-200 transition"
-                >
-                  Admin Governance Console
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full text-left">
-                <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800">
-                  <div className="text-2xl mb-2">🤖</div>
-                  <h3 className="font-bold text-white mb-1">AI Recommendation</h3>
-                  <p className="text-xs text-slate-400">Capacity fit, facilities, distance & historical score.</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800">
-                  <div className="text-2xl mb-2">🗺️</div>
-                  <h3 className="font-bold text-white mb-1">Live Campus Map</h3>
-                  <p className="text-xs text-slate-400">OpenStreetMap + Leaflet with live status pins.</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800">
-                  <div className="text-2xl mb-2">📱</div>
-                  <h3 className="font-bold text-white mb-1">Anti-Ghost QR</h3>
-                  <p className="text-xs text-slate-400">Smart pass check-in to auto-release empty halls.</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800">
-                  <div className="text-2xl mb-2">📊</div>
-                  <h3 className="font-bold text-white mb-1">Utilization Analytics</h3>
-                  <p className="text-xs text-slate-400">Hourly curves & 4-week predictive demand forecasts.</p>
-                </div>
-              </div>
-            </main>
-          </div>
-        );
-      }
-
-      const pendingApprovalsCount = bookings.filter(b => b.status === 'pending').length;
-
-      return (
-        <div className="min-h-screen bg-[#070e1e] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
-          {/* Toast Notification */}
-          {toastMessage && (
-            <div className="fixed top-20 right-6 z-50 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold px-5 py-3 rounded-2xl shadow-2xl text-xs flex items-center gap-2 animate-bounce">
-              <span>✨</span><span>{toastMessage}</span>
-            </div>
-          )}
-
-          {/* Top Navbar */}
-          <header className="h-18 bg-[#0b1329]/95 backdrop-blur-md border-b border-slate-800 text-white flex items-center justify-between px-6 sticky top-0 z-40">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setIsLanding(true)}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 font-black text-xl text-white">CS</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-300">CampusSpace</span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60">AI Powered</span>
-                </div>
-                <p className="text-[11px] text-slate-400 hidden sm:block">Book smarter. Use better. Plan ahead.</p>
-              </div>
-            </div>
-
-            <div className="hidden md:flex items-center relative w-72 lg:w-80">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search campus venues, halls, labs..."
-                className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl py-2 pl-4 pr-4 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400"
-              />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  setUserLocation(CAMPUS_CENTER);
-                  showToast('Campus GPS locked to Central Plaza');
-                }}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border bg-cyan-500/10 border-cyan-500/30 text-cyan-300"
-              >
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                <span>Campus GPS</span>
-              </button>
-
-              <div className="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-1 text-xs">
-                {['student', 'organizer', 'admin'].map(r => (
-                  <button
-                    key={r}
-                    onClick={() => setCurrentRole(r)}
-                    className={`capitalize px-2.5 py-1 rounded-lg font-medium transition ${currentRole === r ? 'bg-cyan-500 text-black font-bold shadow' : 'text-slate-400 hover:text-white'}`}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => setIsNotificationsOpen(true)}
-                className="relative p-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white"
-              >
-                🔔
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                    {notifications.filter(n => !n.read).length}
-                  </span>
-                )}
-              </button>
-            </div>
-          </header>
-
-          {/* Body */}
-          <div className="flex flex-1 overflow-hidden">
-            {/* Sidebar */}
-            <aside className="w-60 bg-[#070e1e] border-r border-slate-800/80 flex flex-col justify-between py-5 px-3 select-none flex-shrink-0">
-              <div className="space-y-1">
-                {[
-                  { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
-                  { id: 'map', label: 'Campus Map', icon: '🗺️' },
-                  { id: 'recommendations', label: 'AI Recommendations', icon: '🤖' },
-                  { id: 'bookings', label: 'My Bookings', icon: '📅' },
-                  { id: 'navigation', label: 'Live Navigation', icon: '📍' },
-                  { id: 'analytics', label: 'Analytics', icon: '📊' },
-                  { id: 'forecast', label: 'Demand Forecast', icon: '🔮' },
-                  ...(currentRole === 'admin' ? [{ id: 'admin', label: 'Admin Approvals', icon: '🛡️', badge: pendingApprovalsCount }] : []),
-                  { id: 'settings', label: 'Settings', icon: '⚙️' }
-                ].map(item => {
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-xs transition ${isActive ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span>{item.icon}</span>
-                        <span>{item.label}</span>
-                      </div>
-                      {item.badge > 0 && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-xs space-y-1">
-                <div className="text-cyan-300 font-semibold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-                  <span>Demo Mode Active</span>
-                </div>
-                <p className="text-[11px] text-slate-400">Switch personas above to test Student, Organizer, or Admin flows.</p>
-              </div>
-            </aside>
-
-            {/* Main Content Area */}
-            <main className="flex-1 overflow-y-auto p-6">
-              {/* TAB 1: DASHBOARD */}
-              {activeTab === 'dashboard' && (
-                <div className="space-y-8 max-w-7xl mx-auto">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-[#0d1c3a] to-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl">
-                    <div>
-                      <h1 className="text-2xl sm:text-3xl font-black text-white">Good evening 👋</h1>
-                      <p className="text-slate-400 text-xs mt-1">What are you planning today? Enter your event specs to generate instant AI recommendations.</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="bg-slate-800/80 px-4 py-2 rounded-2xl border border-slate-700 text-center"><span className="block text-xl font-bold text-emerald-400">9</span><span className="text-[10px] text-slate-400 font-semibold uppercase">Venues Open</span></div>
-                      <div className="bg-slate-800/80 px-4 py-2 rounded-2xl border border-slate-700 text-center"><span className="block text-xl font-bold text-cyan-400">96%</span><span className="text-[10px] text-slate-400 font-semibold uppercase">AI Match Rate</span></div>
-                      <div className="bg-slate-800/80 px-4 py-2 rounded-2xl border border-slate-700 text-center"><span className="block text-xl font-bold text-indigo-400">4.1%</span><span className="text-[10px] text-slate-400 font-semibold uppercase">No-Show Rate</span></div>
-                    </div>
-                  </div>
-
-                  {/* AI Matcher Form */}
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">✨</div>
-                        <div>
-                          <h2 className="text-base font-bold text-white">AI Venue Matchmaker & Capacity Optimizer</h2>
-                          <p className="text-xs text-slate-400">Multi-factor scoring algorithm across 8 capacity and proximity variables</p>
-                        </div>
-                      </div>
-                      <span className="text-xs text-cyan-400 bg-cyan-950 px-3 py-1 rounded-full border border-cyan-800">Scoring Engine v2.4</span>
-                    </div>
-
-                    <form onSubmit={handleFindBestVenue} className="space-y-5">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Event Type</label>
-                          <select
-                            value={eventType}
-                            onChange={(e) => setEventType(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-slate-100 font-medium"
-                          >
-                            {['Hackathon', 'Seminar', 'Workshop', 'Conference', 'Cultural Event', 'Club Meeting', 'Sports Event', 'Examination', 'Exhibition'].map(t => (
-                              <option key={t} value={t}>{t}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Expected Attendance</label>
-                          <input
-                            type="number"
-                            min="5"
-                            max="2000"
-                            value={attendance}
-                            onChange={(e) => setAttendance(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-slate-100 font-medium"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Date</label>
-                          <input
-                            type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-slate-100 font-medium"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Start Time</label>
-                          <input
-                            type="time"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-slate-100 font-medium"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">End Time</label>
-                          <input
-                            type="time"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-slate-100 font-medium"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
-                          Required Facilities ({selectedFacilities.length} selected)
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          {[
-                            'Projector', 'Wi-Fi', 'Air Conditioning', 'Stage', 'Microphones',
-                            'Lab Equipment', 'Power Outlets', 'Whiteboard', 'Recording Equipment',
-                            'Wheelchair Accessibility', 'Parking'
-                          ].map(fac => {
-                            const isSelected = selectedFacilities.includes(fac);
-                            return (
-                              <button
-                                type="button"
-                                key={fac}
-                                onClick={() => {
-                                  if (isSelected) setSelectedFacilities(selectedFacilities.filter(f => f !== fac));
-                                  else setSelectedFacilities([...selectedFacilities, fac]);
-                                }}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${isSelected ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500' : 'bg-slate-950 border border-slate-800 text-slate-400'}`}
-                              >
-                                {isSelected ? '✓ ' : '+ '}{fac}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <button
-                          type="submit"
-                          className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 text-white font-extrabold text-sm tracking-wider shadow-xl shadow-cyan-500/20 transition flex items-center justify-center gap-2"
-                        >
-                          <span>FIND BEST VENUE</span><span>→</span>
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-
-                  {/* Featured Venues */}
-                  <div>
-                    <h2 className="text-base font-bold text-white mb-4">Popular Campus Venues (12 Available)</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                      {venues.slice(0, 3).map(v => (
-                        <div key={v.id} className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col justify-between">
-                          <div>
-                            <div className="h-36 relative overflow-hidden bg-slate-800">
-                              <img src={v.image} alt={v.name} className="w-full h-full object-cover" />
-                              <span className="absolute top-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-white">
-                                Cap: {v.capacity}
-                              </span>
-                            </div>
-                            <div className="p-4">
-                              <span className="text-[11px] text-cyan-400 font-medium">{v.building}</span>
-                              <h3 className="text-sm font-bold text-white mt-0.5">{v.name}</h3>
-                              <p className="text-xs text-slate-400 line-clamp-2 mt-1">{v.description}</p>
-                            </div>
-                          </div>
-                          <div className="p-4 pt-0 flex gap-2 border-t border-slate-800/80 mt-2">
-                            <button
-                              onClick={() => { setSelectedMapVenue(v); setActiveTab('map'); }}
-                              className="flex-1 py-2 rounded-xl bg-slate-800 text-xs font-bold text-slate-200"
-                            >
-                              Map
-                            </button>
-                            <button
-                              onClick={() => setBookingModalVenue({ venue: v, matchScore: 92 })}
-                              className="flex-1 py-2 rounded-xl bg-cyan-500 text-black text-xs font-bold"
-                            >
-                              Book
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 2: CAMPUS MAP */}
-              {activeTab === 'map' && (
-                <CampusMapSubView
-                  venues={venues}
-                  selectedVenue={selectedMapVenue}
-                  onSelectVenue={setSelectedMapVenue}
-                  onBookVenue={(v) => setBookingModalVenue({ venue: v, matchScore: 90 })}
-                  onNavigateToVenue={(v) => { setNavigationTargetVenue(v); setActiveTab('navigation'); }}
-                />
-              )}
-
-              {/* TAB 3: AI RECOMMENDATIONS */}
-              {activeTab === 'recommendations' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <div className="flex items-center justify-between bg-[#0b1329] border border-slate-800 p-4 rounded-2xl">
-                    <div>
-                      <span className="text-xs uppercase font-bold text-cyan-400">AI Query Evaluation</span>
-                      <p className="text-xs text-slate-300">Evaluating for {eventType} with {attendance} attendees on {date}</p>
-                    </div>
-                    <button onClick={() => setActiveTab('dashboard')} className="text-xs px-3.5 py-1.5 rounded-xl bg-slate-800 text-slate-200 font-semibold border border-slate-700">
-                      Modify Query ✏️
-                    </button>
-                  </div>
-
-                  <div>
-                    <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                      <span>AI RECOMMENDATIONS</span>
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">
-                        Multi-Factor Scored
-                      </span>
-                    </h2>
-                  </div>
-
-                  {/* 🥇 Top Match Hero */}
-                  {recommendations[0] && (
-                    <div className="relative bg-gradient-to-br from-slate-900 via-[#0e1c36] to-slate-900 border-2 border-cyan-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden">
-                      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                        <div className="flex items-start gap-5">
-                          {/* Circular Match Score Ring */}
-                          <div className="relative flex-shrink-0">
-                            <svg className="w-24 h-24 -rotate-90">
-                              <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="7" className="text-slate-800" fill="transparent" />
-                              <circle
-                                cx="48"
-                                cy="48"
-                                r="40"
-                                stroke="currentColor"
-                                strokeWidth="7"
-                                strokeDasharray="251.2"
-                                strokeDashoffset={251.2 - (251.2 * recommendations[0].matchScore) / 100}
-                                className="text-cyan-400 transition-all duration-1000"
-                                strokeLinecap="round"
-                                fill="transparent"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-2xl font-black text-white">{recommendations[0].matchScore}%</span>
-                              <span className="text-[9px] uppercase font-bold text-cyan-300">Match</span>
-                            </div>
-                            <div className="absolute -top-1 -left-1 text-2xl">🥇</div>
-                          </div>
-
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-cyan-500 text-black">Top Recommendation</span>
-                              <span className="text-xs text-slate-400">{recommendations[0].venue.building}</span>
-                            </div>
-                            <h3 className="text-2xl sm:text-3xl font-black text-white">{recommendations[0].venue.name}</h3>
-                            <p className="text-xs text-slate-300 mt-1 max-w-xl line-clamp-2">{recommendations[0].venue.description}</p>
-
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
-                              <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80">
-                                <span className="text-slate-400 block text-[10px]">Capacity</span>
-                                <span className="font-bold text-white">{recommendations[0].venue.capacity} <span className="text-slate-400 font-normal">(Req: {attendance})</span></span>
-                              </div>
-                              <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80">
-                                <span className="text-slate-400 block text-[10px]">Distance</span>
-                                <span className="font-bold text-cyan-300">{recommendations[0].distanceMeters} m ({recommendations[0].walkingMinutes} min)</span>
-                              </div>
-                              <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80">
-                                <span className="text-slate-400 block text-[10px]">Suitability</span>
-                                <span className="font-bold text-emerald-300">{recommendations[0].historicalScore}% Match</span>
-                              </div>
-                              <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80">
-                                <span className="text-slate-400 block text-[10px]">Availability</span>
-                                <span className="font-bold text-emerald-400">✓ Available</span>
-                              </div>
-                            </div>
-
-                            <div className="flex flex-wrap gap-2 mt-3">
-                              {recommendations[0].venue.facilities.slice(0, 5).map(f => (
-                                <span key={f} className="text-[11px] bg-slate-900 text-slate-200 px-2 py-0.5 rounded border border-slate-800">
-                                  ✓ {f}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2 w-full lg:w-44 flex-shrink-0">
-                          <button
-                            onClick={() => setBookingModalVenue({ venue: recommendations[0].venue, matchScore: recommendations[0].matchScore })}
-                            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black text-xs uppercase tracking-wider transition"
-                          >
-                            BOOK NOW
-                          </button>
-                          <button
-                            onClick={() => setSelectedDetailsRec(recommendations[0])}
-                            className="w-full py-2.5 px-4 rounded-xl bg-slate-800 text-slate-200 font-bold text-xs uppercase tracking-wider transition"
-                          >
-                            VIEW DETAILS
-                          </button>
-                          <button
-                            onClick={() => { setSelectedMapVenue(recommendations[0].venue); setActiveTab('map'); }}
-                            className="w-full py-2.5 px-4 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-300 font-bold text-xs uppercase tracking-wider transition"
-                          >
-                            VIEW ON MAP
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 🥈 & 🥉 Alternatives */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {recommendations.slice(1, 3).map(rec => {
-                      const medal = rec.rank === 2 ? '🥈' : '🥉';
-                      return (
-                        <div key={rec.venue.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
-                          <div>
-                            <div className="flex items-start justify-between gap-4 mb-3">
-                              <div>
-                                <span className="text-xl">{medal}</span>
-                                <h4 className="text-lg font-bold text-white mt-1">{rec.venue.name}</h4>
-                                <span className="text-xs text-slate-400">{rec.venue.building}</span>
-                              </div>
-                              <div className="w-14 h-14 rounded-full border-2 border-cyan-400/60 flex items-center justify-center font-black text-sm text-cyan-300">
-                                {rec.matchScore}%
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-2 text-xs mb-4">
-                              <div className="bg-slate-800 p-2 rounded-lg text-center"><span className="text-[10px] text-slate-400 block">Capacity</span><span className="font-bold text-white">{rec.venue.capacity}</span></div>
-                              <div className="bg-slate-800 p-2 rounded-lg text-center"><span className="text-[10px] text-slate-400 block">Distance</span><span className="font-bold text-cyan-300">{rec.distanceMeters}m</span></div>
-                              <div className="bg-slate-800 p-2 rounded-lg text-center"><span className="text-[10px] text-slate-400 block">Walk Time</span><span className="font-bold text-white">{rec.walkingMinutes}m</span></div>
-                            </div>
-                          </div>
-
-                          <div className="flex gap-2 pt-3 border-t border-slate-800">
-                            <button onClick={() => { setSelectedMapVenue(rec.venue); setActiveTab('map'); }} className="flex-1 py-2 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold">
-                              VIEW ON MAP
-                            </button>
-                            <button onClick={() => setSelectedDetailsRec(rec)} className="flex-1 py-2 rounded-xl bg-slate-800 text-cyan-400 text-xs font-bold">
-                              VIEW DETAILS
-                            </button>
-                            <button onClick={() => setBookingModalVenue({ venue: rec.venue, matchScore: rec.matchScore })} className="flex-1 py-2 rounded-xl bg-cyan-500 text-black text-xs font-black">
-                              BOOK NOW
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 4: MY BOOKINGS */}
-              {activeTab === 'bookings' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                    <span>📅</span><span>My Bookings & Smart Passes</span>
-                  </h2>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {bookings.map(b => (
-                      <div key={b.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${b.status === 'confirmed' ? 'bg-emerald-950 text-emerald-400 border-emerald-700' : b.status === 'pending' ? 'bg-amber-950 text-amber-400 border-amber-700' : 'bg-blue-950 text-blue-400 border-blue-700'}`}>
-                              ● {b.status}
-                            </span>
-                            <span className="text-xs font-mono text-cyan-400">#{b.id}</span>
-                          </div>
-
-                          <h3 className="text-lg font-bold text-white">{b.eventName}</h3>
-                          <p className="text-xs text-cyan-300">{b.venueName} • {b.building}</p>
-
-                          <div className="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-3 rounded-xl border border-slate-800 my-4">
-                            <div><span className="text-[10px] text-slate-400 block">Date & Time</span><span className="font-semibold text-slate-200">{b.date} ({b.startTime} - {b.endTime})</span></div>
-                            <div><span className="text-[10px] text-slate-400 block">Attendance</span><span className="font-semibold text-slate-200">{b.attendance} people</span></div>
-                          </div>
-
-                          {b.checkedIn ? (
-                            <div className="text-xs text-emerald-400 font-semibold mb-4 bg-emerald-950/40 border border-emerald-800/40 px-3 py-1.5 rounded-lg">
-                              ✓ Check-in verified. Smart Door lock open.
-                            </div>
-                          ) : (
-                            <div className="text-xs text-amber-400 font-medium mb-4 bg-amber-950/30 border border-amber-800/30 px-3 py-1.5 rounded-lg">
-                              ⏳ Check-in required within 15 min of start via QR.
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex gap-2 pt-3 border-t border-slate-800">
-                          <button
-                            onClick={() => setQrModalBooking(b)}
-                            className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-extrabold text-xs tracking-wider"
-                          >
-                            Smart Pass (QR) 📱
-                          </button>
-                          <button
-                            onClick={() => {
-                              const found = venues.find(v => v.id === b.venueId);
-                              if (found) { setNavigationTargetVenue(found); setActiveTab('navigation'); }
-                            }}
-                            className="py-2.5 px-3 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold"
-                          >
-                            📍
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 5: LIVE NAVIGATION */}
-              {activeTab === 'navigation' && (
-                <LiveNavSubView
-                  venues={venues}
-                  userLocation={userLocation}
-                  onUpdateUserLocation={setUserLocation}
-                  targetVenue={navigationTargetVenue || recommendations[0]?.venue}
-                />
-              )}
-
-              {/* TAB 6: ANALYTICS */}
-              {activeTab === 'analytics' && (
-                <div className="space-y-8 max-w-7xl mx-auto">
-                  <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                    <span>📊</span><span>Campus Resource Analytics</span>
-                  </h2>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-                    <div className="bg-[#0b1329] border border-slate-800 p-5 rounded-2xl">
-                      <span className="text-xs text-slate-400 block mb-1">Campus Occupancy</span>
-                      <span className="text-3xl font-black text-white">82.4%</span>
-                      <span className="text-xs text-emerald-400 font-bold block mt-1">+18% term efficiency</span>
-                    </div>
-                    <div className="bg-[#0b1329] border border-slate-800 p-5 rounded-2xl">
-                      <span className="text-xs text-slate-400 block mb-1">Ghost Bookings Prevented</span>
-                      <span className="text-3xl font-black text-cyan-400">239</span>
-                      <span className="text-xs text-slate-400 block mt-1">710 hours reclaimed</span>
-                    </div>
-                    <div className="bg-[#0b1329] border border-slate-800 p-5 rounded-2xl">
-                      <span className="text-xs text-slate-400 block mb-1">No-Show Rate</span>
-                      <span className="text-3xl font-black text-emerald-400">4.1%</span>
-                      <span className="text-xs text-emerald-400 font-bold block mt-1">Down from 35.4%</span>
-                    </div>
-                    <div className="bg-[#0b1329] border border-slate-800 p-5 rounded-2xl">
-                      <span className="text-xs text-slate-400 block mb-1">HVAC Energy Reduction</span>
-                      <span className="text-3xl font-black text-indigo-400">28.6%</span>
-                      <span className="text-xs text-slate-400 block mt-1">Auto-sleep idle zones</span>
-                    </div>
-                  </div>
-
-                  {/* Hourly Chart */}
-                  <div className="bg-[#0b1329] border border-slate-800 rounded-3xl p-6">
-                    <h3 className="text-base font-bold text-white mb-4">Campus-wide Hourly Utilization Curve (08:00 - 21:00)</h3>
-                    <div className="h-60 w-full relative">
-                      <svg viewBox="0 0 700 200" className="w-full h-full overflow-visible">
-                        <defs>
-                          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
-                            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-                        {(() => {
-                          const pts = HOURLY_UTILIZATION.map((d, i) => {
-                            const x = (i / (HOURLY_UTILIZATION.length - 1)) * 700;
-                            const y = 180 - (d.occupancyRate / 100) * 160;
-                            return `${x},${y}`;
-                          });
-                          return (
-                            <>
-                              <path d={`M0,180 L${pts.join(' L')} L700,180 Z`} fill="url(#chartGrad)" />
-                              <path d={`M${pts.join(' L')}`} fill="none" stroke="#38bdf8" strokeWidth="3" />
-                            </>
-                          );
-                        })()}
-                      </svg>
-                      <div className="flex justify-between text-[10px] text-slate-400 mt-2">
-                        {HOURLY_UTILIZATION.map(h => <span key={h.hour}>{h.hour}</span>)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 7: DEMAND FORECAST */}
-              {activeTab === 'forecast' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                    <span>🔮</span><span>AI Predictive Demand Forecast</span>
-                  </h2>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {DEMAND_FORECAST.map((f, i) => (
-                      <div key={i} className="bg-[#0b1329] border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
-                        <div>
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <span className="text-xs font-mono text-cyan-400 font-bold">{f.week}</span>
-                              <h3 className="text-lg font-bold text-white mt-0.5">{f.period}</h3>
-                            </div>
-                            <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">
-                              {f.riskLevel}
-                            </span>
-                          </div>
-
-                          <div className="bg-slate-900 p-3.5 rounded-2xl my-3">
-                            <div className="flex justify-between text-xs mb-1">
-                              <span className="text-slate-400">Projected Demand</span>
-                              <span className="font-bold text-white">{f.demandScore}%</span>
-                            </div>
-                            <div className="w-full bg-slate-800 rounded-full h-2">
-                              <div className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full" style={{ width: `${f.demandScore}%` }} />
-                            </div>
-                          </div>
-
-                          <div className="text-xs space-y-1 text-slate-300 mb-4">
-                            <p><strong>Peak Days:</strong> {f.peakDays.join(', ')}</p>
-                            <p><strong>High-Demand Venues:</strong> {f.predictedPeakVenues.join(' • ')}</p>
-                          </div>
-                        </div>
-
-                        <div className="pt-3 border-t border-slate-800 text-xs text-slate-400 flex items-start gap-2">
-                          <span>💡</span>
-                          <p><strong className="text-cyan-300">AI Scheduling Tip:</strong> {f.aiRecommendationTip}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 8: ADMIN APPROVALS */}
-              {activeTab === 'admin' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                    <span>🛡️</span><span>Administrator Governance & Approvals</span>
-                  </h2>
-
-                  <div className="space-y-4">
-                    {bookings.filter(b => b.status === 'pending').length === 0 ? (
-                      <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl text-center text-slate-400">
-                        No pending booking requests awaiting review!
-                      </div>
-                    ) : (
-                      bookings.filter(b => b.status === 'pending').map(b => (
-                        <div key={b.id} className="bg-[#0b1329] border border-slate-800 p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-mono text-cyan-400 font-bold">#{b.id}</span>
-                              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">Pending Review</span>
-                            </div>
-                            <h4 className="text-lg font-bold text-white">{b.eventName}</h4>
-                            <p className="text-xs text-slate-300">{b.venueName} • {b.date} ({b.startTime} - {b.endTime}) • {b.attendance} Attendees</p>
-                            <p className="text-xs text-slate-400">Requested by: {b.organizerName}</p>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <button onClick={() => handleRejectBooking(b.id)} className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-rose-900 text-xs font-bold text-slate-200">
-                              Reject
-                            </button>
-                            <button onClick={() => handleApproveBooking(b.id)} className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
-                              ✓ Approve
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 9: SETTINGS */}
-              {activeTab === 'settings' && (
-                <div className="space-y-6 max-w-2xl mx-auto text-white">
-                  <h2 className="text-2xl font-black">⚙️ Settings</h2>
-                  <div className="bg-[#0b1329] border border-slate-800 p-6 rounded-3xl space-y-4">
-                    <h3 className="text-sm font-bold text-cyan-400 uppercase">Persona Role</h3>
-                    <div className="grid grid-cols-3 gap-3">
-                      {['student', 'organizer', 'admin'].map(r => (
-                        <button
-                          key={r}
-                          onClick={() => setCurrentRole(r)}
-                          className={`p-3 rounded-xl border capitalize text-xs font-bold ${currentRole === r ? 'bg-cyan-500 text-black' : 'bg-slate-900 border-slate-700 text-slate-300'}`}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0b1329] border border-rose-950/40 p-6 rounded-3xl">
-                    <h3 className="text-sm font-bold text-rose-400 uppercase mb-2">Reset Demo Data</h3>
-                    <button
-                      onClick={handleResetDemoData}
-                      className="px-4 py-2 rounded-xl bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-200 text-xs font-bold"
-                    >
-                      Reset All Data to Preset
-                    </button>
-                  </div>
-                </div>
-              )}
-            </main>
-          </div>
-
-          {/* EXPLAINABLE AI MODAL */}
-          {selectedDetailsRec && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-              <div className="bg-[#0b1329] border border-slate-700 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto text-white">
-                <button onClick={() => setSelectedDetailsRec(null)} className="absolute top-5 right-5 text-slate-400 hover:text-white p-2">✕</button>
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-full border-4 border-cyan-400 flex items-center justify-center font-black text-xl text-cyan-300">
-                    {selectedDetailsRec.matchScore}%
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-cyan-400 uppercase">Explainable AI Transparency Engine</span>
-                    <h2 className="text-2xl font-bold text-white">{selectedDetailsRec.venue.name}</h2>
-                    <p className="text-xs text-slate-400">{selectedDetailsRec.venue.building}</p>
-                  </div>
-                </div>
-
-                <div className="mb-6 bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-300 mb-3">✓ Why CampusSpace recommends this venue</h3>
-                  <div className="space-y-2">
-                    {selectedDetailsRec.whyRecommended.map((r, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-slate-200">
-                        <span className="text-emerald-400 font-bold">✓</span><span>{r}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => { setSelectedMapVenue(selectedDetailsRec.venue); setSelectedDetailsRec(null); setActiveTab('map'); }}
-                    className="flex-1 py-3 rounded-xl bg-slate-800 text-white text-xs font-bold"
-                  >
-                    View on Map
-                  </button>
-                  <button
-                    onClick={() => { setBookingModalVenue({ venue: selectedDetailsRec.venue, matchScore: selectedDetailsRec.matchScore }); setSelectedDetailsRec(null); }}
-                    className="flex-1 py-3 rounded-xl bg-cyan-500 text-black text-xs font-black"
-                  >
-                    Reserve Venue
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* BOOKING MODAL */}
-          {bookingModalVenue && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-              <div className="bg-[#0b1329] border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-white">
-                <button onClick={() => setBookingModalVenue(null)} className="absolute top-5 right-5 text-slate-400 hover:text-white p-2">✕</button>
-                <span className="text-xs font-bold text-cyan-400 uppercase">Reserve Campus Venue</span>
-                <h3 className="text-2xl font-bold text-white mb-1">{bookingModalVenue.venue.name}</h3>
-                <p className="text-xs text-slate-400 mb-4">{bookingModalVenue.venue.building} • Max Capacity: {bookingModalVenue.venue.capacity}</p>
-
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  const newB = {
-                    id: `BK-2026-${Math.floor(100 + Math.random() * 900)}`,
-                    venueId: bookingModalVenue.venue.id,
-                    venueName: bookingModalVenue.venue.name,
-                    building: bookingModalVenue.venue.building,
-                    eventName: e.target.elements.eventName.value,
-                    eventType: 'Workshop',
-                    organizerName: e.target.elements.organizerName.value,
-                    attendance: Number(e.target.elements.attCount.value),
-                    date,
-                    startTime,
-                    endTime,
-                    status: 'confirmed',
-                    qrCodeToken: `CS-PASS-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
-                    checkedIn: false
-                  };
-                  setBookings([newB, ...bookings]);
-                  setBookingModalVenue(null);
-                  setQrModalBooking(newB);
-                  showToast('Smart Pass Issued! Reservation confirmed.');
-                }} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold uppercase text-slate-300 mb-1">Event Title</label>
-                    <input name="eventName" defaultValue="National AI Hackathon Kickoff" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm" required />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold uppercase text-slate-300 mb-1">Organizer</label>
-                      <input name="organizerName" defaultValue={currentRole === 'organizer' ? 'Pooja Hegde' : 'Aarav Patel'} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm" required />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold uppercase text-slate-300 mb-1">Attendees</label>
-                      <input name="attCount" type="number" defaultValue={Math.min(bookingModalVenue.venue.capacity, 180)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm" required />
-                    </div>
-                  </div>
-                  <button type="submit" className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xs uppercase tracking-wider shadow-lg">
-                    Confirm & Generate Smart Pass
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* QR PASS MODAL */}
-          {qrModalBooking && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-              <div className="bg-[#0b1329] border border-slate-700 rounded-3xl max-w-md w-full p-6 text-center text-white relative">
-                <button onClick={() => setQrModalBooking(null)} className="absolute top-5 right-5 text-slate-400 hover:text-white p-2">✕</button>
-                <span className="text-[10px] uppercase font-bold text-cyan-400 bg-cyan-950 px-3 py-1 rounded-full border border-cyan-800">
-                  CampusSpace Smart Pass
-                </span>
-                <h3 className="text-xl font-bold mt-3">{qrModalBooking.eventName}</h3>
-                <p className="text-xs text-slate-400 mb-4">{qrModalBooking.venueName}</p>
-
-                <div className="flex justify-center mb-4">
-                  <div dangerouslySetInnerHTML={{ __html: generateQRCodeSVG(qrModalBooking.qrCodeToken, 200) }} />
-                </div>
-
-                <div className="bg-slate-900 p-3 rounded-xl text-xs space-y-1 mb-4 text-left border border-slate-800">
-                  <div className="flex justify-between"><span className="text-slate-400">Token ID:</span><span className="font-mono text-cyan-300">{qrModalBooking.qrCodeToken}</span></div>
-                  <div className="flex justify-between"><span className="text-slate-400">Schedule:</span><span>{qrModalBooking.date} ({qrModalBooking.startTime})</span></div>
-                  <div className="flex justify-between"><span className="text-slate-400">Status:</span><span className="text-emerald-400 font-bold">{qrModalBooking.checkedIn ? '✓ Verified (Door Unlocked)' : '● Pending Arrival'}</span></div>
-                </div>
-
-                <button
-                  onClick={() => { handleSimulateCheckIn(qrModalBooking.id); setQrModalBooking(null); }}
-                  disabled={qrModalBooking.checkedIn}
-                  className={`w-full py-3 rounded-xl text-xs font-bold uppercase ${qrModalBooking.checkedIn ? 'bg-slate-800 text-slate-400' : 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-lg shadow-emerald-500/20'}`}
-                >
-                  {qrModalBooking.checkedIn ? 'Already Checked In' : '📱 Simulate Door QR Scan (Check-in)'}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* NOTIFICATIONS DRAWER */}
-          {isNotificationsOpen && (
-            <div className="fixed inset-0 z-50 overflow-hidden animate-fadeIn">
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsNotificationsOpen(false)} />
-              <div className="absolute inset-y-0 right-0 max-w-md w-full bg-[#0b1329] border-l border-slate-800 p-6 flex flex-col justify-between text-white shadow-2xl">
-                <div>
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-                    <h3 className="text-base font-bold">Campus Notifications</h3>
-                    <button onClick={() => setIsNotificationsOpen(false)}>✕</button>
-                  </div>
-                  <div className="space-y-3">
-                    {notifications.map(n => (
-                      <div key={n.id} className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-                        <div className="flex justify-between font-bold text-white mb-1"><span>{n.title}</span><span className="text-slate-500 text-[10px]">{n.timestamp}</span></div>
-                        <p className="text-slate-300">{n.message}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    ReactDOM.render(<CampusSpaceApp />, document.getElementById('root'));
-  </script>
+
+<body>
+
+<!-- LOGIN -->
+
+<section id="loginPage">
+
+<div class="loginShell">
+
+<div class="loginHero">
+
+<div class="badge">Smart Living & Connected Communities</div>
+
+<h1>
+MACE<br>
+<span class="gradientText">Smart Campus OS</span>
+</h1>
+
+<p>
+An intelligent venue discovery, booking and campus resource
+management platform for Mar Athanasius College of Engineering,
+Kothamangalam.
+</p>
+
+<div class="heroStats">
+
+<div class="heroStat">
+<strong>9</strong>
+<span>Smart venues</span>
+</div>
+
+<div class="heroStat">
+<strong>4,330+</strong>
+<span>Total venue capacity</span>
+</div>
+
+<div class="heroStat">
+<strong>AI</strong>
+<span>Venue matching</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="loginCard">
+
+<h2>Welcome</h2>
+<p>Select your portal and sign in.</p>
+
+<div class="roleSwitcher">
+
+<button
+class="roleBtn active"
+id="studentRole"
+onclick="setLoginRole('student')">
+🎓 Student
+</button>
+
+<button
+class="roleBtn"
+id="adminRole"
+onclick="setLoginRole('admin')">
+🛡 Admin
+</button>
+
+</div>
+
+<div class="inputGroup">
+<label>Username</label>
+<input id="username" placeholder="Enter username">
+</div>
+
+<div class="inputGroup">
+<label>Password</label>
+<input
+id="password"
+type="password"
+placeholder="Enter password"
+onkeydown="if(event.key==='Enter') login()">
+</div>
+
+<button class="primaryBtn" onclick="login()">
+Sign In →
+</button>
+
+<div id="errorMsg"></div>
+
+</div>
+</div>
+</section>
+
+
+<!-- APP -->
+
+<section id="app" class="hidden">
+
+<header>
+
+<div class="logo">
+
+<div class="logoMark">M</div>
+
+<div class="logoText">
+MACE Smart Campus
+<span>Connected Campus Intelligence</span>
+</div>
+
+</div>
+
+<div class="headerRight">
+
+<div class="roleChip" id="currentRole">
+STUDENT
+</div>
+
+<button class="logoutBtn" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</header>
+
+<div class="layout">
+
+<aside class="sidebar">
+
+<button class="navButton active"
+onclick="showPage('dashboard',this)">
+🏠 Dashboard
+</button>
+
+<button class="navButton"
+onclick="showPage('map',this)">
+🗺 Campus Map
+</button>
+
+<button class="navButton"
+onclick="showPage('venues',this)">
+🏫 Venues
+</button>
+
+<button class="navButton"
+onclick="showPage('recommend',this)">
+✨ Smart Recommendation
+</button>
+
+<button class="navButton studentOnly"
+onclick="showPage('bookings',this)">
+📅 My Bookings
+</button>
+
+<button class="navButton adminOnly"
+onclick="showPage('adminBookings',this)">
+✅ Booking Requests
+</button>
+
+<button class="navButton adminOnly"
+onclick="showPage('adminVenues',this)">
+⚙ Manage Venues
+</button>
+
+</aside>
+
+
+<main class="main">
+
+<!-- DASHBOARD -->
+
+<section id="dashboardPage" class="page">
+
+<div class="pageTitle">
+<h1>Campus Intelligence Dashboard</h1>
+<p>Live overview of MACE venues and campus resources.</p>
+</div>
+
+<div class="statsGrid">
+
+<div class="statCard">
+<div class="statIcon">🏫</div>
+<h3 id="venueCount">9</h3>
+<p>Total venues</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">🟢</div>
+<h3 id="availableCount">9</h3>
+<p>Available venues</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">👥</div>
+<h3>4,330</h3>
+<p>Combined capacity</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">📅</div>
+<h3 id="pendingCount">0</h3>
+<p>Pending requests</p>
+</div>
+
+</div>
+
+<div class="grid2">
+
+<div class="card">
+
+<div class="cardTitle">
+<h2>Smart Campus Overview</h2>
+</div>
+
+<div class="mapContainer" id="dashboardMap"></div>
+
+</div>
+
+<div>
+
+<div class="card">
+
+<div class="cardTitle">
+<h2>AI Insight</h2>
+</div>
+
+<p style="color:#b7c9da;line-height:1.8">
+Our recommendation engine selects venues based on
+capacity, event type, facilities, availability and
+department priority.
+</p>
+
+<br>
+
+<button class="smallBtn"
+onclick="showPage('recommend')">
+Find Best Venue
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+<h2>Quick Availability</h2>
+</div>
+
+<div id="quickAvailability"></div>
+
+</div>
+
+</div>
+</div>
+
+</section>
+
+
+<!-- MAP -->
+
+<section id="mapPage" class="page hidden">
+
+<div class="pageTitle">
+<h1>MACE Interactive Campus Map</h1>
+<p>Explore important venues and event spaces across campus.</p>
+</div>
+
+<div class="mapContainer" id="mainMap"></div>
+
+<p style="color:#7f96ad;font-size:12px;margin-top:12px">
+Map pin positions are currently demonstration positions.
+Replace <b>mace-map.png</b> with your official MACE route-map
+image and adjust venue coordinates after adding the image.
+</p>
+
+</section>
+
+
+<!-- VENUES -->
+
+<section id="venuesPage" class="page hidden">
+
+<div class="pageTitle">
+<h1>Venue Explorer</h1>
+<p>Search MACE spaces by capacity, block and facilities.</p>
+</div>
+
+<div class="filters">
+
+<input
+id="venueSearch"
+placeholder="Search venues..."
+oninput="renderVenues()">
+
+<select id="blockFilter" onchange="renderVenues()">
+<option value="">All Blocks</option>
+<option>Main Block</option>
+<option>ECE Department Block</option>
+<option>Placement Cell</option>
+<option>Open Air Theatre</option>
+<option>Founders Block</option>
+<option>Canteen</option>
+</select>
+
+<select id="availabilityFilter" onchange="renderVenues()">
+<option value="">Any Status</option>
+<option value="available">Available</option>
+<option value="unavailable">Unavailable</option>
+</select>
+
+</div>
+
+<div class="venueGrid" id="venueGrid"></div>
+
+</section>
+
+
+<!-- RECOMMENDER -->
+
+<section id="recommendPage" class="page hidden">
+
+<div class="pageTitle">
+<h1>AI Smart Venue Recommendation</h1>
+<p>Tell us what your event needs and the system will find the best MACE venue.</p>
+</div>
+
+<div class="card aiPanel">
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Number of People</label>
+<input type="number" id="reqCapacity" value="50" min="1">
+</div>
+
+<div class="inputGroup">
+
+<label>Event Type</label>
+
+<select id="eventType">
+
+<option value="technical">
+Technical Workshop / Seminar
+</option>
+
+<option value="placement">
+Placement / Recruitment
+</option>
+
+<option value="cultural">
+Cultural Event
+</option>
+
+<option value="concert">
+Concert / Music
+</option>
+
+<option value="meeting">
+Meeting
+</option>
+
+<option value="pta">
+PTA Meeting
+</option>
+
+<option value="practice">
+Practice / Rehearsal
+</option>
+
+<option value="exam">
+Exam
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="inputGroup">
+
+<label>Required Facilities</label>
+
+<div class="checkGrid">
+
+<label class="check">
+<input type="checkbox" value="wifi" class="facilityReq">
+ Wi-Fi
+</label>
+
+<label class="check">
+<input type="checkbox" value="ac" class="facilityReq">
+ AC
+</label>
+
+<label class="check">
+<input type="checkbox" value="projector" class="facilityReq">
+ Projector
+</label>
+
+<label class="check">
+<input type="checkbox" value="audio" class="facilityReq">
+ Audio System
+</label>
+
+<label class="check">
+<input type="checkbox" value="tables" class="facilityReq">
+ Tables
+</label>
+
+<label class="check">
+<input type="checkbox" value="soundproof" class="facilityReq">
+ Soundproof
+</label>
+
+</div>
+
+</div>
+
+<button class="primaryBtn" onclick="recommendVenue()">
+✨ Find Best Venue
+</button>
+
+<div id="recommendationResult"></div>
+
+</div>
+
+</section>
+
+
+<!-- STUDENT BOOKINGS -->
+
+<section id="bookingsPage" class="page hidden">
+
+<div class="pageTitle">
+<h1>My Booking Requests</h1>
+<p>Track submitted MACE venue booking requests.</p>
+</div>
+
+<div class="card">
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>VENUE</th>
+<th>EVENT</th>
+<th>DATE</th>
+<th>TIME</th>
+<th>PEOPLE</th>
+<th>STATUS</th>
+</tr>
+</thead>
+
+<tbody id="studentBookingsTable"></tbody>
+
+</table>
+</div>
+</div>
+
+</section>
+
+
+<!-- ADMIN REQUESTS -->
+
+<section id="adminBookingsPage" class="page hidden">
+
+<div class="pageTitle">
+<h1>Booking Requests</h1>
+<p>Approve or reject student venue requests.</p>
+</div>
+
+<div class="card">
+
+<div class="tableWrap">
+
+<table>
+
+<thead>
+<tr>
+<th>VENUE</th>
+<th>EVENT</th>
+<th>DATE</th>
+<th>TIME</th>
+<th>PEOPLE</th>
+<th>STATUS</th>
+<th>ACTION</th>
+</tr>
+</thead>
+
+<tbody id="adminBookingsTable"></tbody>
+
+</table>
+
+</div>
+</div>
+
+</section>
+
+
+<!-- ADMIN VENUE MANAGEMENT -->
+
+<section id="adminVenuesPage" class="page hidden">
+
+<div class="pageTitle">
+<h1>Venue Management</h1>
+<p>Control venue availability across MACE.</p>
+</div>
+
+<div class="card">
+
+<div class="tableWrap">
+
+<table>
+
+<thead>
+<tr>
+<th>VENUE</th>
+<th>BLOCK</th>
+<th>CAPACITY</th>
+<th>TIME</th>
+<th>STATUS</th>
+<th>ACTION</th>
+</tr>
+</thead>
+
+<tbody id="manageVenueTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+</div>
+</section>
+
+
+<!-- BOOKING MODAL -->
+
+<div id="bookingModal" class="modalOverlay hidden">
+
+<div class="modal">
+
+<button class="closeModal" onclick="closeBooking()">×</button>
+
+<h2>Request Venue</h2>
+
+<p
+id="bookingVenueName"
+style="color:#82bfff;margin:8px 0 22px">
+</p>
+
+<input type="hidden" id="bookingVenueId">
+
+<div class="inputGroup">
+<label>Event Name</label>
+<input id="bookingEvent"
+placeholder="Example: Coding Workshop">
+</div>
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Date</label>
+<input type="date" id="bookingDate">
+</div>
+
+<div class="inputGroup">
+<label>Expected People</label>
+<input type="number" id="bookingPeople" min="1">
+</div>
+
+</div>
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Start Time</label>
+<input type="time" id="bookingStart">
+</div>
+
+<div class="inputGroup">
+<label>End Time</label>
+<input type="time" id="bookingEnd">
+</div>
+
+</div>
+
+<div class="inputGroup">
+<label>Purpose</label>
+<textarea id="bookingPurpose"
+rows="3"
+placeholder="Briefly describe the event"></textarea>
+</div>
+
+<button class="primaryBtn" onclick="submitBooking()">
+Submit Request
+</button>
+
+</div>
+</div>
+
+
+<script>
+
+/* ================================
+   MACE VENUE DATABASE
+================================ */
+
+const venues = [
+
+{
+id:1,
+name:"Main Auditorium",
+block:"Main Block",
+capacity:500,
+time:"9:00 AM – 9:00 PM",
+facilities:[
+"Stage",
+"Practice Area",
+"Fans & Lights",
+"Audio System",
+"Speakers"
+],
+tags:["audio","practice","stage"],
+available:true,
+x:24,
+y:38
+},
+
+{
+id:2,
+name:"Seminar Hall 2",
+block:"Main Block",
+capacity:50,
+time:"9:00 AM – 7:00 PM",
+facilities:[
+"Wi-Fi",
+"AC",
+"Meeting Area",
+"Tiered Seating",
+"Projector",
+"Audio System",
+"Soundproof"
+],
+tags:[
+"wifi",
+"ac",
+"projector",
+"audio",
+"soundproof",
+"meeting"
+],
+available:true,
+x:36,
+y:31
+},
+
+{
+id:3,
+name:"PTA Seminar Hall",
+block:"Main Block",
+capacity:50,
+time:"9:00 AM – 5:00 PM",
+facilities:[
+"Wi-Fi",
+"AC",
+"PTA Meeting Area",
+"Tiered Seating",
+"Tables",
+"Projector",
+"Audio System",
+"Soundproof"
+],
+tags:[
+"wifi",
+"ac",
+"tables",
+"projector",
+"audio",
+"soundproof",
+"pta",
+"meeting"
+],
+available:true,
+x:39,
+y:43
+},
+
+{
+id:4,
+name:"Seminar Hall 4",
+block:"ECE Department Block",
+capacity:80,
+time:"9:00 AM – 10:00 PM",
+facilities:[
+"Wi-Fi",
+"AC",
+"Tiered Seating",
+"Tables",
+"Multiple Plug Points",
+"Projector",
+"Soundproof",
+"Speaker & Sound System"
+],
+tags:[
+"wifi",
+"ac",
+"tables",
+"projector",
+"soundproof",
+"audio"
+],
+available:true,
+x:60,
+y:28
+},
+
+{
+id:5,
+name:"Placement Hall 1",
+block:"Placement Cell",
+capacity:50,
+time:"9:00 AM – 4:00 PM",
+facilities:[
+"Attached Table Chairs",
+"AC",
+"Wi-Fi",
+"Projector"
+],
+tags:[
+"wifi",
+"ac",
+"projector",
+"tables",
+"placement"
+],
+available:true,
+priority:"placement",
+x:69,
+y:48
+},
+
+{
+id:6,
+name:"Placement Hall 2",
+block:"Placement Cell",
+capacity:100,
+time:"9:00 AM – 4:00 PM",
+facilities:[
+"Attached Table Chairs",
+"AC",
+"Wi-Fi",
+"Projector"
+],
+tags:[
+"wifi",
+"ac",
+"projector",
+"tables",
+"placement"
+],
+available:true,
+priority:"placement",
+x:76,
+y:44
+},
+
+{
+id:7,
+name:"Open Air Theatre (OAT)",
+block:"Open Air Theatre",
+capacity:3000,
+time:"6:00 AM – 9:00 PM",
+facilities:[
+"Concert Venue",
+"Tiered Open Theatre",
+"Sound System",
+"Practice Area",
+"Cultural Events"
+],
+tags:[
+"concert",
+"cultural",
+"audio",
+"practice"
+],
+available:true,
+priority:"cultural",
+x:56,
+y:71
+},
+
+{
+id:8,
+name:"Founders Block",
+block:"Founders Block",
+capacity:250,
+time:"9:00 AM – 7:00 PM",
+facilities:[
+"Top Floor Practice Area",
+"Exam Centre",
+"Tables",
+"Chairs"
+],
+tags:[
+"practice",
+"tables",
+"exam"
+],
+available:true,
+x:32,
+y:72
+},
+
+{
+id:9,
+name:"Canteen",
+block:"Canteen",
+capacity:250,
+time:"9:00 AM – 6:30 PM",
+facilities:[
+"Small Music Band Events",
+"Informal Event Space"
+],
+tags:[
+"music",
+"cultural"
+],
+available:true,
+x:80,
+y:70
+}
+
+];
+
+
+/* ================================
+   AUTHENTICATION
+================================ */
+
+let selectedLoginRole="student";
+let currentUserRole=null;
+
+function setLoginRole(role){
+
+selectedLoginRole=role;
+
+document
+.getElementById("studentRole")
+.classList.toggle("active",role==="student");
+
+document
+.getElementById("adminRole")
+.classList.toggle("active",role==="admin");
+
+document.getElementById("errorMsg").textContent="";
+
+}
+
+function login(){
+
+const username=
+document.getElementById("username")
+.value.trim();
+
+const password=
+document.getElementById("password")
+.value;
+
+let valid=false;
+
+if(
+selectedLoginRole==="student" &&
+username==="student" &&
+password==="student@123"
+){
+valid=true;
+}
+
+if(
+selectedLoginRole==="admin" &&
+username==="admin" &&
+password==="admin@123"
+){
+valid=true;
+}
+
+if(!valid){
+
+document.getElementById("errorMsg")
+.textContent="Incorrect username or password.";
+
+return;
+}
+
+currentUserRole=selectedLoginRole;
+
+document.getElementById("loginPage")
+.classList.add("hidden");
+
+document.getElementById("app")
+.classList.remove("hidden");
+
+document.getElementById("currentRole")
+.textContent=currentUserRole.toUpperCase();
+
+document.querySelectorAll(".adminOnly")
+.forEach(el=>
+el.classList.toggle(
+"hidden",
+currentUserRole!=="admin"
+)
+);
+
+document.querySelectorAll(".studentOnly")
+.forEach(el=>
+el.classList.toggle(
+"hidden",
+currentUserRole!=="student"
+)
+);
+
+showPage("dashboard");
+
+renderAll();
+
+}
+
+function logout(){
+
+currentUserRole=null;
+
+document.getElementById("app")
+.classList.add("hidden");
+
+document.getElementById("loginPage")
+.classList.remove("hidden");
+
+document.getElementById("username").value="";
+document.getElementById("password").value="";
+
+}
+
+
+/* ================================
+   PAGE NAVIGATION
+================================ */
+
+function showPage(page,button){
+
+document
+.querySelectorAll(".page")
+.forEach(p=>p.classList.add("hidden"));
+
+const target=
+document.getElementById(page+"Page");
+
+if(target)
+target.classList.remove("hidden");
+
+document
+.querySelectorAll(".navButton")
+.forEach(btn=>btn.classList.remove("active"));
+
+if(button)
+button.classList.add("active");
+
+renderAll();
+
+}
+
+
+/* ================================
+   MAP
+================================ */
+
+function buildMap(container){
+
+container.innerHTML=`
+<div class="mapGrid"></div>
+
+<div class="road road1"></div>
+<div class="road road2"></div>
+<div class="road road3"></div>
+
+${venues.map(v=>`
+
+<button
+class="venuePin ${v.available?"":"closed"}"
+style="left:${v.x}%;top:${v.y}%"
+onclick="openVenueDetails(${v.id})">
+
+📍 ${v.name}
+
+</button>
+
+`).join("")}
+
+<div class="mapLegend">
+
+<span class="dot green"></span>
+Available
+
+&nbsp;&nbsp;
+
+<span class="dot red"></span>
+Unavailable
+
+</div>
+`;
+
+}
+
+
+/* ================================
+   VENUES
+================================ */
+
+function renderVenues(){
+
+const grid=
+document.getElementById("venueGrid");
+
+if(!grid)
+return;
+
+const search=
+document.getElementById("venueSearch")
+?.value.toLowerCase() || "";
+
+const block=
+document.getElementById("blockFilter")
+?.value || "";
+
+const availability=
+document.getElementById("availabilityFilter")
+?.value || "";
+
+const results=venues.filter(v=>{
+
+const searchMatch=
+v.name.toLowerCase().includes(search) ||
+v.block.toLowerCase().includes(search) ||
+v.facilities.join(" ").toLowerCase().includes(search);
+
+const blockMatch=
+!block || v.block===block;
+
+const availabilityMatch=
+!availability ||
+(
+availability==="available"
+? v.available
+: !v.available
+);
+
+return searchMatch &&
+blockMatch &&
+availabilityMatch;
+
+});
+
+grid.innerHTML=
+results.map(v=>`
+
+<div class="venueCard">
+
+<div class="venueTop">
+
+<div>
+
+<h3>${v.name}</h3>
+
+<div class="venueBlock">
+${v.block}
+</div>
+
+</div>
+
+<span
+class="status ${v.available?"available":"unavailable"}">
+
+${v.available?"AVAILABLE":"UNAVAILABLE"}
+
+</span>
+
+</div>
+
+<div class="venueMeta">
+
+<span>
+👥 ${v.capacity}
+</span>
+
+<span>
+🕒 ${v.time}
+</span>
+
+</div>
+
+<div class="facilities">
+
+${v.facilities
+.map(f=>`
+<span class="facility">
+${f}
+</span>
+`)
+.join("")}
+
+</div>
+
+<br>
+
+<button
+class="smallBtn secondary"
+onclick="openVenueDetails(${v.id})">
+
+View Details
+
+</button>
+
+${currentUserRole==="student" && v.available
+?`
+
+<button
+class="smallBtn"
+onclick="openBooking(${v.id})">
+
+Request Booking
+
+</button>
+
+`
+:""}
+
+</div>
+
+`).join("");
+
+}
+
+
+/* ================================
+   VENUE DETAILS
+================================ */
+
+function openVenueDetails(id){
+
+const v=
+venues.find(v=>v.id===id);
+
+alert(
+`${v.name}
+
+Block: ${v.block}
+
+Capacity: ${v.capacity}
+
+Available Time:
+${v.time}
+
+Facilities:
+• ${v.facilities.join("\n• ")}
+
+Status:
+${v.available
+?"Available"
+:"Unavailable"}`
+);
+
+}
+
+
+/* ================================
+   SMART AI STYLE RECOMMENDER
+================================ */
+
+function recommendVenue(){
+
+const people=
+Number(
+document.getElementById("reqCapacity").value
+);
+
+const type=
+document.getElementById("eventType").value;
+
+const requestedFacilities=
+[
+...document.querySelectorAll(
+".facilityReq:checked"
+)
+].map(c=>c.value);
+
+let candidates=
+venues
+.filter(v=>
+v.available &&
+v.capacity>=people
+)
+.map(v=>{
+
+let score=60;
+let reasons=[];
+
+/* Capacity */
+
+const unused=
+v.capacity-people;
+
+if(unused<=20){
+score+=18;
+reasons.push(
+"capacity closely matches your requirement"
+);
+}
+else if(
+v.capacity<=people*2
+){
+score+=12;
+reasons.push(
+"good capacity utilisation"
+);
+}
+else{
+score+=3;
+}
+
+/* Requested facilities */
+
+requestedFacilities.forEach(f=>{
+
+if(v.tags.includes(f)){
+score+=7;
+}
+else{
+score-=8;
+}
+
+});
+
+/* Event intelligence */
+
+if(type==="placement"){
+
+if(v.priority==="placement"){
+score+=35;
+reasons.push(
+"Placement Cell receives priority for placement-related activities"
+);
+}
+else{
+score-=12;
+}
+
+}
+
+if(type==="cultural"){
+
+if(v.name.includes("Open Air Theatre")){
+score+=35;
+reasons.push(
+"OAT is the main cultural-event destination"
+);
+}
+
+if(v.tags.includes("cultural"))
+score+=15;
+
+}
+
+if(type==="concert"){
+
+if(v.name.includes("Open Air Theatre")){
+score+=40;
+reasons.push(
+"OAT is designed for concerts and large performances"
+);
+}
+
+if(v.tags.includes("audio"))
+score+=8;
+
+}
+
+if(type==="technical"){
+
+["wifi","projector","ac"]
+.forEach(f=>{
+
+if(v.tags.includes(f))
+score+=7;
+
+});
+
+}
+
+if(type==="pta"){
+
+if(v.name.includes("PTA")){
+score+=45;
+reasons.push(
+"specifically intended for PTA sessions"
+);
+}
+
+}
+
+if(type==="exam"){
+
+if(v.name.includes("Founders")){
+score+=45;
+reasons.push(
+"Founders Block functions as a major examination centre"
+);
+}
+
+}
+
+if(type==="practice"){
+
+if(v.tags.includes("practice")){
+score+=25;
+reasons.push(
+"dedicated practice space is available"
+);
+}
+
+}
+
+if(type==="meeting"){
+
+if(v.tags.includes("meeting")){
+score+=20;
+}
+
+}
+
+score=
+Math.max(
+1,
+Math.min(99,score)
+);
+
+return{
+...v,
+score,
+reasons
+};
+
+});
+
+candidates.sort(
+(a,b)=>b.score-a.score
+);
+
+const box=
+document.getElementById(
+"recommendationResult"
+);
+
+if(!candidates.length){
+
+box.innerHTML=`
+
+<div class="recommendation">
+
+<h3>⚠ No suitable venue available</h3>
+
+<p class="reason">
+No currently available venue can accommodate
+${people} people with the selected requirements.
+</p>
+
+</div>
+
+`;
+
+return;
+}
+
+const best=candidates[0];
+
+const missing=
+requestedFacilities.filter(
+f=>!best.tags.includes(f)
+);
+
+box.innerHTML=`
+
+<div class="recommendation">
+
+<div style="
+display:flex;
+justify-content:space-between;
+gap:20px;
+align-items:center">
+
+<div>
+
+<div style="
+color:#70e9b4;
+font-weight:700;
+font-size:12px;
+margin-bottom:6px">
+
+🏆 BEST MATCH
+
+</div>
+
+<h2>
+${best.name}
+</h2>
+
+<p style="
+color:#79baff;
+margin-top:5px">
+
+${best.block}
+
+</p>
+
+</div>
+
+<div>
+
+<div class="score">
+${best.score}%
+</div>
+
+<div style="
+font-size:11px;
+color:#8298ad">
+
+SUITABILITY
+
+</div>
+
+</div>
+
+</div>
+
+<div class="venueMeta">
+
+<span>
+👥 Capacity ${best.capacity}
+</span>
+
+<span>
+🕒 ${best.time}
+</span>
+
+</div>
+
+<div class="facilities">
+
+${best.facilities.map(f=>`
+<span class="facility">${f}</span>
+`).join("")}
+
+</div>
+
+<p class="reason">
+
+<b>Why this venue?</b><br>
+
+${best.reasons.length
+? best.reasons.join(
+". "
+)+"."
+:"It provides the strongest overall balance of capacity, facilities and availability."}
+
+${missing.length
+? `<br><br>⚠ Missing requested facilities:
+${missing.join(", ")}`
+:""}
+
+</p>
+
+${currentUserRole==="student"
+?`
+
+<button
+class="smallBtn"
+style="margin-top:16px"
+onclick="openBooking(${best.id})">
+
+Request This Venue
+
+</button>
+
+`
+:""}
+
+</div>
+`;
+
+}
+
+
+/* ================================
+   BOOKINGS
+================================ */
+
+function getBookings(){
+
+return JSON.parse(
+localStorage.getItem(
+"maceBookings"
+) || "[]"
+);
+
+}
+
+function saveBookings(bookings){
+
+localStorage.setItem(
+"maceBookings",
+JSON.stringify(bookings)
+);
+
+}
+
+function openBooking(id){
+
+const venue=
+venues.find(v=>v.id===id);
+
+document.getElementById(
+"bookingVenueId"
+).value=id;
+
+document.getElementById(
+"bookingVenueName"
+).textContent=
+`${venue.name} • Capacity ${venue.capacity}`;
+
+document.getElementById(
+"bookingPeople"
+).max=venue.capacity;
+
+document.getElementById(
+"bookingModal"
+).classList.remove("hidden");
+
+}
+
+function closeBooking(){
+
+document.getElementById(
+"bookingModal"
+).classList.add("hidden");
+
+}
+
+function submitBooking(){
+
+const venueId=
+Number(
+document.getElementById(
+"bookingVenueId"
+).value
+);
+
+const venue=
+venues.find(v=>v.id===venueId);
+
+const event=
+document.getElementById(
+"bookingEvent"
+).value.trim();
+
+const date=
+document.getElementById(
+"bookingDate"
+).value;
+
+const people=
+Number(
+document.getElementById(
+"bookingPeople"
+).value
+);
+
+const start=
+document.getElementById(
+"bookingStart"
+).value;
+
+const end=
+document.getElementById(
+"bookingEnd"
+).value;
+
+const purpose=
+document.getElementById(
+"bookingPurpose"
+).value.trim();
+
+if(
+!event ||
+!date ||
+!people ||
+!start ||
+!end
+){
+
+alert(
+"Please complete all required fields."
+);
+
+return;
+}
+
+if(people>venue.capacity){
+
+alert(
+`This venue can accommodate only ${venue.capacity} people.`
+);
+
+return;
+}
+
+const bookings=
+getBookings();
+
+bookings.push({
+
+id:Date.now(),
+
+venueId,
+
+venue:venue.name,
+
+event,
+
+date,
+
+people,
+
+start,
+
+end,
+
+purpose,
+
+status:"Pending",
+
+createdAt:
+new Date().toISOString()
+
+});
+
+saveBookings(bookings);
+
+closeBooking();
+
+alert(
+"Booking request submitted successfully."
+);
+
+renderAll();
+
+}
+
+
+/* ================================
+   RENDER BOOKINGS
+================================ */
+
+function renderBookings(){
+
+const bookings=
+getBookings();
+
+/* Student */
+
+const studentTable=
+document.getElementById(
+"studentBookingsTable"
+);
+
+if(studentTable){
+
+studentTable.innerHTML=
+bookings.length
+?
+bookings.map(b=>`
+
+<tr>
+
+<td>${b.venue}</td>
+
+<td>${b.event}</td>
+
+<td>${b.date}</td>
+
+<td>
+${b.start} – ${b.end}
+</td>
+
+<td>${b.people}</td>
+
+<td>
+${statusBadge(b.status)}
+</td>
+
+</tr>
+
+`).join("")
+
+:
+
+`
+
+<tr>
+<td colspan="6"
+style="
+text-align:center;
+color:#7f96ad;
+padding:30px">
+
+No booking requests yet.
+
+</td>
+</tr>
+
+`;
+
+}
+
+
+/* Admin */
+
+const adminTable=
+document.getElementById(
+"adminBookingsTable"
+);
+
+if(adminTable){
+
+adminTable.innerHTML=
+bookings.length
+?
+bookings.map(b=>`
+
+<tr>
+
+<td>${b.venue}</td>
+
+<td>${b.event}</td>
+
+<td>${b.date}</td>
+
+<td>
+${b.start} – ${b.end}
+</td>
+
+<td>${b.people}</td>
+
+<td>
+${statusBadge(b.status)}
+</td>
+
+<td>
+
+${b.status==="Pending"
+?`
+
+<button
+class="smallBtn approve"
+onclick="updateBooking(
+${b.id},
+'Approved'
+)">
+
+Approve
+
+</button>
+
+<button
+class="smallBtn reject"
+onclick="updateBooking(
+${b.id},
+'Rejected'
+)">
+
+Reject
+
+</button>
+
+`
+:"—"}
+
+</td>
+
+</tr>
+
+`).join("")
+
+:
+
+`
+
+<tr>
+<td colspan="7"
+style="
+text-align:center;
+color:#7f96ad;
+padding:30px">
+
+No booking requests.
+
+</td>
+</tr>
+
+`;
+
+}
+
+}
+
+function statusBadge(status){
+
+let color=
+status==="Approved"
+?"#61e59b"
+:
+status==="Rejected"
+?"#ff8585"
+:
+"#ffd166";
+
+return `
+<span style="
+color:${color};
+font-weight:800">
+${status}
+</span>
+`;
+
+}
+
+function updateBooking(id,status){
+
+let bookings=
+getBookings();
+
+bookings=
+bookings.map(b=>
+b.id===id
+?
+{
+...b,
+status
+}
+:
+b
+);
+
+saveBookings(bookings);
+
+renderAll();
+
+}
+
+
+/* ================================
+   ADMIN VENUE MANAGEMENT
+================================ */
+
+function renderVenueManagement(){
+
+const table=
+document.getElementById(
+"manageVenueTable"
+);
+
+if(!table)
+return;
+
+table.innerHTML=
+venues.map(v=>`
+
+<tr>
+
+<td>
+<strong>${v.name}</strong>
+</td>
+
+<td>${v.block}</td>
+
+<td>${v.capacity}</td>
+
+<td>${v.time}</td>
+
+<td>
+
+<span class="
+status
+${v.available
+?"available"
+:"unavailable"}">
+
+${v.available
+?"AVAILABLE"
+:"UNAVAILABLE"}
+
+</span>
+
+</td>
+
+<td>
+
+<button
+class="
+smallBtn
+${v.available
+?"reject"
+:"approve"}"
+
+onclick="
+toggleVenue(${v.id})
+">
+
+${v.available
+?"Mark Unavailable"
+:"Mark Available"}
+
+</button>
+
+</td>
+
+</tr>
+
+`).join("");
+
+}
+
+function toggleVenue(id){
+
+const v=
+venues.find(v=>v.id===id);
+
+v.available=
+!v.available;
+
+renderAll();
+
+}
+
+
+/* ================================
+   QUICK DASHBOARD
+================================ */
+
+function renderDashboard(){
+
+const available=
+venues.filter(
+v=>v.available
+).length;
+
+document.getElementById(
+"availableCount"
+).textContent=available;
+
+document.getElementById(
+"pendingCount"
+).textContent=
+getBookings()
+.filter(
+b=>b.status==="Pending"
+).length;
+
+const quick=
+document.getElementById(
+"quickAvailability"
+);
+
+if(quick){
+
+quick.innerHTML=
+venues
+.slice(0,5)
+.map(v=>`
+
+<div style="
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid #203348;
+font-size:13px">
+
+<span>
+${v.name}
+</span>
+
+<span style="
+color:${v.available
+?"#61e59b"
+:"#ff8585"}">
+
+${v.available
+?"Available"
+:"Unavailable"}
+
+</span>
+
+</div>
+
+`).join("");
+
+}
+
+}
+
+
+/* ================================
+   GLOBAL RENDER
+================================ */
+
+function renderAll(){
+
+renderDashboard();
+renderVenues();
+renderBookings();
+renderVenueManagement();
+
+const dashboardMap=
+document.getElementById(
+"dashboardMap"
+);
+
+if(dashboardMap)
+buildMap(dashboardMap);
+
+const mainMap=
+document.getElementById(
+"mainMap"
+);
+
+if(mainMap)
+buildMap(mainMap);
+
+}
+
+
+/* ================================
+   INITIALIZATION
+================================ */
+
+document.getElementById(
+"bookingDate"
+).min=
+new Date()
+.toISOString()
+.split("T")[0];
+
+</script>
+
 </body>
 </html>

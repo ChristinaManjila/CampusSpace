@@ -1,34 +1,41 @@
-export type UserRole = 'student' | 'organizer' | 'admin';
+export type UserRole = 'organizer' | 'admin';
 
-export type VenueStatus = 'available' | 'booked' | 'pending' | 'maintenance';
+export type VenueStatus = 'available' | 'booked' | 'maintenance';
 
 export type EventType =
   | 'Seminar'
   | 'Workshop'
-  | 'Hackathon'
-  | 'Conference'
-  | 'Cultural Event'
   | 'Club Meeting'
-  | 'Sports Event'
+  | 'Cultural Event'
+  | 'Hackathon'
+  | 'Presentation'
+  | 'Sports Activity'
+  | 'Conference'
   | 'Examination'
   | 'Exhibition';
 
 export type FacilityItem =
   | 'Projector'
+  | 'Air conditioning'
+  | 'Sound system'
+  | 'Microphone'
   | 'Wi-Fi'
-  | 'Air Conditioning'
   | 'Stage'
-  | 'Microphones'
-  | 'Lab Equipment'
-  | 'Power Outlets'
   | 'Whiteboard'
-  | 'Recording Equipment'
-  | 'Wheelchair Accessibility'
-  | 'Parking';
+  | 'Computer systems';
 
 export interface Coordinates {
   lat: number;
   lng: number;
+}
+
+export interface VenueTimeSlot {
+  id: string;
+  startTime: string;
+  endTime: string;
+  isAvailable: boolean;
+  bookedBy?: string;
+  eventName?: string;
 }
 
 export interface Venue {
@@ -44,14 +51,17 @@ export interface Venue {
   currentEvent?: string;
   energyRating: 'A+' | 'A' | 'B' | 'C';
   historicalSuitability: Record<string, number>; // eventType -> score %
-  cancellationRate: number; // 0 to 100%
+  cancellationRate: number; // %
   historicalAverageOccupancy: number; // %
   description: string;
   image: string;
   contactPerson: string;
   noiseLevel: 'Quiet' | 'Moderate' | 'High-Energy Allowed';
   wheelchairAccessible: boolean;
+  availableTimeSlots?: VenueTimeSlot[];
 }
+
+export type BookingStatus = 'Pending' | 'Auto-approved' | 'Approved' | 'Rejected' | 'Cancelled';
 
 export interface Booking {
   id: string;
@@ -67,14 +77,12 @@ export interface Booking {
   date: string;
   startTime: string;
   endTime: string;
-  status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
-  qrCodeToken: string;
-  checkedIn: boolean;
-  checkedInAt?: string;
+  status: BookingStatus;
   requestedFacilities: FacilityItem[];
   notes?: string;
   matchScore?: number;
   createdAt: string;
+  isAutoApproved?: boolean;
 }
 
 export interface AIRecommendationRequest {
@@ -84,6 +92,7 @@ export interface AIRecommendationRequest {
   startTime: string;
   endTime: string;
   requiredFacilities: FacilityItem[];
+  flexibleTiming?: boolean;
   userLocation?: Coordinates;
 }
 
@@ -96,13 +105,12 @@ export interface AIRecommendationResult {
   availabilityScore: number;
   proximityScore: number;
   historicalScore: number;
-  reliabilityScore: number;
-  demandScore: number;
+  whyRecommended: string;
+  detailedReasons: string[];
+  matchedFacilities: FacilityItem[];
+  missingFacilities: FacilityItem[];
   distanceMeters: number;
   walkingMinutes: number;
-  whyRecommended: string[];
-  highlights: string[];
-  warnings: string[];
 }
 
 export interface NotificationItem {
@@ -112,20 +120,40 @@ export interface NotificationItem {
   type: 'info' | 'success' | 'warning' | 'alert';
   timestamp: string;
   read: boolean;
-  actionId?: string;
 }
 
-export interface RouteStep {
-  instruction: string;
-  distanceMeters: number;
-  durationMinutes: number;
-  icon: string;
+export interface UserProfile {
+  id: string;
+  username: string;
+  name: string;
+  role: UserRole;
+  department: string;
+  avatar: string;
+  badge: string;
 }
 
-export interface NavigationRoute {
-  destination: Venue;
-  totalDistanceMeters: number;
-  totalWalkingMinutes: number;
-  waypoints: [number, number][];
-  steps: RouteStep[];
-}
+export const PRESET_CREDENTIALS = {
+  admin: {
+    username: 'admin',
+    password: 'admin123',
+    role: 'admin' as UserRole,
+    name: 'Campus Facilities Administrator',
+    department: 'Office of Campus Administration',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    badge: 'Senior Admin'
+  },
+  organizer: {
+    username: 'organizer',
+    password: '12345',
+    role: 'organizer' as UserRole,
+    name: 'Event Organizer',
+    department: 'University Event & Club Council',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+    badge: 'Faculty / Club Convener'
+  }
+};
+
+export const DEFAULT_USERS = {
+  admin: PRESET_CREDENTIALS.admin,
+  organizer: PRESET_CREDENTIALS.organizer
+};

@@ -1,5 +1,5 @@
-import React from 'react';
-import { UserRole } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { UserRole, UserProfile } from '../types';
 
 interface NavbarProps {
   currentRole: UserRole;
@@ -10,6 +10,9 @@ interface NavbarProps {
   onSearchChange: (q: string) => void;
   onQuickLocate: () => void;
   isSimulatingLocation: boolean;
+  currentUser?: UserProfile | null;
+  onLogout: () => void;
+  onOpenLanding?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -20,13 +23,33 @@ export const Navbar: React.FC<NavbarProps> = ({
   searchQuery,
   onSearchChange,
   onQuickLocate,
-  isSimulatingLocation
+  isSimulatingLocation,
+  currentUser,
+  onLogout,
+  onOpenLanding
 }) => {
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="h-18 bg-[#0b1329]/95 backdrop-blur-md border-b border-slate-800 text-white flex items-center justify-between px-6 sticky top-0 z-40">
       {/* Brand & Tagline */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 font-black text-xl text-white">
+      <div
+        className="flex items-center gap-3 cursor-pointer group"
+        onClick={onOpenLanding}
+        title="View CampusSpace Landing Page"
+      >
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 font-black text-xl text-white group-hover:scale-105 transition">
           CS
         </div>
         <div>
@@ -35,11 +58,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               CampusSpace
             </span>
             <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/60">
-              AI Powered
+              Smart Venue Platform
             </span>
           </div>
           <p className="text-[11px] text-slate-400 hidden sm:block">
-            Book smarter. Use better. Plan ahead.
+            AI-Powered Campus Venue Allocation & Capacity Optimization
           </p>
         </div>
       </div>
@@ -73,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Quick GPS Status */}
         <button
           onClick={onQuickLocate}
-          title="Toggle Campus GPS Simulation / Live Tracking"
+          title="Campus GPS Simulation / Live Tracking"
           className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border transition ${
             isSimulatingLocation
               ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-300 shadow-sm shadow-cyan-500/10'
@@ -82,19 +105,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
           <span className="hidden sm:inline">GPS:</span>
-          <span className="font-semibold">{isSimulatingLocation ? 'Campus Active' : 'Locate Me'}</span>
+          <span className="font-semibold">{isSimulatingLocation ? 'Campus Central' : 'Locate'}</span>
         </button>
 
         {/* Role Switcher */}
         <div className="flex items-center bg-slate-900/90 border border-slate-700/80 rounded-xl p-1 text-xs">
-          <span className="text-slate-400 px-2 font-medium hidden lg:inline">Role:</span>
-          {(['student', 'organizer', 'admin'] as UserRole[]).map((role) => (
+          {(['organizer', 'admin'] as UserRole[]).map((role) => (
             <button
               key={role}
               onClick={() => onRoleChange(role)}
-              className={`capitalize px-2.5 py-1 rounded-lg font-medium transition ${
+              className={`capitalize px-3 py-1 rounded-lg font-bold transition text-xs ${
                 currentRole === role
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -124,21 +146,103 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </button>
 
-        {/* User Pill */}
-        <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shadow">
-            {currentRole === 'admin' ? 'AD' : currentRole === 'organizer' ? 'OR' : 'ST'}
-          </div>
-          <div className="hidden xl:block text-left">
-            <div className="text-xs font-semibold text-slate-200 capitalize">
-              {currentRole === 'admin'
-                ? 'Campus Admin'
-                : currentRole === 'organizer'
-                ? 'Pooja Hegde'
-                : 'Aarav Patel'}
+        {/* User Pill & Profile Dropdown with Logout */}
+        <div className="relative pl-2 border-l border-slate-800" ref={menuRef}>
+          {currentUser ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-800/80 transition cursor-pointer text-left"
+              >
+                <img
+                  src={currentUser.avatar}
+                  alt={currentUser.name}
+                  className="w-8 h-8 rounded-full object-cover border border-cyan-500/40 shadow-sm"
+                />
+                <div className="hidden xl:block">
+                  <div className="text-xs font-bold text-slate-100 leading-tight">
+                    {currentUser.name}
+                  </div>
+                  <div className="text-[10px] text-cyan-400 capitalize font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                    <span>{currentUser.role} mode</span>
+                  </div>
+                </div>
+                <span className="text-slate-400 text-xs ml-0.5">▾</span>
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-[#0b1329] border border-slate-700/90 rounded-2xl shadow-2xl py-3 px-4 z-50 text-white animate-slideUp">
+                  <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                    <img
+                      src={currentUser.avatar}
+                      alt={currentUser.name}
+                      className="w-11 h-11 rounded-full object-cover border-2 border-cyan-500"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-white truncate">{currentUser.name}</div>
+                      <div className="text-[11px] text-slate-400 truncate">@{currentUser.username}</div>
+                      <span className="inline-block mt-0.5 text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+                        {currentUser.badge}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="py-2.5 space-y-1 text-xs text-slate-300 border-b border-slate-800">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400">Department:</span>
+                      <span className="font-medium text-slate-200 truncate max-w-[140px]">
+                        {currentUser.department}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400">Active Role:</span>
+                      <span className="font-bold text-cyan-400 uppercase">{currentUser.role}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2.5 space-y-1.5">
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onRoleChange(currentRole === 'admin' ? 'organizer' : 'admin');
+                      }}
+                      className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold flex items-center justify-between transition"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>🔄</span>
+                        <span>Switch to {currentRole === 'admin' ? 'Organizer' : 'Admin'}</span>
+                      </span>
+                      <span>→</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onLogout();
+                      }}
+                      className="w-full py-2 px-3 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-900/50 text-rose-300 text-xs font-semibold flex items-center justify-between transition"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>🚪</span>
+                        <span>Log Out of Session</span>
+                      </span>
+                      <span>✕</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="text-[10px] text-slate-400 capitalize">{currentRole} account</div>
-          </div>
+          ) : (
+            <button
+              onClick={onLogout}
+              className="px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </div>
     </header>

@@ -26,6 +26,7 @@ const requiredFiles = [
   'src/components/Navbar.tsx',
   'src/components/Sidebar.tsx',
   'src/components/LandingHero.tsx',
+  'src/components/LoginPage.tsx',
   'src/components/DashboardView.tsx',
   'src/components/AIRecommendationsView.tsx',
   'src/components/ExplainableAIModal.tsx',
@@ -75,9 +76,14 @@ server.listen(5178, () => {
     let data = '';
     res.on('data', (chunk) => { data += chunk; });
     res.on('end', () => {
-      if (data.includes('CampusSpace') && data.includes('AI RECOMMENDATIONS') && data.includes('Leaflet')) {
-        console.log('[PASS] HTML Content contains CampusSpace, AI Recommendations, and Leaflet modules');
-        console.log('\n>>> ALL 27 VERIFICATION CHECKS PASSED SUCCESSFULLY! <<<');
+      const hasCampusSpace = data.includes('CampusSpace');
+      const hasLeaflet = data.includes('Leaflet');
+      const hasLoginPage = data.includes('LoginPageView') && data.includes('DEFAULT_USERS');
+      const hasPortalSignIn = data.includes('Portal Sign In');
+
+      if (hasCampusSpace && hasLeaflet && hasLoginPage && hasPortalSignIn) {
+        console.log('[PASS] HTML Content contains CampusSpace, Leaflet, and full LoginPage components');
+        console.log('\n>>> ALL 28 VERIFICATION CHECKS PASSED SUCCESSFULLY! <<<');
         server.close(() => process.exit(0));
       } else {
         console.error('[FAIL] Expected tags not found in HTML output');
