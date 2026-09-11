@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Venue, Coordinates } from '../types';
 
 interface CampusMapViewProps {
@@ -16,331 +16,210 @@ export const CampusMapView: React.FC<CampusMapViewProps> = ({
   selectedVenue,
   onSelectVenue,
   onBookVenue,
-  onNavigateToVenue,
-  recommendedVenueId,
-  userLocation
+  onNavigateToVenue
 }) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<{ [key: string]: any }>({});
-  const userMarkerRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [hasError, setHasError] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [searchFilter, setSearchFilter] = useState<string>('');
+  const mapUrl = 'https://mace-maps.vercel.app/';
 
-  const categories = [
-    { id: 'all', label: 'All Campus Spaces' },
-    { id: 'hall', label: 'Seminar Halls & Auds' },
-    { id: 'lab', label: 'Tech & Maker Labs' },
-    { id: 'classroom', label: 'Smart Classrooms' },
-    { id: 'commons', label: 'Library & Hub' },
-    { id: 'sports', label: 'Sports & Grounds' }
-  ];
-
-  const filteredVenues = venues.filter((v) => {
-    const matchesCat =
-      activeCategory === 'all' ||
-      (activeCategory === 'hall' && (v.category === 'hall' || v.category === 'auditorium')) ||
-      (activeCategory === 'sports' && (v.category === 'sports' || v.category === 'outdoor')) ||
-      v.category === activeCategory;
-
-    const matchesSearch =
-      v.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      v.building.toLowerCase().includes(searchFilter.toLowerCase());
-
-    return matchesCat && matchesSearch;
-  });
-
-  // Initialize Leaflet Map
-  useEffect(() => {
-    if (!mapContainerRef.current) return;
-    const L = (window as any).L;
-    if (!L) return;
-
-    if (!mapInstanceRef.current) {
-      const map = L.map(mapContainerRef.current, {
-        zoomControl: false
-      }).setView([19.1334, 72.9133], 16);
-
-      // Clean OpenStreetMap CartoDB / standard tiles
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> | &copy; OpenStreetMap',
-        maxZoom: 19
-      }).addTo(map);
-
-      // Add Zoom Control at bottom right
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-      mapInstanceRef.current = map;
+  const handleToggleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen?.().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen?.().then(() => setIsFullscreen(false)).catch(() => {});
     }
+  };
 
-    const map = mapInstanceRef.current;
-
-    // Clear existing markers
-    Object.values(markersRef.current).forEach((marker: any) => map.removeLayer(marker));
-    markersRef.current = {};
-
-    // Render Venue Markers
-    filteredVenues.forEach((venue) => {
-      const isRecommended = venue.id === recommendedVenueId;
-
-      // Determine marker color
-      let markerColor = '#22c55e'; // Green available
-      let markerBorder = '#15803d';
-      let statusLabel = 'Available';
-
-      if (isRecommended) {
-        markerColor = '#06b6d4'; // Cyan/Blue AI Recommended
-        markerBorder = '#0891b2';
-        statusLabel = 'AI Match';
-      } else if (venue.status === 'booked') {
-        markerColor = '#ef4444'; // Red booked
-        markerBorder = '#b91c1c';
-        statusLabel = 'Booked';
-      } else if (venue.status === 'pending') {
-        markerColor = '#f59e0b'; // Amber pending
-        markerBorder = '#d97706';
-        statusLabel = 'Pending';
-      }
-
-      // Custom HTML Pin
-      const iconHtml = `
-        <div style="
-          background: ${markerColor};
-          border: 2px solid white;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-          width: 32px;
-          height: 32px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-        ">
-          <div style="
-            transform: rotate(45deg);
-            color: white;
-            font-size: 11px;
-            font-weight: 800;
-          ">
-            ${isRecommended ? '★' : venue.capacity > 300 ? 'H' : '●'}
-          </div>
-        </div>
-      `;
-
-      const customIcon = L.divIcon({
-        className: 'custom-campus-pin',
-        html: iconHtml,
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
-      });
-
-      const marker = L.marker([venue.coordinates.lat, venue.coordinates.lng], {
-        icon: customIcon
-      }).addTo(map);
-
-      marker.on('click', () => {
-        onSelectVenue(venue);
-      });
-
-      markersRef.current[venue.id] = marker;
-    });
-
-    // Render User Location Pin (Live GPS or Simulated Campus Point)
-    if (userMarkerRef.current) {
-      map.removeLayer(userMarkerRef.current);
+  const handleReload = () => {
+    setHasError(false);
+    if (iframeRef.current) {
+      const src = iframeRef.current.src;
+      iframeRef.current.src = '';
+      setTimeout(() => {
+        if (iframeRef.current) iframeRef.current.src = src;
+      }, 50);
     }
-
-    const userIconHtml = `
-      <div style="
-        position: relative;
-        width: 22px;
-        height: 22px;
-      ">
-        <div style="
-          position: absolute;
-          inset: -4px;
-          border-radius: 50%;
-          background: rgba(56, 189, 248, 0.4);
-          animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-        "></div>
-        <div style="
-          position: relative;
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background: #0284c7;
-          border: 3px solid white;
-          box-shadow: 0 0 10px rgba(2, 132, 199, 0.6);
-        "></div>
-      </div>
-    `;
-
-    const userIcon = L.divIcon({
-      className: 'user-location-pin',
-      html: userIconHtml,
-      iconSize: [22, 22],
-      iconAnchor: [11, 11]
-    });
-
-    const userMarker = L.marker([userLocation.lat, userLocation.lng], {
-      icon: userIcon,
-      zIndexOffset: 1000
-    }).addTo(map);
-
-    userMarker.bindTooltip('Your Live Location (Campus)', {
-      permanent: false,
-      direction: 'top',
-      className: 'bg-slate-900 text-white text-xs px-2 py-1 rounded shadow'
-    });
-
-    userMarkerRef.current = userMarker;
-
-  }, [filteredVenues, recommendedVenueId, userLocation]);
-
-  // Center on selected venue when changed
-  useEffect(() => {
-    if (selectedVenue && mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo(
-        [selectedVenue.coordinates.lat, selectedVenue.coordinates.lng],
-        17,
-        { duration: 1 }
-      );
-    }
-  }, [selectedVenue]);
+  };
 
   return (
-    <div className="relative w-full h-[calc(100vh-140px)] rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 flex flex-col">
-      {/* Top Floating Controls Bar */}
-      <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-800 pointer-events-auto shadow-xl">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition ${
-                activeCategory === cat.id
-                  ? 'bg-cyan-500 text-black shadow-md'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+    <div
+      ref={containerRef}
+      className="relative w-full h-[calc(100vh-140px)] min-h-[580px] rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 flex flex-col"
+    >
+      {/* Top Header / Action Bar */}
+      <div className="flex items-center justify-between px-5 py-3 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 z-20 gap-3 flex-wrap">
+        <div className="flex items-center gap-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
+            Live MACE Maps
+          </div>
+          <span className="text-xs text-slate-400 hidden sm:inline">
+            Interactive Campus Structure & Live Navigation
+          </span>
         </div>
 
-        {/* Legend */}
-        <div className="hidden sm:flex items-center gap-3 bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-800 pointer-events-auto text-[11px] text-slate-300 shadow-xl font-medium">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span>Available</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-            <span>Booked</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span>Pending</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-            <span>AI Recommended</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <a
+            href={mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition transform hover:-translate-y-0.5"
+            title="Open MACE Maps in new tab"
+          >
+            <span>🧭 Open Navigation</span>
+            <span className="text-[10px]">↗</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={handleToggleFullscreen}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
+            title="Toggle full screen"
+          >
+            <span>{isFullscreen ? 'Exit' : '⛶'}</span>
+            <span className="hidden sm:inline">Fullscreen</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleReload}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
+            title="Reload map"
+          >
+            <span>🔄</span>
+            <span className="hidden sm:inline">Reload</span>
+          </button>
         </div>
       </div>
 
-      {/* Full Map Canvas */}
-      <div ref={mapContainerRef} className="w-full h-full z-10" />
-
-      {/* Selected Venue Slide-Up Detail Card */}
-      {selectedVenue && (
-        <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:w-[420px] z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-3xl p-5 shadow-2xl text-white animate-slideUp">
-          <div className="flex items-start justify-between gap-3 mb-2">
-            <div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                    selectedVenue.status === 'available'
-                      ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700'
-                      : selectedVenue.status === 'booked'
-                      ? 'bg-rose-950/80 text-rose-300 border-rose-700'
-                      : 'bg-amber-950/80 text-amber-300 border-amber-700'
-                  }`}
-                >
-                  {selectedVenue.status === 'available'
-                    ? '🟢 Available'
-                    : selectedVenue.status === 'booked'
-                    ? '🔴 Booked'
-                    : '🟡 Pending'}
-                </span>
-                <span className="text-xs text-slate-400">{selectedVenue.floor}</span>
-              </div>
-              <h3 className="text-lg font-bold text-white tracking-tight mt-1">
-                {selectedVenue.name}
-              </h3>
-              <p className="text-xs text-cyan-400 font-medium">{selectedVenue.building}</p>
-            </div>
-
-            <button
-              onClick={() => onSelectVenue(null as any)}
-              className="text-slate-400 hover:text-white p-1"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 my-3 text-xs">
-            <div className="bg-slate-800/80 p-2 rounded-xl text-center">
-              <span className="text-[10px] text-slate-400 block">Capacity</span>
-              <span className="font-bold text-white">{selectedVenue.capacity}</span>
-            </div>
-            <div className="bg-slate-800/80 p-2 rounded-xl text-center">
-              <span className="text-[10px] text-slate-400 block">Occupancy</span>
-              <span className="font-bold text-cyan-300">
-                {selectedVenue.historicalAverageOccupancy}%
-              </span>
-            </div>
-            <div className="bg-slate-800/80 p-2 rounded-xl text-center">
-              <span className="text-[10px] text-slate-400 block">Energy</span>
-              <span className="font-bold text-emerald-400">Class {selectedVenue.energyRating}</span>
-            </div>
-          </div>
-
-          {/* Facilities Checklist */}
-          <div className="flex flex-wrap gap-1 mb-4">
-            {selectedVenue.facilities.slice(0, 4).map((f) => (
-              <span
-                key={f}
-                className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md flex items-center gap-1"
+      {/* Map Frame Canvas & Fallback */}
+      <div className="relative flex-1 w-full h-full bg-[#07111f] overflow-hidden">
+        {!hasError ? (
+          <iframe
+            ref={iframeRef}
+            src={mapUrl}
+            title="MACE Campus Map & Navigation"
+            className="w-full h-full border-0 block bg-[#07111f]"
+            allow="geolocation *; camera; microphone; fullscreen; clipboard-read; clipboard-write"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            onError={() => setHasError(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-radial-slate text-white z-10">
+            <div className="text-5xl mb-3 drop-shadow-[0_4px_12px_rgba(56,189,248,0.4)]">🗺️</div>
+            <h3 className="text-xl font-bold mb-2">MACE Campus Navigation</h3>
+            <p className="text-sm text-slate-400 max-w-md mb-5 leading-relaxed">
+              Official interactive campus map for Mar Athanasius College of Engineering with GPS tracking, building floor plans, and navigation.
+            </p>
+            <div className="flex items-center gap-3">
+              <a
+                href={mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-600/30 transition"
               >
-                <span className="text-cyan-400">✓</span>
-                <span>{f}</span>
-              </span>
-            ))}
+                🧭 Open Navigation
+              </a>
+              <button
+                type="button"
+                onClick={handleReload}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold border border-slate-700 transition"
+              >
+                🔄 Retry
+              </button>
+            </div>
           </div>
+        )}
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
-            <button
-              onClick={() => onNavigateToVenue(selectedVenue)}
-              className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5"
-            >
-              <span>Walk Directions</span>
-              <span>📍</span>
-            </button>
-            <button
-              onClick={() => onBookVenue(selectedVenue)}
-              className="flex-1 py-2.5 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-black transition"
-            >
-              BOOK VENUE
-            </button>
+        {/* Selected Venue Slide-Up Detail Card */}
+        {selectedVenue && (
+          <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:w-[420px] z-30 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-3xl p-5 shadow-2xl text-white animate-slideUp">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                      selectedVenue.status === 'available'
+                        ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700'
+                        : selectedVenue.status === 'booked'
+                        ? 'bg-rose-950/80 text-rose-300 border-rose-700'
+                        : 'bg-amber-950/80 text-amber-300 border-amber-700'
+                    }`}
+                  >
+                    {selectedVenue.status === 'available'
+                      ? '🟢 Available'
+                      : selectedVenue.status === 'booked'
+                      ? '🔴 Booked'
+                      : '🟡 Pending'}
+                  </span>
+                  <span className="text-xs text-slate-400">{selectedVenue.floor}</span>
+                </div>
+                <h3 className="text-lg font-bold text-white tracking-tight mt-1">
+                  {selectedVenue.name}
+                </h3>
+                <p className="text-xs text-cyan-400 font-medium">{selectedVenue.building}</p>
+              </div>
+
+              <button
+                onClick={() => onSelectVenue(null as any)}
+                className="text-slate-400 hover:text-white p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 my-3 text-xs">
+              <div className="bg-slate-800/80 p-2 rounded-xl text-center">
+                <span className="text-[10px] text-slate-400 block">Capacity</span>
+                <span className="font-bold text-white">{selectedVenue.capacity}</span>
+              </div>
+              <div className="bg-slate-800/80 p-2 rounded-xl text-center">
+                <span className="text-[10px] text-slate-400 block">Occupancy</span>
+                <span className="font-bold text-cyan-300">
+                  {selectedVenue.historicalAverageOccupancy}%
+                </span>
+              </div>
+              <div className="bg-slate-800/80 p-2 rounded-xl text-center">
+                <span className="text-[10px] text-slate-400 block">Energy</span>
+                <span className="font-bold text-emerald-400">Class {selectedVenue.energyRating}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-1 mb-4">
+              {selectedVenue.facilities.slice(0, 4).map((f) => (
+                <span
+                  key={f}
+                  className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md flex items-center gap-1"
+                >
+                  <span className="text-cyan-400">✓</span>
+                  <span>{f}</span>
+                </span>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+              <button
+                onClick={() => onNavigateToVenue(selectedVenue)}
+                className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5"
+              >
+                <span>Walk Directions</span>
+                <span>📍</span>
+              </button>
+              <button
+                onClick={() => onBookVenue(selectedVenue)}
+                className="flex-1 py-2.5 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-black transition"
+              >
+                BOOK VENUE
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

@@ -559,98 +559,198 @@ body.light-mode .roleChip{
     gap:20px;
 }
 
-/* MAP */
+/* MACE MAP EMBED & CONTAINER AESTHETICS */
 
 .mapContainer{
     height:560px;
     position:relative;
     overflow:hidden;
-    border-radius:22px;
-    background:
-      linear-gradient(rgba(12,33,43,.94),rgba(12,33,43,.94)),
-      url("mace-map.png") center/cover;
-    border:1px solid #21434c;
-}
-
-.mapGrid{
-    position:absolute;
-    inset:0;
-    opacity:.18;
-    background-image:
-    linear-gradient(#62dba7 1px,transparent 1px),
-    linear-gradient(90deg,#62dba7 1px,transparent 1px);
-    background-size:45px 45px;
-}
-
-.road{
-    position:absolute;
-    height:16px;
-    background:#44515a;
-    border:3px solid #596771;
     border-radius:20px;
-    transform-origin:left center;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    box-shadow:0 12px 32px rgba(0,0,0,.35);
+    display:flex;
+    flex-direction:column;
+    transition:box-shadow .25s ease, border-color .25s ease;
 }
 
-.road1{
-    width:65%;
-    left:8%;
-    top:52%;
-    transform:rotate(-12deg);
+.mapContainer:hover{
+    border-color:rgba(79,163,255,.35);
+    box-shadow:0 14px 40px rgba(0,0,0,.45);
 }
 
-.road2{
-    width:38%;
-    left:45%;
-    top:45%;
-    transform:rotate(53deg);
+#mapPage .mapContainer{
+    height:720px;
+    min-height:560px;
 }
 
-.road3{
-    width:37%;
-    left:30%;
-    top:26%;
-    transform:rotate(20deg);
+@media(max-width:900px){
+    .mapContainer{
+        height:480px;
+    }
+    #mapPage .mapContainer{
+        height:560px;
+    }
 }
 
-.venuePin{
-    position:absolute;
-    transform:translate(-50%,-50%);
-    border:0;
-    background:#122b40;
-    color:white;
-    border:2px solid #50e4a2;
-    border-radius:15px;
-    padding:9px 12px;
-    box-shadow:0 8px 22px rgba(0,0,0,.4);
-    font-size:12px;
-    font-weight:800;
-    transition:transform .2s;
+.mapHeaderBar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:11px 16px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    gap:12px;
+    flex-wrap:wrap;
+    z-index:2;
 }
 
-.venuePin:hover{
-    transform:translate(-50%,-50%) scale(1.08);
+.mapTitleArea{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
-.venuePin.busy{
-    border-color:var(--yellow);
+.mapLiveTag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--green);
+    background:rgba(46,213,115,.12);
+    border:1px solid rgba(46,213,115,.3);
+    padding:3px 8px;
+    border-radius:12px;
+    letter-spacing:.3px;
+    text-transform:uppercase;
 }
 
-.venuePin.closed{
-    border-color:var(--red);
-    opacity:.75;
+.mapPulseDot{
+    width:7px;
+    height:7px;
+    background:var(--green);
+    border-radius:50%;
+    box-shadow:0 0 8px var(--green);
+    animation:mapPulse 2s infinite ease-in-out;
 }
 
-.mapLegend{
-    position:absolute;
-    left:16px;
-    bottom:16px;
-    background:var(--legend-bg);
-    border-radius:14px;
-    padding:12px 15px;
+@keyframes mapPulse{
+    0%, 100%{ transform:scale(.9); opacity:.75; }
+    50%{ transform:scale(1.25); opacity:1; }
+}
+
+.mapSubtext{
     font-size:12px;
     color:var(--muted);
-    border:1px solid var(--border);
 }
+
+.mapControls{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.mapBtn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--text);
+    background:var(--facility-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    cursor:pointer;
+    text-decoration:none;
+    transition:background .2s, border-color .2s, transform .15s;
+    user-select:none;
+}
+
+.mapBtn:hover{
+    background:var(--role-btn-active-bg);
+    border-color:var(--primary);
+    transform:translateY(-1px);
+}
+
+.mapBtn.primary{
+    background:linear-gradient(135deg, #1d6fd8, #2563eb);
+    border-color:rgba(79,163,255,.5);
+    color:#ffffff;
+    box-shadow:0 4px 14px rgba(37,99,235,.35);
+}
+
+.mapBtn.primary:hover{
+    background:linear-gradient(135deg, #2563eb, #3b82f6);
+    box-shadow:0 6px 18px rgba(37,99,235,.5);
+}
+
+.mapFrameWrapper{
+    flex:1;
+    position:relative;
+    width:100%;
+    height:100%;
+    background:#07111f;
+    min-height:0;
+}
+
+.mapIframe{
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
+    background:#07111f;
+}
+
+.mapFallbackOverlay{
+    position:absolute;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    text-align:center;
+    background:radial-gradient(circle at center, #0f253e 0%, #07111f 100%);
+    color:var(--text);
+    z-index:3;
+}
+
+.mapFallbackIcon{
+    font-size:42px;
+    margin-bottom:10px;
+    filter:drop-shadow(0 4px 12px rgba(79,163,255,.4));
+}
+
+.mapFallbackTitle{
+    font-size:18px;
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:6px;
+}
+
+.mapFallbackDesc{
+    color:var(--muted);
+    font-size:13px;
+    max-width:440px;
+    line-height:1.5;
+    margin-bottom:18px;
+}
+
+.mapContainer:fullscreen{
+    width:100vw;
+    height:100vh;
+    border-radius:0;
+    border:none;
+}
+.mapContainer:-webkit-full-screen{
+    width:100vw;
+    height:100vh;
+    border-radius:0;
+    border:none;
+}
+
 
 .dot{
     width:8px;
@@ -1499,7 +1599,7 @@ Find Best Venue →
 <div class="mapContainer" id="mainMap"></div>
 
 <p style="color:var(--muted);font-size:12px;margin-top:12px">
-Campus coordinates mapped to MACE facilities. Click any pin to view venue capacity, facilities, and live status.
+Official MACE interactive campus map with live GPS tracking, building floor plans, departmental locations, and turn-by-turn navigation.
 </p>
 
 </section>
@@ -3640,38 +3740,103 @@ function closePhotoViewer(){
 
 
 /* ================================================================
-   15. MAP RENDERING
+   15. MACE MAPS INTEGRATION
 ================================================================ */
 
 function buildMap(container){
-    const selectedDate = document.getElementById("venueDateFilter")?.value || "";
-    const startTime = document.getElementById("venueStartTimeFilter")?.value || "";
-    const endTime = document.getElementById("venueEndTimeFilter")?.value || "";
+    if(!container) return;
+
+    // Prevent reloading iframe if already initialized in this container
+    if(container.querySelector('.mapIframe')){
+        return;
+    }
+
+    const containerId = container.id || ('map-' + Math.random().toString(36).substring(2, 9));
+    const mapUrl = "https://mace-maps.vercel.app/";
 
     container.innerHTML = `
-        <div class="mapGrid"></div>
-        <div class="road road1"></div>
-        <div class="road road2"></div>
-        <div class="road road3"></div>
-
-        ${venues.map(v => {
-            const avail = isVenueAvailable(v.id, selectedDate, startTime, endTime);
-            return `
-                <button
-                    class="venuePin ${avail ? "" : "closed"}"
-                    style="left:${v.x}%;top:${v.y}%"
-                    onclick="openVenueDetails(${v.id})">
-                    📍 ${v.name}
+        <div class="mapHeaderBar">
+            <div class="mapTitleArea">
+                <span class="mapLiveTag"><span class="mapPulseDot"></span> MACE Maps</span>
+                <span class="mapSubtext">Interactive Campus Structure & Live Navigation</span>
+            </div>
+            <div class="mapControls">
+                <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="mapBtn primary" title="Open MACE Maps in new tab">
+                    🧭 Open Navigation ↗
+                </a>
+                <button type="button" class="mapBtn" onclick="toggleMapFullscreen('${containerId}')" title="Toggle full screen">
+                    ⛶ Fullscreen
                 </button>
-            `;
-        }).join("")}
-
-        <div class="mapLegend">
-            <span class="dot green"></span> Available
-            &nbsp;&nbsp;
-            <span class="dot red"></span> Unavailable / Booked
+                <button type="button" class="mapBtn" onclick="reloadMapFrame('${containerId}')" title="Reload map">
+                    🔄 Reload
+                </button>
+            </div>
+        </div>
+        <div class="mapFrameWrapper">
+            <iframe
+                id="${containerId}-frame"
+                class="mapIframe"
+                src="${mapUrl}"
+                title="MACE Campus Map & Navigation"
+                allow="geolocation *; camera; microphone; fullscreen; clipboard-read; clipboard-write"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            <div id="${containerId}-fallback" class="mapFallbackOverlay">
+                <div class="mapFallbackIcon">🗺️</div>
+                <h3 class="mapFallbackTitle">MACE Campus Navigation</h3>
+                <p class="mapFallbackDesc">
+                    Official interactive campus map for Mar Athanasius College of Engineering with GPS tracking, building floor plans, and navigation.
+                </p>
+                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="mapBtn primary" style="padding:10px 20px;font-size:14px;">
+                        🧭 Open Navigation
+                    </a>
+                    <button type="button" class="mapBtn" onclick="reloadMapFrame('${containerId}')" style="padding:10px 16px;font-size:14px;">
+                        🔄 Retry
+                    </button>
+                </div>
+            </div>
         </div>
     `;
+
+    const frame = document.getElementById(`${containerId}-frame`);
+    const fallback = document.getElementById(`${containerId}-fallback`);
+
+    if(frame && fallback){
+        frame.addEventListener("error", () => {
+            frame.style.display = "none";
+            fallback.style.display = "flex";
+        });
+    }
+}
+
+function toggleMapFullscreen(containerId){
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    if(!document.fullscreenElement){
+        if(el.requestFullscreen){
+            el.requestFullscreen();
+        } else if(el.webkitRequestFullscreen){
+            el.webkitRequestFullscreen();
+        }
+    } else {
+        if(document.exitFullscreen){
+            document.exitFullscreen();
+        }
+    }
+}
+
+function reloadMapFrame(containerId){
+    const frame = document.getElementById(containerId + "-frame");
+    const fallback = document.getElementById(containerId + "-fallback");
+    if(fallback) fallback.style.display = "none";
+    if(frame){
+        frame.style.display = "block";
+        const src = frame.src;
+        frame.src = "";
+        setTimeout(() => { frame.src = src; }, 50);
+    }
 }
 
 
