@@ -48,10 +48,10 @@ export const CampusMapView: React.FC<CampusMapViewProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[calc(100vh-140px)] min-h-[580px] rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 flex flex-col"
+      className="relative w-full h-[calc(100vh-140px)] min-h-[580px] rounded-3xl overflow-hidden border border-sky-500/20 shadow-[0_16px_40px_rgba(0,0,0,0.5),0_0_25px_rgba(37,141,255,0.10),0_0_45px_rgba(36,214,140,0.06)] bg-slate-950 flex flex-col"
     >
       {/* Top Header / Action Bar */}
-      <div className="flex items-center justify-between px-5 py-3 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 z-20 gap-3 flex-wrap">
+      <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-slate-900/95 to-slate-950/95 backdrop-blur-md border-b border-slate-800 z-20 gap-3 flex-wrap">
         <div className="flex items-center gap-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
@@ -67,7 +67,7 @@ export const CampusMapView: React.FC<CampusMapViewProps> = ({
             href={mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition transform hover:-translate-y-0.5"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-500 hover:from-blue-500 hover:to-emerald-400 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 transition transform hover:-translate-y-0.5"
             title="Open MACE Maps in new tab"
           >
             <span>🧭 Open Navigation</span>
@@ -99,16 +99,20 @@ export const CampusMapView: React.FC<CampusMapViewProps> = ({
       {/* Map Frame Canvas & Fallback */}
       <div className="relative flex-1 w-full h-full bg-[#07111f] overflow-hidden">
         {!hasError ? (
-          <iframe
-            ref={iframeRef}
-            src={mapUrl}
-            title="MACE Campus Map & Navigation"
-            className="w-full h-full border-0 block bg-[#07111f]"
-            allow="geolocation *; camera; microphone; fullscreen; clipboard-read; clipboard-write"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            onError={() => setHasError(true)}
-          />
+          <>
+            <iframe
+              ref={iframeRef}
+              src={mapUrl}
+              title="MACE Campus Map & Navigation"
+              className="w-full h-full border-0 block bg-[#07111f] brightness-[0.97] contrast-[1.02]"
+              allow="geolocation *; camera; microphone; fullscreen; clipboard-read; clipboard-write"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              onError={() => setHasError(true)}
+            />
+            {/* Subtle edge-blending treatment that softens harsh iframe borders into CampusSpace navy theme */}
+            <div className="absolute inset-0 pointer-events-none rounded-b-3xl shadow-[inset_0_0_24px_rgba(7,17,31,0.65),inset_0_0_1px_rgba(79,163,255,0.2)]" />
+          </>
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-radial-slate text-white z-10">
             <div className="text-5xl mb-3 drop-shadow-[0_4px_12px_rgba(56,189,248,0.4)]">🗺️</div>
