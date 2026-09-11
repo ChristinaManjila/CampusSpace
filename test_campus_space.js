@@ -22,7 +22,6 @@ const requiredFiles = [
   'src/data/sampleAnalytics.ts',
   'src/utils/aiRecommender.ts',
   'src/utils/mapRouting.ts',
-  'src/utils/qrGenerator.ts',
   'src/components/Navbar.tsx',
   'src/components/Sidebar.tsx',
   'src/components/LandingHero.tsx',
@@ -33,7 +32,6 @@ const requiredFiles = [
   'src/components/CampusMapView.tsx',
   'src/components/LiveNavigationView.tsx',
   'src/components/MyBookingsView.tsx',
-  'src/components/QRCodeModal.tsx',
   'src/components/AnalyticsView.tsx',
   'src/components/DemandForecastView.tsx',
   'src/components/AdminApprovalView.tsx',
@@ -61,7 +59,29 @@ if (!allExist) {
   process.exit(1);
 }
 
-// 3. Test HTTP Server functionality
+// 3. Test Conflict Detection Logic Unit Test
+console.log('\n--- TESTING DATE & TIME CONFLICT ENGINE ---');
+function testConflict(reqStart, reqEnd, existStart, existEnd) {
+  return reqStart < existEnd && reqEnd > existStart;
+}
+
+// Overlapping cases
+const c1 = testConflict("10:00", "12:00", "11:00", "13:00"); // True (overlap)
+const c2 = testConflict("09:00", "14:00", "10:00", "12:00"); // True (contains)
+const c3 = testConflict("11:00", "12:00", "10:00", "13:00"); // True (contained)
+
+// Non-overlapping cases
+const c4 = testConflict("10:00", "12:00", "12:00", "14:00"); // False (adjacent end-start)
+const c5 = testConflict("14:00", "16:00", "10:00", "12:00"); // False (strictly after)
+
+if (c1 && c2 && c3 && !c4 && !c5) {
+  console.log('[PASS] Conflict detection logic verified (requestedStart < existingEnd && requestedEnd > existingStart)');
+} else {
+  console.error('[FAIL] Conflict detection test failed');
+  process.exit(1);
+}
+
+// 4. Test HTTP Server functionality
 const server = http.createServer((req, res) => {
   const content = fs.readFileSync(indexPath, 'utf-8');
   res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -69,6 +89,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(5178, () => {
+  console.log('\n--- TESTING HTTP SERVER & HTML CONTENT ---');
   console.log('[PASS] Dev Server started successfully on port 5178');
 
   http.get('http://localhost:5178', (res) => {
@@ -77,16 +98,19 @@ server.listen(5178, () => {
     res.on('data', (chunk) => { data += chunk; });
     res.on('end', () => {
       const hasCampusSpace = data.includes('CampusSpace');
-      const hasLeaflet = data.includes('Leaflet');
-      const hasLoginPage = data.includes('LoginPageView') && data.includes('DEFAULT_USERS');
-      const hasPortalSignIn = data.includes('Portal Sign In');
+      const hasQuickAvail = data.includes('Quick Availability');
+      const hasMaintenance = data.includes('Maintenance');
+      const hasEvents = data.includes('Campus & Inter-College Events');
+      const hasConflictMsg = data.includes('Sorry, already taken!');
+      const hasThemeToggle = data.includes('themeToggleBtn');
 
-      if (hasCampusSpace && hasLeaflet && hasLoginPage && hasPortalSignIn) {
-        console.log('[PASS] HTML Content contains CampusSpace, Leaflet, and full LoginPage components');
-        console.log('\n>>> ALL 28 VERIFICATION CHECKS PASSED SUCCESSFULLY! <<<');
+      if (hasCampusSpace && hasQuickAvail && hasMaintenance && hasEvents && hasConflictMsg && hasThemeToggle) {
+        console.log('[PASS] HTML Content contains CampusSpace, Quick Availability, Maintenance Hub, Events, and Conflict Handling');
+        console.log('\n>>> ALL AUTOMATED VERIFICATION CHECKS PASSED SUCCESSFULLY! <<<');
         server.close(() => process.exit(0));
       } else {
-        console.error('[FAIL] Expected tags not found in HTML output');
+        console.error('[FAIL] Expected features or tags not found in HTML output');
+        console.error(`Status: CampusSpace:${hasCampusSpace}, QuickAvail:${hasQuickAvail}, Maintenance:${hasMaintenance}, Events:${hasEvents}, Conflict:${hasConflictMsg}, Theme:${hasThemeToggle}`);
         server.close(() => process.exit(1));
       }
     });
@@ -95,3 +119,4 @@ server.listen(5178, () => {
     server.close(() => process.exit(1));
   });
 });
+

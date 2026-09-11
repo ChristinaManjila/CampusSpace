@@ -1,6 +1,33 @@
-export type UserRole = 'organizer' | 'admin';
+export type UserRole = 'admin' | 'maintenance' | 'teamlead' | 'student' | 'organizer';
 
-export type VenueStatus = 'available' | 'booked' | 'maintenance';
+export interface MaintenanceReport {
+  id: string;
+  title: string;
+  category: string;
+  location: string;
+  dateTime: string;
+  reporter: string;
+  status: 'Reported' | 'In Progress' | 'Resolved';
+  description: string;
+  photoUrl?: string;
+}
+
+export interface CampusEvent {
+  id: string;
+  title: string;
+  college: string;
+  category: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  posterUrl?: string;
+  registrationLink?: string;
+  googleFormLink?: string;
+  description: string;
+  organizer: string;
+  createdAt: string;
+}
 
 export type EventType =
   | 'Seminar'

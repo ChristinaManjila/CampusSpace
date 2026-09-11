@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MACE Smart Campus OS</title>
+<title>MACE Smart Campus OS — CampusSpace</title>
 
 <style>
 *{
@@ -24,6 +24,57 @@
     --yellow:#feca57;
     --red:#ff6b6b;
     --purple:#a78bfa;
+    --border:rgba(255,255,255,.08);
+    --input-bg:#091727;
+    --input-border:#243952;
+    --header-bg:rgba(5,15,27,.85);
+    --sidebar-bg:rgba(6,16,28,.65);
+    --card-bg:rgba(14,31,49,.82);
+    --card-border:rgba(255,255,255,.075);
+    --modal-bg:#0c1c2d;
+    --table-header-border:#294057;
+    --table-row-border:#1d3247;
+    --shell-bg:rgba(8,20,36,.88);
+    --login-card-bg:rgba(4,12,24,.75);
+    --role-switcher-bg:#071421;
+    --role-btn-active-bg:#173350;
+    --venue-card-bg:#0d2032;
+    --venue-card-border:#21384e;
+    --facility-bg:#132b41;
+    --facility-text:#aec6dc;
+    --legend-bg:rgba(3,10,17,.88);
+}
+
+body.light-mode{
+    --bg:#f1f5f9;
+    --panel:#ffffff;
+    --panel2:#e8eef6;
+    --text:#0f172a;
+    --muted:#64748b;
+    --primary:#0284c7;
+    --green:#16a34a;
+    --yellow:#d97706;
+    --red:#dc2626;
+    --purple:#7c3aed;
+    --border:rgba(0,0,0,.1);
+    --input-bg:#ffffff;
+    --input-border:#cbd5e1;
+    --header-bg:rgba(255,255,255,.9);
+    --sidebar-bg:rgba(248,250,252,.92);
+    --card-bg:#ffffff;
+    --card-border:rgba(0,0,0,.08);
+    --modal-bg:#ffffff;
+    --table-header-border:#e2e8f0;
+    --table-row-border:#edf2f7;
+    --shell-bg:rgba(255,255,255,.94);
+    --login-card-bg:#ffffff;
+    --role-switcher-bg:#e2e8f0;
+    --role-btn-active-bg:#ffffff;
+    --venue-card-bg:#ffffff;
+    --venue-card-border:#e2e8f0;
+    --facility-bg:#f1f5f9;
+    --facility-text:#334155;
+    --legend-bg:rgba(255,255,255,.95);
 }
 
 body{
@@ -34,6 +85,14 @@ body{
         var(--bg);
     color:var(--text);
     min-height:100vh;
+    transition:background-color .25s ease, color .25s ease;
+}
+
+body.light-mode{
+    background:
+        radial-gradient(circle at top right,#e0edff 0%,transparent 30%),
+        radial-gradient(circle at bottom left,#dcf4ed 0%,transparent 28%),
+        var(--bg);
 }
 
 button,input,select,textarea{
@@ -63,9 +122,9 @@ button{
     display:grid;
     grid-template-columns:1.2fr .8fr;
     overflow:hidden;
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid var(--border);
     border-radius:30px;
-    background:rgba(8,20,36,.85);
+    background:var(--shell-bg);
     backdrop-filter:blur(20px);
     box-shadow:0 30px 90px rgba(0,0,0,.45);
 }
@@ -93,6 +152,12 @@ button{
     margin-bottom:20px;
 }
 
+body.light-mode .badge{
+    background:rgba(2,132,199,.12);
+    border-color:rgba(2,132,199,.3);
+    color:#0284c7;
+}
+
 .loginHero h1{
     font-size:56px;
     line-height:1;
@@ -103,6 +168,11 @@ button{
     background:linear-gradient(90deg,#6db6ff,#56efb2);
     -webkit-background-clip:text;
     color:transparent;
+}
+
+body.light-mode .gradientText{
+    background:linear-gradient(90deg,#0284c7,#10b981);
+    -webkit-background-clip:text;
 }
 
 .loginHero p{
@@ -126,6 +196,11 @@ button{
     border-radius:16px;
 }
 
+body.light-mode .heroStat{
+    background:rgba(0,0,0,.03);
+    border-color:rgba(0,0,0,.06);
+}
+
 .heroStat strong{
     display:block;
     font-size:22px;
@@ -137,68 +212,100 @@ button{
 }
 
 .loginCard{
-    padding:55px 42px;
-    background:rgba(4,12,24,.7);
+    padding:50px 38px;
+    background:var(--login-card-bg);
     display:flex;
     flex-direction:column;
     justify-content:center;
 }
 
 .loginCard h2{
-    font-size:30px;
-    margin-bottom:8px;
+    font-size:28px;
+    margin-bottom:6px;
 }
 
 .loginCard>p{
     color:var(--muted);
-    margin-bottom:25px;
+    margin-bottom:20px;
+    font-size:14px;
 }
 
 .roleSwitcher{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(2,1fr);
     gap:8px;
     padding:6px;
-    background:#071421;
+    background:var(--role-switcher-bg);
     border-radius:14px;
-    margin-bottom:22px;
+    margin-bottom:18px;
 }
 
 .roleBtn{
-    padding:12px;
+    padding:10px 8px;
     border:0;
     background:transparent;
     color:var(--muted);
     border-radius:10px;
     font-weight:700;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    transition:.2s;
 }
 
 .roleBtn.active{
-    background:#173350;
-    color:white;
+    background:var(--role-btn-active-bg);
+    color:var(--text);
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+
+.demoPills{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+}
+
+.demoPill{
+    font-size:11px;
+    padding:4px 9px;
+    border-radius:20px;
+    background:rgba(79,163,255,.1);
+    color:var(--primary);
+    border:1px solid rgba(79,163,255,.25);
+    cursor:pointer;
+    transition:.15s;
+}
+
+.demoPill:hover{
+    background:rgba(79,163,255,.2);
 }
 
 .inputGroup{
-    margin-bottom:16px;
+    margin-bottom:15px;
 }
 
 .inputGroup label{
     display:block;
     font-size:13px;
-    color:#aec0d3;
-    margin-bottom:7px;
+    color:var(--muted);
+    margin-bottom:6px;
+    font-weight:600;
 }
 
 .inputGroup input,
 .inputGroup select,
 .inputGroup textarea{
     width:100%;
-    padding:14px 15px;
-    border:1px solid #243952;
-    background:#091727;
-    color:white;
+    padding:13px 14px;
+    border:1px solid var(--input-border);
+    background:var(--input-bg);
+    color:var(--text);
     border-radius:12px;
     outline:none;
+    transition:border-color .2s;
 }
 
 .inputGroup input:focus,
@@ -216,13 +323,18 @@ button{
     color:white;
     font-weight:800;
     margin-top:5px;
+    transition:opacity .2s;
+}
+
+.primaryBtn:hover{
+    opacity:.92;
 }
 
 #errorMsg{
     color:#ff8787;
     font-size:13px;
     min-height:20px;
-    margin-top:12px;
+    margin-top:10px;
 }
 
 /* MAIN APP */
@@ -237,9 +349,9 @@ header{
     align-items:center;
     justify-content:space-between;
     padding:0 28px;
-    background:rgba(5,15,27,.82);
+    background:var(--header-bg);
     backdrop-filter:blur(18px);
-    border-bottom:1px solid rgba(255,255,255,.07);
+    border-bottom:1px solid var(--border);
     position:sticky;
     top:0;
     z-index:100;
@@ -259,6 +371,12 @@ header{
     display:grid;
     place-items:center;
     background:linear-gradient(135deg,#2395ff,#25d991);
+    color:white;
+    font-weight:900;
+}
+
+.logoText{
+    font-size:15px;
 }
 
 .logoText span{
@@ -271,7 +389,25 @@ header{
 .headerRight{
     display:flex;
     align-items:center;
-    gap:14px;
+    gap:12px;
+}
+
+.themeToggleBtn{
+    border:1px solid var(--border);
+    background:var(--panel2);
+    color:var(--text);
+    padding:7px 13px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:700;
+    transition:.2s;
+}
+
+.themeToggleBtn:hover{
+    opacity:.85;
 }
 
 .roleChip{
@@ -281,48 +417,75 @@ header{
     color:#8dccff;
     font-size:12px;
     font-weight:700;
+    letter-spacing:.3px;
+}
+
+body.light-mode .roleChip{
+    background:#e0f2fe;
+    color:#0369a1;
 }
 
 .logoutBtn{
-    border:1px solid #34475a;
+    border:1px solid var(--border);
     background:transparent;
-    color:#dce8f4;
+    color:var(--text);
     padding:8px 14px;
     border-radius:10px;
+    font-size:13px;
+    transition:.2s;
+}
+
+.logoutBtn:hover{
+    background:rgba(255,255,255,.05);
 }
 
 .layout{
     display:grid;
-    grid-template-columns:220px 1fr;
+    grid-template-columns:230px 1fr;
 }
 
 .sidebar{
     min-height:calc(100vh - 72px);
-    padding:25px 14px;
-    border-right:1px solid rgba(255,255,255,.06);
-    background:rgba(6,16,28,.6);
+    padding:22px 12px;
+    border-right:1px solid var(--border);
+    background:var(--sidebar-bg);
 }
 
 .navButton{
     width:100%;
     border:0;
     background:transparent;
-    color:#9eb2c7;
+    color:var(--muted);
     text-align:left;
-    padding:13px 14px;
-    margin:4px 0;
+    padding:12px 14px;
+    margin:3px 0;
     border-radius:12px;
+    font-weight:600;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    transition:.15s;
 }
 
 .navButton:hover,
 .navButton.active{
+    color:var(--text);
+    background:var(--panel2);
+}
+
+.badgeMini{
+    font-size:11px;
+    background:var(--primary);
     color:white;
-    background:#11273d;
+    padding:2px 7px;
+    border-radius:10px;
+    font-weight:700;
 }
 
 .main{
     padding:30px;
-    overflow:hidden;
+    overflow-y:auto;
 }
 
 .pageTitle{
@@ -330,15 +493,16 @@ header{
 }
 
 .pageTitle h1{
-    font-size:32px;
+    font-size:30px;
 }
 
 .pageTitle p{
     color:var(--muted);
-    margin-top:7px;
+    margin-top:6px;
+    font-size:14px;
 }
 
-/* DASHBOARD */
+/* STATS */
 
 .statsGrid{
     display:grid;
@@ -349,8 +513,8 @@ header{
 
 .statCard,
 .card{
-    background:rgba(14,31,49,.8);
-    border:1px solid rgba(255,255,255,.075);
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
     border-radius:18px;
 }
 
@@ -360,7 +524,7 @@ header{
 
 .statIcon{
     font-size:25px;
-    margin-bottom:16px;
+    margin-bottom:14px;
 }
 
 .statCard h3{
@@ -460,6 +624,7 @@ header{
     box-shadow:0 8px 22px rgba(0,0,0,.4);
     font-size:12px;
     font-weight:800;
+    transition:transform .2s;
 }
 
 .venuePin:hover{
@@ -479,11 +644,12 @@ header{
     position:absolute;
     left:16px;
     bottom:16px;
-    background:rgba(3,10,17,.88);
+    background:var(--legend-bg);
     border-radius:14px;
     padding:12px 15px;
     font-size:12px;
-    color:#b5c5d6;
+    color:var(--muted);
+    border:1px solid var(--border);
 }
 
 .dot{
@@ -505,15 +671,17 @@ header{
     gap:10px;
     flex-wrap:wrap;
     margin-bottom:20px;
+    align-items:center;
 }
 
 .filters input,
 .filters select{
     padding:11px 13px;
     border-radius:10px;
-    border:1px solid #263b50;
-    color:white;
-    background:#0b1a2a;
+    border:1px solid var(--input-border);
+    color:var(--text);
+    background:var(--input-bg);
+    outline:none;
 }
 
 .venueGrid{
@@ -523,16 +691,19 @@ header{
 }
 
 .venueCard{
-    background:#0d2032;
-    border:1px solid #21384e;
+    background:var(--venue-card-bg);
+    border:1px solid var(--venue-card-border);
     border-radius:17px;
     padding:18px;
     transition:.2s;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
 }
 
 .venueCard:hover{
-    transform:translateY(-4px);
-    border-color:#3c6183;
+    transform:translateY(-3px);
+    border-color:var(--primary);
 }
 
 .venueTop{
@@ -546,34 +717,46 @@ header{
 }
 
 .venueBlock{
-    color:#79baff;
+    color:var(--primary);
     font-size:12px;
-    margin-top:5px;
+    margin-top:4px;
+    font-weight:600;
 }
 
 .status{
     height:max-content;
-    padding:5px 9px;
+    padding:4px 9px;
     border-radius:20px;
     font-size:11px;
     font-weight:800;
+    white-space:nowrap;
 }
 
 .status.available{
-    background:rgba(46,213,115,.12);
-    color:#62e699;
+    background:rgba(46,213,115,.14);
+    color:var(--green);
 }
 
 .status.unavailable{
-    background:rgba(255,107,107,.12);
-    color:#ff8989;
+    background:rgba(255,107,107,.14);
+    color:var(--red);
+}
+
+.status.pending{
+    background:rgba(254,202,87,.14);
+    color:var(--yellow);
+}
+
+.status.inprogress{
+    background:rgba(79,163,255,.14);
+    color:var(--primary);
 }
 
 .venueMeta{
     display:flex;
     gap:14px;
-    margin:17px 0;
-    color:#b0c3d7;
+    margin:14px 0;
+    color:var(--muted);
     font-size:13px;
 }
 
@@ -581,35 +764,204 @@ header{
     display:flex;
     flex-wrap:wrap;
     gap:6px;
+    margin-bottom:16px;
 }
 
 .facility{
-    background:#132b41;
-    color:#aec6dc;
-    padding:5px 8px;
+    background:var(--facility-bg);
+    color:var(--facility-text);
+    padding:4px 8px;
     border-radius:7px;
     font-size:10px;
+    font-weight:600;
+}
+
+.actionBtns{
+    display:flex;
+    gap:8px;
+    margin-top:auto;
 }
 
 .smallBtn{
     border:0;
-    background:#1f89ef;
+    background:var(--primary);
     color:white;
     font-weight:700;
     border-radius:9px;
-    padding:9px 12px;
+    padding:9px 13px;
+    font-size:12px;
+    transition:opacity .15s;
+}
+
+.smallBtn:hover{
+    opacity:.9;
 }
 
 .smallBtn.secondary{
-    background:#183047;
+    background:var(--panel2);
+    color:var(--text);
+    border:1px solid var(--border);
 }
 
 .smallBtn.approve{
-    background:#168953;
+    background:var(--green);
 }
 
 .smallBtn.reject{
-    background:#a83b47;
+    background:var(--red);
+}
+
+.smallBtn.warning{
+    background:var(--yellow);
+    color:#1f2937;
+}
+
+/* EVENT CARDS */
+
+.eventGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.eventCard{
+    background:var(--venue-card-bg);
+    border:1px solid var(--venue-card-border);
+    border-radius:18px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:.2s;
+}
+
+.eventCard:hover{
+    transform:translateY(-3px);
+    border-color:var(--primary);
+}
+
+.eventPoster{
+    width:100%;
+    height:170px;
+    object-fit:cover;
+    background:var(--panel2);
+}
+
+.eventBody{
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    flex:1;
+}
+
+.collegeBadge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:4px 9px;
+    border-radius:8px;
+    background:rgba(167,139,250,.15);
+    color:var(--purple);
+    margin-bottom:10px;
+}
+
+.eventCard h3{
+    font-size:18px;
+    margin-bottom:8px;
+    line-height:1.3;
+}
+
+.eventSchedule{
+    font-size:12px;
+    color:var(--primary);
+    font-weight:700;
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.eventVenue{
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+.eventDesc{
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.6;
+    margin-bottom:16px;
+    flex:1;
+}
+
+.eventLinks{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:auto;
+}
+
+.linkBtn{
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:11px;
+    font-weight:700;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    color:white;
+    background:var(--primary);
+}
+
+.linkBtn.formBtn{
+    background:#10b981;
+}
+
+/* MAINTENANCE ISSUES */
+
+.maintGrid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.maintCard{
+    background:var(--venue-card-bg);
+    border:1px solid var(--venue-card-border);
+    border-radius:16px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.maintTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+}
+
+.maintCategory{
+    font-size:11px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:6px;
+    background:var(--panel2);
+    color:var(--primary);
+}
+
+.maintPhotoThumb{
+    width:70px;
+    height:70px;
+    border-radius:10px;
+    object-fit:cover;
+    cursor:pointer;
+    border:1px solid var(--border);
 }
 
 /* AI RECOMMENDER */
@@ -632,17 +984,20 @@ header{
 
 .check{
     padding:10px;
-    border:1px solid #263c52;
+    border:1px solid var(--input-border);
     border-radius:10px;
-    color:#bcd0e4;
+    color:var(--text);
     font-size:13px;
+    background:var(--input-bg);
+    display:flex;
+    align-items:center;
+    gap:8px;
 }
 
 .recommendation{
     margin-top:25px;
     border:1px solid #285373;
-    background:
-        linear-gradient(135deg,rgba(40,145,255,.10),rgba(38,211,139,.08));
+    background:linear-gradient(135deg,rgba(40,145,255,.10),rgba(38,211,139,.08));
     border-radius:18px;
     padding:22px;
 }
@@ -654,7 +1009,7 @@ header{
 }
 
 .reason{
-    color:#adc0d3;
+    color:var(--muted);
     line-height:1.7;
     margin-top:10px;
 }
@@ -662,7 +1017,7 @@ header{
 /* TABLE */
 
 .tableWrap{
-    overflow:auto;
+    overflow-x:auto;
 }
 
 table{
@@ -672,16 +1027,16 @@ table{
 }
 
 th{
-    color:#7e98b1;
+    color:var(--muted);
     text-align:left;
     font-size:11px;
     padding:12px;
-    border-bottom:1px solid #294057;
+    border-bottom:1px solid var(--table-header-border);
 }
 
 td{
     padding:14px 12px;
-    border-bottom:1px solid #1d3247;
+    border-bottom:1px solid var(--table-row-border);
     font-size:13px;
 }
 
@@ -690,32 +1045,56 @@ td{
 .modalOverlay{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.7);
+    background:rgba(0,0,0,.72);
     display:grid;
     place-items:center;
     z-index:500;
     padding:20px;
+    backdrop-filter:blur(4px);
 }
 
 .modal{
-    width:min(600px,100%);
+    width:min(620px,100%);
     max-height:90vh;
-    overflow:auto;
-    background:#0c1c2d;
-    border:1px solid #29415a;
+    overflow-y:auto;
+    background:var(--modal-bg);
+    border:1px solid var(--border);
     border-radius:22px;
-    padding:25px;
+    padding:26px;
+    box-shadow:0 25px 60px rgba(0,0,0,.5);
 }
 
 .closeModal{
     float:right;
     border:0;
     background:transparent;
-    color:white;
-    font-size:25px;
+    color:var(--text);
+    font-size:24px;
+    line-height:1;
+    cursor:pointer;
 }
 
-/* MOBILE */
+.bannerNotice{
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:12px;
+    line-height:1.5;
+    margin-bottom:16px;
+}
+
+.bannerNotice.info{
+    background:rgba(79,163,255,.12);
+    border:1px solid rgba(79,163,255,.3);
+    color:var(--primary);
+}
+
+.bannerNotice.alert{
+    background:rgba(255,107,107,.12);
+    border:1px solid rgba(255,107,107,.3);
+    color:var(--red);
+}
+
+/* RESPONSIVE */
 
 @media(max-width:950px){
     .loginShell{
@@ -723,7 +1102,7 @@ td{
     }
     .loginHero{
         min-height:auto;
-        padding:45px;
+        padding:40px;
     }
     .loginHero h1{
         font-size:40px;
@@ -734,7 +1113,7 @@ td{
     .sidebar{
         min-height:auto;
         display:flex;
-        overflow:auto;
+        overflow-x:auto;
         position:sticky;
         top:72px;
         z-index:90;
@@ -750,17 +1129,22 @@ td{
     .grid2{
         grid-template-columns:1fr;
     }
-    .venueGrid{
+    .venueGrid,
+    .eventGrid{
         grid-template-columns:repeat(2,1fr);
+    }
+    .maintGrid{
+        grid-template-columns:1fr;
     }
 }
 
 @media(max-width:650px){
     .main{
-        padding:18px;
+        padding:16px;
     }
     .statsGrid,
     .venueGrid,
+    .eventGrid,
     .formGrid,
     .checkGrid{
         grid-template-columns:1fr;
@@ -788,14 +1172,13 @@ td{
 <div class="badge">Smart Living & Connected Communities</div>
 
 <h1>
-MACE<br>
+CampusSpace<br>
 <span class="gradientText">Smart Campus OS</span>
 </h1>
 
 <p>
-An intelligent venue discovery, booking and campus resource
-management platform for Mar Athanasius College of Engineering,
-Kothamangalam.
+An intelligent venue discovery, date-based booking, multi-college event explorer
+and physical campus infrastructure maintenance portal for Mar Athanasius College of Engineering.
 </p>
 
 <div class="heroStats">
@@ -811,8 +1194,13 @@ Kothamangalam.
 </div>
 
 <div class="heroStat">
+<strong>4</strong>
+<span>Dedicated roles</span>
+</div>
+
+<div class="heroStat">
 <strong>AI</strong>
-<span>Venue matching</span>
+<span>Conflict detection</span>
 </div>
 
 </div>
@@ -822,24 +1210,47 @@ Kothamangalam.
 <div class="loginCard">
 
 <h2>Welcome</h2>
-<p>Select your portal and sign in.</p>
+<p>Select your user mode to enter CampusSpace.</p>
 
 <div class="roleSwitcher">
 
 <button
 class="roleBtn active"
-id="studentRole"
+id="roleBtn_student"
 onclick="setLoginRole('student')">
 🎓 Student
 </button>
 
 <button
 class="roleBtn"
-id="adminRole"
+id="roleBtn_teamlead"
+onclick="setLoginRole('teamlead')">
+👥 Team Lead
+</button>
+
+<button
+class="roleBtn"
+id="roleBtn_maintenance"
+onclick="setLoginRole('maintenance')">
+🔧 Maintenance
+</button>
+
+<button
+class="roleBtn"
+id="roleBtn_admin"
 onclick="setLoginRole('admin')">
 🛡 Admin
 </button>
 
+</div>
+
+<!-- Demo Quick-Fill Pills -->
+<div class="demoPills">
+<span style="font-size:11px;color:var(--muted);align-self:center">Quick test:</span>
+<span class="demoPill" onclick="autoFillLogin('student')">Student</span>
+<span class="demoPill" onclick="autoFillLogin('teamlead')">Team Lead</span>
+<span class="demoPill" onclick="autoFillLogin('maintenance')">Maintenance</span>
+<span class="demoPill" onclick="autoFillLogin('admin')">Admin</span>
 </div>
 
 <div class="inputGroup">
@@ -867,7 +1278,7 @@ Sign In →
 </section>
 
 
-<!-- APP -->
+<!-- MAIN APPLICATION -->
 
 <section id="app" class="hidden">
 
@@ -875,16 +1286,20 @@ Sign In →
 
 <div class="logo">
 
-<div class="logoMark">M</div>
+<div class="logoMark">CS</div>
 
 <div class="logoText">
-MACE Smart Campus
-<span>Connected Campus Intelligence</span>
+CampusSpace
+<span>MACE Connected Campus Intelligence</span>
 </div>
 
 </div>
 
 <div class="headerRight">
+
+<button class="themeToggleBtn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">
+🌙 Dark Mode
+</button>
 
 <div class="roleChip" id="currentRole">
 STUDENT
@@ -902,39 +1317,59 @@ Logout
 
 <aside class="sidebar">
 
-<button class="navButton active"
+<button class="navButton active nav-dashboard"
 onclick="showPage('dashboard',this)">
 🏠 Dashboard
 </button>
 
-<button class="navButton"
+<button class="navButton nav-events"
+onclick="showPage('events',this)">
+📅 Campus Events
+</button>
+
+<button class="navButton nav-venues"
+onclick="showPage('venues',this)">
+🏫 Venue Explorer
+</button>
+
+<button class="navButton nav-map"
 onclick="showPage('map',this)">
 🗺 Campus Map
 </button>
 
-<button class="navButton"
-onclick="showPage('venues',this)">
-🏫 Venues
-</button>
-
-<button class="navButton"
-onclick="showPage('recommend',this)">
-✨ Smart Recommendation
-</button>
-
-<button class="navButton studentOnly"
+<button class="navButton nav-mybookings"
 onclick="showPage('bookings',this)">
-📅 My Bookings
+📅 My Venue Requests
 </button>
 
-<button class="navButton adminOnly"
+<button class="navButton nav-createevent"
+onclick="openCreateEventModal()">
+➕ Create Event
+</button>
+
+<button class="navButton nav-recommend"
+onclick="showPage('recommend',this)">
+✨ Smart Match
+</button>
+
+<button class="navButton nav-adminbookings"
 onclick="showPage('adminBookings',this)">
-✅ Booking Requests
+✅ Booking Requests <span id="pendingNavBadge" class="badgeMini hidden">0</span>
 </button>
 
-<button class="navButton adminOnly"
+<button class="navButton nav-adminvenues"
 onclick="showPage('adminVenues',this)">
 ⚙ Manage Venues
+</button>
+
+<button class="navButton nav-maintenance"
+onclick="showPage('maintenance',this)">
+🔧 Maintenance Hub <span id="maintNavBadge" class="badgeMini hidden">0</span>
+</button>
+
+<button class="navButton nav-report"
+onclick="openReportIssueModal()">
+⚠️ Report Issue
 </button>
 
 </aside>
@@ -942,13 +1377,13 @@ onclick="showPage('adminVenues',this)">
 
 <main class="main">
 
-<!-- DASHBOARD -->
+<!-- 1. DASHBOARD -->
 
 <section id="dashboardPage" class="page">
 
 <div class="pageTitle">
-<h1>Campus Intelligence Dashboard</h1>
-<p>Live overview of MACE venues and campus resources.</p>
+<h1 id="dashboardGreeting">Campus Intelligence Dashboard</h1>
+<p id="dashboardSubtitle">Live overview of MACE venue availability, bookings, and operations.</p>
 </div>
 
 <div class="statsGrid">
@@ -960,21 +1395,21 @@ onclick="showPage('adminVenues',this)">
 </div>
 
 <div class="statCard">
-<div class="statIcon">🟢</div>
-<h3 id="availableCount">9</h3>
-<p>Available venues</p>
-</div>
-
-<div class="statCard">
-<div class="statIcon">👥</div>
-<h3>4,330</h3>
-<p>Combined capacity</p>
-</div>
-
-<div class="statCard">
 <div class="statIcon">📅</div>
+<h3 id="eventsCount">0</h3>
+<p>Active events</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">⏳</div>
 <h3 id="pendingCount">0</h3>
-<p>Pending requests</p>
+<p>Pending booking requests</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">🔧</div>
+<h3 id="openIssuesCount">0</h3>
+<p>Open maintenance issues</p>
 </div>
 
 </div>
@@ -993,34 +1428,56 @@ onclick="showPage('adminVenues',this)">
 
 <div>
 
-<div class="card">
-
-<div class="cardTitle">
-<h2>AI Insight</h2>
-</div>
-
-<p style="color:#b7c9da;line-height:1.8">
-Our recommendation engine selects venues based on
-capacity, event type, facilities, availability and
-department priority.
-</p>
-
-<br>
-
-<button class="smallBtn"
-onclick="showPage('recommend')">
-Find Best Venue
-</button>
-
-</div>
-
+<!-- QUICK AVAILABILITY CARD (DATE-FIRST) -->
 <div class="card">
 
 <div class="cardTitle">
 <h2>Quick Availability</h2>
 </div>
 
+<p style="color:var(--muted);font-size:12px;margin-bottom:12px">
+Select a date to check live venue availability across campus.
+</p>
+
+<div style="display:grid;grid-template-columns:1.2fr .9fr .9fr;gap:8px;margin-bottom:14px">
+
+<div>
+<label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600">Date *</label>
+<input type="date" id="quickDate" onchange="renderQuickAvailability()" style="width:100%;padding:9px 10px;font-size:12px;border-radius:9px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)">
+</div>
+
+<div>
+<label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600">Start</label>
+<input type="time" id="quickStartTime" value="09:00" onchange="renderQuickAvailability()" style="width:100%;padding:9px 6px;font-size:12px;border-radius:9px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)">
+</div>
+
+<div>
+<label style="display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600">End</label>
+<input type="time" id="quickEndTime" value="17:00" onchange="renderQuickAvailability()" style="width:100%;padding:9px 6px;font-size:12px;border-radius:9px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)">
+</div>
+
+</div>
+
 <div id="quickAvailability"></div>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+<h2>AI Smart Match</h2>
+</div>
+
+<p style="color:var(--muted);line-height:1.7;font-size:13px">
+Our engine matches venues based on capacity, event type, required facilities and existing booking schedules.
+</p>
+
+<br>
+
+<button class="smallBtn"
+onclick="showPage('recommend')">
+Find Best Venue →
+</button>
 
 </div>
 
@@ -1030,33 +1487,31 @@ Find Best Venue
 </section>
 
 
-<!-- MAP -->
+<!-- 2. CAMPUS MAP -->
 
 <section id="mapPage" class="page hidden">
 
 <div class="pageTitle">
 <h1>MACE Interactive Campus Map</h1>
-<p>Explore important venues and event spaces across campus.</p>
+<p>Explore important venues, departments, and event spaces across campus.</p>
 </div>
 
 <div class="mapContainer" id="mainMap"></div>
 
-<p style="color:#7f96ad;font-size:12px;margin-top:12px">
-Map pin positions are currently demonstration positions.
-Replace <b>mace-map.png</b> with your official MACE route-map
-image and adjust venue coordinates after adding the image.
+<p style="color:var(--muted);font-size:12px;margin-top:12px">
+Campus coordinates mapped to MACE facilities. Click any pin to view venue capacity, facilities, and live status.
 </p>
 
 </section>
 
 
-<!-- VENUES -->
+<!-- 3. VENUE EXPLORER (DATE & TIME SORTED) -->
 
 <section id="venuesPage" class="page hidden">
 
 <div class="pageTitle">
 <h1>Venue Explorer</h1>
-<p>Search MACE spaces by capacity, block and facilities.</p>
+<p>Search venues by date, time window, capacity, and facilities.</p>
 </div>
 
 <div class="filters">
@@ -1076,12 +1531,28 @@ oninput="renderVenues()">
 <option>Canteen</option>
 </select>
 
+<div style="display:flex;align-items:center;gap:6px">
+<span style="font-size:12px;color:var(--muted)">Date:</span>
+<input type="date" id="venueDateFilter" onchange="renderVenues()">
+</div>
+
+<div style="display:flex;align-items:center;gap:6px">
+<span style="font-size:12px;color:var(--muted)">From:</span>
+<input type="time" id="venueStartTimeFilter" value="09:00" onchange="renderVenues()">
+<span style="font-size:12px;color:var(--muted)">To:</span>
+<input type="time" id="venueEndTimeFilter" value="17:00" onchange="renderVenues()">
+</div>
+
 <select id="availabilityFilter" onchange="renderVenues()">
 <option value="">Any Status</option>
-<option value="available">Available</option>
+<option value="available">Available First</option>
 <option value="unavailable">Unavailable</option>
 </select>
 
+</div>
+
+<div class="bannerNotice info" id="venueNoticeBanner">
+💡 Venues are sorted based on real-time availability for the selected date and time window.
 </div>
 
 <div class="venueGrid" id="venueGrid"></div>
@@ -1089,126 +1560,69 @@ oninput="renderVenues()">
 </section>
 
 
-<!-- RECOMMENDER -->
+<!-- 4. CAMPUS & INTER-COLLEGE EVENTS -->
 
-<section id="recommendPage" class="page hidden">
+<section id="eventsPage" class="page hidden">
 
-<div class="pageTitle">
-<h1>AI Smart Venue Recommendation</h1>
-<p>Tell us what your event needs and the system will find the best MACE venue.</p>
+<div class="pageTitle" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:15px">
+<div>
+<h1>Campus & Inter-College Events</h1>
+<p>Discover programs, competitions, and technical workshops happening at MACE and partner colleges.</p>
 </div>
 
-<div class="card aiPanel">
-
-<div class="formGrid">
-
-<div class="inputGroup">
-<label>Number of People</label>
-<input type="number" id="reqCapacity" value="50" min="1">
+<button class="smallBtn teamLeadOnly" onclick="openCreateEventModal()">
+➕ Create Event Listing
+</button>
 </div>
 
-<div class="inputGroup">
+<div class="filters">
 
-<label>Event Type</label>
+<div style="display:flex;align-items:center;gap:6px">
+<span style="font-size:12px;color:var(--muted)">Filter Date:</span>
+<input type="date" id="eventDateFilter" onchange="renderEvents()">
+</div>
 
-<select id="eventType">
-
-<option value="technical">
-Technical Workshop / Seminar
-</option>
-
-<option value="placement">
-Placement / Recruitment
-</option>
-
-<option value="cultural">
-Cultural Event
-</option>
-
-<option value="concert">
-Concert / Music
-</option>
-
-<option value="meeting">
-Meeting
-</option>
-
-<option value="pta">
-PTA Meeting
-</option>
-
-<option value="practice">
-Practice / Rehearsal
-</option>
-
-<option value="exam">
-Exam
-</option>
-
+<select id="eventCollegeFilter" onchange="renderEvents()">
+<option value="">All Colleges / Institutions</option>
+<option value="MACE">Mar Athanasius College of Engineering (MACE)</option>
+<option value="ABC">ABC College of Engineering</option>
+<option value="MEC">Model Engineering College</option>
+<option value="Other">Other Institutions</option>
 </select>
 
-</div>
+<select id="eventCategoryFilter" onchange="renderEvents()">
+<option value="">All Categories</option>
+<option value="Technical">Technical</option>
+<option value="Cultural">Cultural</option>
+<option value="Symposium">Symposium / Workshop</option>
+<option value="Hackathon">Hackathon</option>
+<option value="Placement">Placement / Career</option>
+</select>
 
-</div>
-
-<div class="inputGroup">
-
-<label>Required Facilities</label>
-
-<div class="checkGrid">
-
-<label class="check">
-<input type="checkbox" value="wifi" class="facilityReq">
- Wi-Fi
-</label>
-
-<label class="check">
-<input type="checkbox" value="ac" class="facilityReq">
- AC
-</label>
-
-<label class="check">
-<input type="checkbox" value="projector" class="facilityReq">
- Projector
-</label>
-
-<label class="check">
-<input type="checkbox" value="audio" class="facilityReq">
- Audio System
-</label>
-
-<label class="check">
-<input type="checkbox" value="tables" class="facilityReq">
- Tables
-</label>
-
-<label class="check">
-<input type="checkbox" value="soundproof" class="facilityReq">
- Soundproof
-</label>
-
-</div>
-
-</div>
-
-<button class="primaryBtn" onclick="recommendVenue()">
-✨ Find Best Venue
+<button class="smallBtn secondary" onclick="clearEventFilters()">
+Reset Filters
 </button>
 
-<div id="recommendationResult"></div>
-
 </div>
+
+<div class="eventGrid" id="eventGrid"></div>
 
 </section>
 
 
-<!-- STUDENT BOOKINGS -->
+<!-- 5. TEAM LEAD: MY VENUE REQUESTS -->
 
 <section id="bookingsPage" class="page hidden">
 
-<div class="pageTitle">
-<h1>My Booking Requests</h1>
-<p>Track submitted MACE venue booking requests.</p>
+<div class="pageTitle" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:15px">
+<div>
+<h1>My Venue Requests</h1>
+<p>Track submitted venue requests and approval statuses.</p>
+</div>
+
+<button class="smallBtn" onclick="showPage('venues')">
++ New Venue Request
+</button>
 </div>
 
 <div class="card">
@@ -1222,6 +1636,7 @@ Exam
 <th>TIME</th>
 <th>PEOPLE</th>
 <th>STATUS</th>
+<th>DETAILS</th>
 </tr>
 </thead>
 
@@ -1234,13 +1649,13 @@ Exam
 </section>
 
 
-<!-- ADMIN REQUESTS -->
+<!-- 6. ADMIN: BOOKING REQUESTS -->
 
 <section id="adminBookingsPage" class="page hidden">
 
 <div class="pageTitle">
-<h1>Booking Requests</h1>
-<p>Approve or reject student venue requests.</p>
+<h1>Booking Requests Review</h1>
+<p>Approve or reject venue requests submitted by Team Leads with automatic double-booking prevention.</p>
 </div>
 
 <div class="card">
@@ -1251,6 +1666,7 @@ Exam
 
 <thead>
 <tr>
+<th>SUBMITTED BY</th>
 <th>VENUE</th>
 <th>EVENT</th>
 <th>DATE</th>
@@ -1271,37 +1687,199 @@ Exam
 </section>
 
 
-<!-- ADMIN VENUE MANAGEMENT -->
+<!-- 7. ADMIN: MANAGE VENUES (DATE-FIRST) -->
 
 <section id="adminVenuesPage" class="page hidden">
 
 <div class="pageTitle">
-<h1>Venue Management</h1>
-<p>Control venue availability across MACE.</p>
+<h1>Venue Availability Management</h1>
+<p>Inspect real-time booking conflicts and venue availability for specific campus dates.</p>
 </div>
 
 <div class="card">
 
-<div class="tableWrap">
+<div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px">
+<div style="min-width:240px">
+<label style="display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:700">Select Date to View Availability *</label>
+<input type="date" id="adminVenueDate" onchange="renderVenueManagement()" style="padding:10px 14px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);width:100%">
+</div>
 
-<table>
+<div>
+<button class="smallBtn secondary" onclick="setAdminDateToday()">
+Today
+</button>
+</div>
 
-<thead>
-<tr>
-<th>VENUE</th>
-<th>BLOCK</th>
-<th>CAPACITY</th>
-<th>TIME</th>
-<th>STATUS</th>
-<th>ACTION</th>
-</tr>
-</thead>
+<div style="color:var(--muted);font-size:12px;align-self:center">
+Availability is calculated from approved bookings for this date.
+</div>
+</div>
 
-<tbody id="manageVenueTable"></tbody>
-
-</table>
+<div id="adminVenuesContainer"></div>
 
 </div>
+
+</section>
+
+
+<!-- 8. MAINTENANCE HUB -->
+
+<section id="maintenancePage" class="page hidden">
+
+<div class="pageTitle" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:15px">
+<div>
+<h1>Campus Maintenance Hub</h1>
+<p>Track, inspect, and resolve reported device, equipment, and facility issues across campus.</p>
+</div>
+
+<button class="smallBtn warning" onclick="openReportIssueModal()">
+⚠️ Report New Issue
+</button>
+</div>
+
+<div class="statsGrid" style="grid-template-columns:repeat(4,1fr);margin-bottom:22px">
+
+<div class="statCard">
+<div class="statIcon">📋</div>
+<h3 id="maintTotalCount">0</h3>
+<p>Total Reported</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">⚠️</div>
+<h3 id="maintReportedCount">0</h3>
+<p>Awaiting Inspection</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">🛠</div>
+<h3 id="maintInProgressCount">0</h3>
+<p>In Progress</p>
+</div>
+
+<div class="statCard">
+<div class="statIcon">✅</div>
+<h3 id="maintResolvedCount">0</h3>
+<p>Resolved Issues</p>
+</div>
+
+</div>
+
+<div class="filters">
+
+<select id="maintStatusFilter" onchange="renderMaintenanceReports()">
+<option value="">All Statuses</option>
+<option value="Reported">Reported</option>
+<option value="In Progress">In Progress</option>
+<option value="Resolved">Resolved</option>
+</select>
+
+<select id="maintCategoryFilter" onchange="renderMaintenanceReports()">
+<option value="">All Categories</option>
+<option>Projector</option>
+<option>Computer</option>
+<option>Microphone</option>
+<option>Speaker</option>
+<option>AC</option>
+<option>Lights</option>
+<option>Fan</option>
+<option>Furniture</option>
+<option>Electrical</option>
+<option>Network</option>
+<option>Infrastructure</option>
+<option>Other</option>
+</select>
+
+<input
+id="maintSearch"
+placeholder="Search issue or location..."
+oninput="renderMaintenanceReports()">
+
+</div>
+
+<div class="maintGrid" id="maintGrid"></div>
+
+</section>
+
+
+<!-- 9. AI RECOMMENDER -->
+
+<section id="recommendPage" class="page hidden">
+
+<div class="pageTitle">
+<h1>AI Smart Venue Recommendation</h1>
+<p>Tell us what your event needs and the system will find the best MACE venue.</p>
+</div>
+
+<div class="card aiPanel">
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Number of People</label>
+<input type="number" id="reqCapacity" value="50" min="1">
+</div>
+
+<div class="inputGroup">
+<label>Event Type</label>
+<select id="eventType">
+<option value="technical">Technical Workshop / Seminar</option>
+<option value="placement">Placement / Recruitment</option>
+<option value="cultural">Cultural Event</option>
+<option value="concert">Concert / Music</option>
+<option value="meeting">Meeting</option>
+<option value="pta">PTA Meeting</option>
+<option value="practice">Practice / Rehearsal</option>
+<option value="exam">Exam</option>
+</select>
+</div>
+
+</div>
+
+<div class="inputGroup">
+<label>Required Facilities</label>
+
+<div class="checkGrid">
+
+<label class="check">
+<input type="checkbox" value="wifi" class="facilityReq">
+Wi-Fi
+</label>
+
+<label class="check">
+<input type="checkbox" value="ac" class="facilityReq">
+AC
+</label>
+
+<label class="check">
+<input type="checkbox" value="projector" class="facilityReq">
+Projector
+</label>
+
+<label class="check">
+<input type="checkbox" value="audio" class="facilityReq">
+Audio System
+</label>
+
+<label class="check">
+<input type="checkbox" value="tables" class="facilityReq">
+Tables
+</label>
+
+<label class="check">
+<input type="checkbox" value="soundproof" class="facilityReq">
+Soundproof
+</label>
+
+</div>
+
+</div>
+
+<button class="primaryBtn" onclick="recommendVenue()">
+✨ Find Best Venue
+</button>
+
+<div id="recommendationResult"></div>
 
 </div>
 
@@ -1312,7 +1890,7 @@ Exam
 </section>
 
 
-<!-- BOOKING MODAL -->
+<!-- MODAL: REQUEST VENUE (TEAM LEAD) -->
 
 <div id="bookingModal" class="modalOverlay hidden">
 
@@ -1322,29 +1900,27 @@ Exam
 
 <h2>Request Venue</h2>
 
-<p
-id="bookingVenueName"
-style="color:#82bfff;margin:8px 0 22px">
-</p>
+<p id="bookingVenueName" style="color:var(--primary);margin:6px 0 18px;font-weight:700"></p>
 
 <input type="hidden" id="bookingVenueId">
 
+<div id="bookingConflictWarning" class="bannerNotice alert hidden"></div>
+
 <div class="inputGroup">
-<label>Event Name</label>
-<input id="bookingEvent"
-placeholder="Example: Coding Workshop">
+<label>Event Name *</label>
+<input id="bookingEvent" placeholder="Example: AI Workshop 2026">
 </div>
 
 <div class="formGrid">
 
 <div class="inputGroup">
-<label>Date</label>
-<input type="date" id="bookingDate">
+<label>Date *</label>
+<input type="date" id="bookingDate" onchange="checkBookingModalConflict()">
 </div>
 
 <div class="inputGroup">
-<label>Expected People</label>
-<input type="number" id="bookingPeople" min="1">
+<label>Expected People *</label>
+<input type="number" id="bookingPeople" min="1" placeholder="e.g. 60">
 </div>
 
 </div>
@@ -1352,1491 +1928,1899 @@ placeholder="Example: Coding Workshop">
 <div class="formGrid">
 
 <div class="inputGroup">
-<label>Start Time</label>
-<input type="time" id="bookingStart">
+<label>Start Time *</label>
+<input type="time" id="bookingStart" value="10:00" onchange="checkBookingModalConflict()">
 </div>
 
 <div class="inputGroup">
-<label>End Time</label>
-<input type="time" id="bookingEnd">
+<label>End Time *</label>
+<input type="time" id="bookingEnd" value="12:00" onchange="checkBookingModalConflict()">
 </div>
 
 </div>
 
 <div class="inputGroup">
-<label>Purpose</label>
-<textarea id="bookingPurpose"
-rows="3"
-placeholder="Briefly describe the event"></textarea>
+<label>Purpose / Details</label>
+<textarea id="bookingPurpose" rows="3" placeholder="Briefly describe the program requirements"></textarea>
 </div>
 
-<button class="primaryBtn" onclick="submitBooking()">
-Submit Request
+<button class="primaryBtn" id="submitBookingBtn" onclick="submitBooking()">
+Submit Booking Request
 </button>
 
+</div>
+</div>
+
+
+<!-- MODAL: CREATE EVENT (TEAM LEAD) -->
+
+<div id="createEventModal" class="modalOverlay hidden">
+
+<div class="modal">
+
+<button class="closeModal" onclick="closeCreateEventModal()">×</button>
+
+<h2>Publish Event Listing</h2>
+<p style="color:var(--muted);font-size:13px;margin:4px 0 18px">Publish event or program details for students across MACE and partner colleges.</p>
+
+<div class="inputGroup">
+<label>Event Name *</label>
+<input id="newEventTitle" placeholder="Example: Inter-College Hackathon 2026">
+</div>
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>College / Institution *</label>
+<input id="newEventCollege" placeholder="e.g. Mar Athanasius College of Engineering" value="Mar Athanasius College of Engineering (MACE)">
+</div>
+
+<div class="inputGroup">
+<label>Category</label>
+<select id="newEventCategory">
+<option value="Technical">Technical</option>
+<option value="Cultural">Cultural</option>
+<option value="Symposium">Symposium / Seminar</option>
+<option value="Hackathon">Hackathon</option>
+<option value="Placement">Placement / Career</option>
+<option value="Sports">Sports</option>
+</select>
+</div>
+
+</div>
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Date *</label>
+<input type="date" id="newEventDate">
+</div>
+
+<div class="inputGroup">
+<label>Venue / Hall *</label>
+<input id="newEventVenue" placeholder="e.g. Main Auditorium or Campus Grounds">
+</div>
+
+</div>
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Start Time *</label>
+<input type="time" id="newEventStartTime" value="10:00">
+</div>
+
+<div class="inputGroup">
+<label>End Time *</label>
+<input type="time" id="newEventEndTime" value="13:00">
+</div>
+
+</div>
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Registration Link (URL)</label>
+<input id="newEventRegLink" placeholder="https://college.edu/register">
+</div>
+
+<div class="inputGroup">
+<label>Google Form Link (URL)</label>
+<input id="newEventFormLink" placeholder="https://forms.gle/xyz">
+</div>
+
+</div>
+
+<div class="inputGroup">
+<label>Event Poster / Advertisement Image</label>
+<input type="file" id="newEventPosterFile" accept="image/*" onchange="handlePosterUpload(event)">
+<input type="text" id="newEventPosterUrl" placeholder="Or paste image URL (https://...)" style="margin-top:6px" oninput="updatePosterPreview(this.value)">
+<div id="posterPreviewContainer" style="margin-top:8px" class="hidden">
+<img id="posterPreviewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">
+</div>
+</div>
+
+<div class="inputGroup">
+<label>Description *</label>
+<textarea id="newEventDesc" rows="3" placeholder="Provide event details, prizes, eligibility, and rules"></textarea>
+</div>
+
+<button class="primaryBtn" onclick="submitNewEvent()">
+Publish Event
+</button>
+
+</div>
+</div>
+
+
+<!-- MODAL: REPORT MAINTENANCE ISSUE (STUDENTS & TEAM LEADS) -->
+
+<div id="reportIssueModal" class="modalOverlay hidden">
+
+<div class="modal">
+
+<button class="closeModal" onclick="closeReportIssueModal()">×</button>
+
+<h2>Report Maintenance Issue</h2>
+<p style="color:var(--muted);font-size:13px;margin:4px 0 18px">Report faulty equipment, broken devices, or venue maintenance requirements directly to the Maintenance Team.</p>
+
+<div class="inputGroup">
+<label>Issue Title *</label>
+<input id="newIssueTitle" placeholder="e.g. Projector bulb flickering or AC not cooling">
+</div>
+
+<div class="formGrid">
+
+<div class="inputGroup">
+<label>Category *</label>
+<select id="newIssueCategory">
+<option value="Projector">Projector</option>
+<option value="Computer">Computer</option>
+<option value="Microphone">Microphone</option>
+<option value="Speaker">Speaker</option>
+<option value="AC">AC</option>
+<option value="Lights">Lights</option>
+<option value="Fan">Fan</option>
+<option value="Furniture">Furniture</option>
+<option value="Electrical">Electrical</option>
+<option value="Network">Network</option>
+<option value="Infrastructure">Infrastructure</option>
+<option value="Other">Other</option>
+</select>
+</div>
+
+<div class="inputGroup">
+<label>Venue / Location *</label>
+<select id="newIssueLocation">
+<option value="Main Auditorium">Main Auditorium</option>
+<option value="Seminar Hall 2">Seminar Hall 2</option>
+<option value="PTA Seminar Hall">PTA Seminar Hall</option>
+<option value="Seminar Hall 4">Seminar Hall 4</option>
+<option value="Placement Hall 1">Placement Hall 1</option>
+<option value="Placement Hall 2">Placement Hall 2</option>
+<option value="Open Air Theatre (OAT)">Open Air Theatre (OAT)</option>
+<option value="Founders Block">Founders Block</option>
+<option value="Canteen">Canteen</option>
+<option value="Other Campus Area">Other Campus Area</option>
+</select>
+</div>
+
+</div>
+
+<div class="inputGroup">
+<label>Attach Photo / Proof (Optional)</label>
+<input type="file" id="newIssuePhotoFile" accept="image/*" onchange="handleIssuePhotoUpload(event)">
+<div id="issuePhotoPreviewContainer" style="margin-top:8px" class="hidden">
+<img id="issuePhotoPreviewImg" style="width:100%;max-height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">
+</div>
+</div>
+
+<div class="inputGroup">
+<label>Problem Description *</label>
+<textarea id="newIssueDesc" rows="3" placeholder="Describe what is damaged, faulty, or malfunctioning"></textarea>
+</div>
+
+<button class="primaryBtn" onclick="submitMaintenanceIssue()">
+Submit Issue Report
+</button>
+
+</div>
+</div>
+
+
+<!-- MODAL: PHOTO VIEWER -->
+
+<div id="photoViewerModal" class="modalOverlay hidden" onclick="closePhotoViewer()">
+<div style="position:relative;max-width:min(700px,95vw);max-height:90vh" onclick="event.stopPropagation()">
+<button class="closeModal" style="position:absolute;top:-35px;right:0;color:white" onclick="closePhotoViewer()">×</button>
+<img id="photoViewerImg" style="width:100%;max-height:80vh;object-fit:contain;border-radius:14px;border:1px solid var(--border)">
 </div>
 </div>
 
 
 <script>
 
-/* ================================
-   MACE VENUE DATABASE
-================================ */
+/* ================================================================
+   1. MACE VENUE DEFINITIONS
+================================================================ */
 
 const venues = [
-
 {
-id:1,
-name:"Main Auditorium",
-block:"Main Block",
-capacity:500,
-time:"9:00 AM – 9:00 PM",
-facilities:[
-"Stage",
-"Practice Area",
-"Fans & Lights",
-"Audio System",
-"Speakers"
-],
-tags:["audio","practice","stage"],
-available:true,
-x:24,
-y:38
+    id:1,
+    name:"Main Auditorium",
+    block:"Main Block",
+    capacity:500,
+    time:"9:00 AM – 9:00 PM",
+    facilities:[
+        "Stage",
+        "Practice Area",
+        "Fans & Lights",
+        "Audio System",
+        "Speakers"
+    ],
+    tags:["audio","practice","stage"],
+    x:24,
+    y:38
 },
-
 {
-id:2,
-name:"Seminar Hall 2",
-block:"Main Block",
-capacity:50,
-time:"9:00 AM – 7:00 PM",
-facilities:[
-"Wi-Fi",
-"AC",
-"Meeting Area",
-"Tiered Seating",
-"Projector",
-"Audio System",
-"Soundproof"
-],
-tags:[
-"wifi",
-"ac",
-"projector",
-"audio",
-"soundproof",
-"meeting"
-],
-available:true,
-x:36,
-y:31
+    id:2,
+    name:"Seminar Hall 2",
+    block:"Main Block",
+    capacity:50,
+    time:"9:00 AM – 7:00 PM",
+    facilities:[
+        "Wi-Fi",
+        "AC",
+        "Meeting Area",
+        "Tiered Seating",
+        "Projector",
+        "Audio System",
+        "Soundproof"
+    ],
+    tags:["wifi","ac","projector","audio","soundproof","meeting"],
+    x:36,
+    y:31
 },
-
 {
-id:3,
-name:"PTA Seminar Hall",
-block:"Main Block",
-capacity:50,
-time:"9:00 AM – 5:00 PM",
-facilities:[
-"Wi-Fi",
-"AC",
-"PTA Meeting Area",
-"Tiered Seating",
-"Tables",
-"Projector",
-"Audio System",
-"Soundproof"
-],
-tags:[
-"wifi",
-"ac",
-"tables",
-"projector",
-"audio",
-"soundproof",
-"pta",
-"meeting"
-],
-available:true,
-x:39,
-y:43
+    id:3,
+    name:"PTA Seminar Hall",
+    block:"Main Block",
+    capacity:50,
+    time:"9:00 AM – 5:00 PM",
+    facilities:[
+        "Wi-Fi",
+        "AC",
+        "PTA Meeting Area",
+        "Tiered Seating",
+        "Tables",
+        "Projector",
+        "Audio System",
+        "Soundproof"
+    ],
+    tags:["wifi","ac","tables","projector","audio","soundproof","pta","meeting"],
+    x:39,
+    y:43
 },
-
 {
-id:4,
-name:"Seminar Hall 4",
-block:"ECE Department Block",
-capacity:80,
-time:"9:00 AM – 10:00 PM",
-facilities:[
-"Wi-Fi",
-"AC",
-"Tiered Seating",
-"Tables",
-"Multiple Plug Points",
-"Projector",
-"Soundproof",
-"Speaker & Sound System"
-],
-tags:[
-"wifi",
-"ac",
-"tables",
-"projector",
-"soundproof",
-"audio"
-],
-available:true,
-x:60,
-y:28
+    id:4,
+    name:"Seminar Hall 4",
+    block:"ECE Department Block",
+    capacity:80,
+    time:"9:00 AM – 10:00 PM",
+    facilities:[
+        "Wi-Fi",
+        "AC",
+        "Tiered Seating",
+        "Tables",
+        "Multiple Plug Points",
+        "Projector",
+        "Soundproof",
+        "Speaker & Sound System"
+    ],
+    tags:["wifi","ac","tables","projector","soundproof","audio"],
+    x:60,
+    y:28
 },
-
 {
-id:5,
-name:"Placement Hall 1",
-block:"Placement Cell",
-capacity:50,
-time:"9:00 AM – 4:00 PM",
-facilities:[
-"Attached Table Chairs",
-"AC",
-"Wi-Fi",
-"Projector"
-],
-tags:[
-"wifi",
-"ac",
-"projector",
-"tables",
-"placement"
-],
-available:true,
-priority:"placement",
-x:69,
-y:48
+    id:5,
+    name:"Placement Hall 1",
+    block:"Placement Cell",
+    capacity:50,
+    time:"9:00 AM – 4:00 PM",
+    facilities:[
+        "Attached Table Chairs",
+        "AC",
+        "Wi-Fi",
+        "Projector"
+    ],
+    tags:["wifi","ac","projector","tables","placement"],
+    priority:"placement",
+    x:69,
+    y:48
 },
-
 {
-id:6,
-name:"Placement Hall 2",
-block:"Placement Cell",
-capacity:100,
-time:"9:00 AM – 4:00 PM",
-facilities:[
-"Attached Table Chairs",
-"AC",
-"Wi-Fi",
-"Projector"
-],
-tags:[
-"wifi",
-"ac",
-"projector",
-"tables",
-"placement"
-],
-available:true,
-priority:"placement",
-x:76,
-y:44
+    id:6,
+    name:"Placement Hall 2",
+    block:"Placement Cell",
+    capacity:100,
+    time:"9:00 AM – 4:00 PM",
+    facilities:[
+        "Attached Table Chairs",
+        "AC",
+        "Wi-Fi",
+        "Projector"
+    ],
+    tags:["wifi","ac","projector","tables","placement"],
+    priority:"placement",
+    x:76,
+    y:44
 },
-
 {
-id:7,
-name:"Open Air Theatre (OAT)",
-block:"Open Air Theatre",
-capacity:3000,
-time:"6:00 AM – 9:00 PM",
-facilities:[
-"Concert Venue",
-"Tiered Open Theatre",
-"Sound System",
-"Practice Area",
-"Cultural Events"
-],
-tags:[
-"concert",
-"cultural",
-"audio",
-"practice"
-],
-available:true,
-priority:"cultural",
-x:56,
-y:71
+    id:7,
+    name:"Open Air Theatre (OAT)",
+    block:"Open Air Theatre",
+    capacity:3000,
+    time:"6:00 AM – 9:00 PM",
+    facilities:[
+        "Concert Venue",
+        "Tiered Open Theatre",
+        "Sound System",
+        "Practice Area",
+        "Cultural Events"
+    ],
+    tags:["concert","cultural","audio","practice"],
+    priority:"cultural",
+    x:56,
+    y:71
 },
-
 {
-id:8,
-name:"Founders Block",
-block:"Founders Block",
-capacity:250,
-time:"9:00 AM – 7:00 PM",
-facilities:[
-"Top Floor Practice Area",
-"Exam Centre",
-"Tables",
-"Chairs"
-],
-tags:[
-"practice",
-"tables",
-"exam"
-],
-available:true,
-x:32,
-y:72
+    id:8,
+    name:"Founders Block",
+    block:"Founders Block",
+    capacity:250,
+    time:"9:00 AM – 7:00 PM",
+    facilities:[
+        "Top Floor Practice Area",
+        "Exam Centre",
+        "Tables",
+        "Chairs"
+    ],
+    tags:["practice","tables","exam"],
+    x:32,
+    y:72
 },
-
 {
-id:9,
-name:"Canteen",
-block:"Canteen",
-capacity:250,
-time:"9:00 AM – 6:30 PM",
-facilities:[
-"Small Music Band Events",
-"Informal Event Space"
-],
-tags:[
-"music",
-"cultural"
-],
-available:true,
-x:80,
-y:70
+    id:9,
+    name:"Canteen",
+    block:"Canteen",
+    capacity:250,
+    time:"9:00 AM – 6:30 PM",
+    facilities:[
+        "Small Music Band Events",
+        "Informal Event Space"
+    ],
+    tags:["music","cultural"],
+    x:80,
+    y:70
 }
-
 ];
 
 
-/* ================================
-   AUTHENTICATION
-================================ */
+/* ================================================================
+   2. DATA PERSISTENCE & INITIAL SEED DATA
+================================================================ */
 
-let selectedLoginRole="student";
-let currentUserRole=null;
+const INITIAL_BOOKINGS = [
+    {
+        id: 101,
+        venueId: 1,
+        venue: "Main Auditorium",
+        event: "National Robotics Symposium",
+        date: "2026-09-15",
+        start: "10:00",
+        end: "13:00",
+        people: 350,
+        purpose: "Keynote addresses and live robotics demonstrations.",
+        submittedBy: "Team Lead (Robotics Club)",
+        status: "Approved",
+        createdAt: "2026-09-10T09:00:00Z"
+    },
+    {
+        id: 102,
+        venueId: 2,
+        venue: "Seminar Hall 2",
+        event: "AI & ML Hands-on Workshop",
+        date: "2026-09-15",
+        start: "14:00",
+        end: "17:00",
+        people: 45,
+        purpose: "PyTorch deep dive with student coders.",
+        submittedBy: "Team Lead (FOSS Cell)",
+        status: "Approved",
+        createdAt: "2026-09-10T11:30:00Z"
+    },
+    {
+        id: 103,
+        venueId: 5,
+        venue: "Placement Hall 1",
+        event: "Placement Technical Assessments",
+        date: "2026-09-16",
+        start: "09:30",
+        end: "12:30",
+        people: 50,
+        purpose: "On-campus recruitment coding round.",
+        submittedBy: "Team Lead (Placement Rep)",
+        status: "Approved",
+        createdAt: "2026-09-11T08:00:00Z"
+    },
+    {
+        id: 104,
+        venueId: 4,
+        venue: "Seminar Hall 4",
+        event: "IoT Micro-Drone Demonstration",
+        date: "2026-09-18",
+        start: "11:00",
+        end: "13:00",
+        people: 60,
+        purpose: "Hardware demonstration for ECE students.",
+        submittedBy: "Team Lead (IEEE SB)",
+        status: "Pending",
+        createdAt: "2026-09-11T14:20:00Z"
+    },
+    {
+        id: 105,
+        venueId: 7,
+        venue: "Open Air Theatre (OAT)",
+        event: "College Band Auditions",
+        date: "2026-09-20",
+        start: "15:00",
+        end: "18:00",
+        people: 200,
+        purpose: "Acoustic and electric band practice sessions.",
+        submittedBy: "Team Lead (Music Club)",
+        status: "Pending",
+        createdAt: "2026-09-11T16:00:00Z"
+    }
+];
+
+const INITIAL_EVENTS = [
+    {
+        id: "evt-1",
+        title: "State Coding Championship 2026",
+        description: "Three rounds of algorithmic puzzles, speed debugging, and data structure challenges with cash prizes worth ₹25,000.",
+        date: "2026-09-15",
+        startTime: "10:00",
+        endTime: "13:00",
+        venue: "Seminar Hall 2",
+        college: "Mar Athanasius College of Engineering (MACE)",
+        category: "Technical",
+        posterUrl: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&q=80",
+        registrationLink: "https://mace.ac.in/coding-fest",
+        googleFormLink: "https://forms.gle/maceCode2026",
+        organizer: "ACM Student Chapter",
+        createdAt: "2026-09-08T10:00:00Z"
+    },
+    {
+        id: "evt-2",
+        title: "National Robotics Combat Expo",
+        description: "Robo-wars, autonomous line-followers, and quadcopter agility trials featuring top engineering teams across South India.",
+        date: "2026-09-15",
+        startTime: "14:00",
+        endTime: "17:00",
+        venue: "Main Auditorium",
+        college: "ABC College of Engineering",
+        category: "Technical",
+        posterUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=700&q=80",
+        registrationLink: "https://abccollege.edu/robo-expo",
+        googleFormLink: "https://forms.gle/abcRobo2026",
+        organizer: "Robotics Society",
+        createdAt: "2026-09-09T14:30:00Z"
+    },
+    {
+        id: "evt-3",
+        title: "Clean Campus IoT Innovation Summit",
+        description: "Showcasing student-designed sensor nodes, automated waste management monitors, and energy-conserving campus grid prototypes.",
+        date: "2026-09-16",
+        startTime: "09:30",
+        endTime: "12:00",
+        venue: "PTA Seminar Hall",
+        college: "Model Engineering College",
+        category: "Symposium",
+        posterUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=700&q=80",
+        registrationLink: "https://mec.ac.in/summit",
+        googleFormLink: "",
+        organizer: "Green Energy Cell",
+        createdAt: "2026-09-10T12:00:00Z"
+    },
+    {
+        id: "evt-4",
+        title: "HackMACE 24-Hour Hackathon",
+        description: "Overnight hackathon building cutting-edge web, mobile, and AI solutions with guidance from top engineering alumni.",
+        date: "2026-09-18",
+        startTime: "09:00",
+        endTime: "18:00",
+        venue: "Open Air Theatre (OAT)",
+        college: "Mar Athanasius College of Engineering (MACE)",
+        category: "Hackathon",
+        posterUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=700&q=80",
+        registrationLink: "https://hackmace.io",
+        googleFormLink: "https://forms.gle/hackmace2026",
+        organizer: "CampusSpace Developer Guild",
+        createdAt: "2026-09-11T09:00:00Z"
+    }
+];
+
+const INITIAL_MAINTENANCE_REPORTS = [
+    {
+        id: "rep-1",
+        title: "Projector bulb flickering and dim during lectures",
+        category: "Projector",
+        location: "Seminar Hall 2",
+        dateTime: "2026-09-11 10:30 AM",
+        reporter: "Team Lead (ECE)",
+        status: "Reported",
+        description: "The primary ceiling-mounted projector intermittently dims and flickers green during presentations.",
+        photoUrl: ""
+    },
+    {
+        id: "rep-2",
+        title: "Air Conditioner compressor making loud humming noise",
+        category: "AC",
+        location: "Placement Hall 1",
+        dateTime: "2026-09-10 02:15 PM",
+        reporter: "Student (CS Dept)",
+        status: "In Progress",
+        description: "Rear AC unit in Placement Hall 1 shuts off after 5 minutes and trips circuit breaker B4.",
+        photoUrl: ""
+    },
+    {
+        id: "rep-3",
+        title: "Wireless Podium Microphone audio crackling",
+        category: "Microphone",
+        location: "Main Auditorium",
+        dateTime: "2026-09-09 11:00 AM",
+        reporter: "Team Lead (Cultural)",
+        status: "Resolved",
+        description: "Replaced faulty wireless receiver antenna and changed battery contacts. Microphone signal restored clearly.",
+        photoUrl: ""
+    },
+    {
+        id: "rep-4",
+        title: "Wall plug points near rear row sparking",
+        category: "Electrical",
+        location: "Seminar Hall 4",
+        dateTime: "2026-09-11 04:20 PM",
+        reporter: "Student (EEE Dept)",
+        status: "Reported",
+        description: "Socket #3 on the south wall has a loose neutral pin and requires electrical servicing.",
+        photoUrl: ""
+    }
+];
+
+function getBookings(){
+    const stored = localStorage.getItem("maceBookings");
+    if(!stored){
+        localStorage.setItem("maceBookings", JSON.stringify(INITIAL_BOOKINGS));
+        return INITIAL_BOOKINGS;
+    }
+    return JSON.parse(stored);
+}
+
+function saveBookings(bookings){
+    localStorage.setItem("maceBookings", JSON.stringify(bookings));
+}
+
+function getEvents(){
+    const stored = localStorage.getItem("maceEvents");
+    if(!stored){
+        localStorage.setItem("maceEvents", JSON.stringify(INITIAL_EVENTS));
+        return INITIAL_EVENTS;
+    }
+    return JSON.parse(stored);
+}
+
+function saveEvents(events){
+    localStorage.setItem("maceEvents", JSON.stringify(events));
+}
+
+function getMaintenanceReports(){
+    const stored = localStorage.getItem("maceMaintenanceReports");
+    if(!stored){
+        localStorage.setItem("maceMaintenanceReports", JSON.stringify(INITIAL_MAINTENANCE_REPORTS));
+        return INITIAL_MAINTENANCE_REPORTS;
+    }
+    return JSON.parse(stored);
+}
+
+function saveMaintenanceReports(reports){
+    localStorage.setItem("maceMaintenanceReports", JSON.stringify(reports));
+}
+
+
+/* ================================================================
+   3. DATE & TIME CONFLICT ENGINE (SOURCE OF TRUTH)
+================================================================ */
+
+/**
+ * Checks if a venue is available on a specific date and time window.
+ * Conflict rule: requestedStart < existingEnd AND requestedEnd > existingStart
+ */
+function isVenueAvailable(venueId, date, startTime, endTime, excludeBookingId = null){
+    if(!date) return true;
+    const approved = getBookings().filter(b =>
+        b.status === "Approved" &&
+        Number(b.venueId) === Number(venueId) &&
+        b.date === date &&
+        (excludeBookingId ? b.id !== excludeBookingId : true)
+    );
+
+    if(approved.length === 0) return true;
+    if(!startTime || !endTime){
+        // Without explicit times, if there's any approved booking on that date, considered occupied
+        return false;
+    }
+    const hasConflict = approved.some(b => startTime < b.end && endTime > b.start);
+    return !hasConflict;
+}
+
+/**
+ * Retrieves the conflicting approved booking if one exists.
+ */
+function getConflictingBooking(venueId, date, startTime, endTime, excludeBookingId = null){
+    if(!date) return null;
+    const approved = getBookings().filter(b =>
+        b.status === "Approved" &&
+        Number(b.venueId) === Number(venueId) &&
+        b.date === date &&
+        (excludeBookingId ? b.id !== excludeBookingId : true)
+    );
+
+    if(!startTime || !endTime){
+        return approved[0] || null;
+    }
+    return approved.find(b => startTime < b.end && endTime > b.start) || null;
+}
+
+
+/* ================================================================
+   4. THEME MANAGEMENT (DARK / LIGHT MODE)
+================================================================ */
+
+function initTheme(){
+    const savedTheme = localStorage.getItem("maceTheme") || "dark";
+    if(savedTheme === "light"){
+        document.body.classList.add("light-mode");
+    } else {
+        document.body.classList.remove("light-mode");
+    }
+    updateThemeButtonText();
+}
+
+function toggleTheme(){
+    document.body.classList.toggle("light-mode");
+    const isLight = document.body.classList.contains("light-mode");
+    localStorage.setItem("maceTheme", isLight ? "light" : "dark");
+    updateThemeButtonText();
+}
+
+function updateThemeButtonText(){
+    const btn = document.getElementById("themeToggleBtn");
+    if(!btn) return;
+    const isLight = document.body.classList.contains("light-mode");
+    btn.innerHTML = isLight ? "☀️ Light Mode" : "🌙 Dark Mode";
+}
+
+
+/* ================================================================
+   5. AUTHENTICATION & ROLES
+   Supported: 'student' | 'teamlead' | 'maintenance' | 'admin'
+================================================================ */
+
+let selectedLoginRole = "student";
+let currentUserRole = null;
+let currentUsername = "";
+
+const PRESET_CREDS = {
+    student: { user: "student", pass: "student@123", name: "Student Explorer" },
+    teamlead: { user: "teamlead", pass: "teamlead@123", name: "Team Lead" },
+    maintenance: { user: "maintenance", pass: "maintenance@123", name: "Maintenance Officer" },
+    admin: { user: "admin", pass: "admin@123", name: "Campus Administrator" }
+};
 
 function setLoginRole(role){
+    selectedLoginRole = role;
+    ["student","teamlead","maintenance","admin"].forEach(r => {
+        const btn = document.getElementById(`roleBtn_${r}`);
+        if(btn) btn.classList.toggle("active", r === role);
+    });
+    document.getElementById("errorMsg").textContent = "";
+}
 
-selectedLoginRole=role;
-
-document
-.getElementById("studentRole")
-.classList.toggle("active",role==="student");
-
-document
-.getElementById("adminRole")
-.classList.toggle("active",role==="admin");
-
-document.getElementById("errorMsg").textContent="";
-
+function autoFillLogin(role){
+    setLoginRole(role);
+    const c = PRESET_CREDS[role];
+    document.getElementById("username").value = c.user;
+    document.getElementById("password").value = c.pass;
+    document.getElementById("errorMsg").textContent = "";
 }
 
 function login(){
+    const user = document.getElementById("username").value.trim().toLowerCase();
+    const pass = document.getElementById("password").value;
+    const creds = PRESET_CREDS[selectedLoginRole];
 
-const username=
-document.getElementById("username")
-.value.trim();
+    let valid = false;
+    if(creds && user === creds.user && pass === creds.pass){
+        valid = true;
+    }
 
-const password=
-document.getElementById("password")
-.value;
+    if(!valid){
+        document.getElementById("errorMsg").textContent =
+            `Invalid credentials for ${selectedLoginRole.toUpperCase()}. Please use ${creds.user} / ${creds.pass}`;
+        return;
+    }
 
-let valid=false;
+    currentUserRole = selectedLoginRole;
+    currentUsername = creds.name;
 
-if(
-selectedLoginRole==="student" &&
-username==="student" &&
-password==="student@123"
-){
-valid=true;
-}
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
 
-if(
-selectedLoginRole==="admin" &&
-username==="admin" &&
-password==="admin@123"
-){
-valid=true;
-}
+    // Header role label
+    const roleLabels = {
+        student: "🎓 STUDENT",
+        teamlead: "👥 TEAM LEAD",
+        maintenance: "🔧 MAINTENANCE OFFICER",
+        admin: "🛡 ADMIN"
+    };
+    document.getElementById("currentRole").textContent = roleLabels[currentUserRole];
 
-if(!valid){
+    // Configure role-based sidebar visibility
+    applyRolePermissions();
 
-document.getElementById("errorMsg")
-.textContent="Incorrect username or password.";
+    // Default landing page per role
+    if(currentUserRole === "maintenance"){
+        showPage("maintenance");
+    } else {
+        showPage("dashboard");
+    }
 
-return;
-}
-
-currentUserRole=selectedLoginRole;
-
-document.getElementById("loginPage")
-.classList.add("hidden");
-
-document.getElementById("app")
-.classList.remove("hidden");
-
-document.getElementById("currentRole")
-.textContent=currentUserRole.toUpperCase();
-
-document.querySelectorAll(".adminOnly")
-.forEach(el=>
-el.classList.toggle(
-"hidden",
-currentUserRole!=="admin"
-)
-);
-
-document.querySelectorAll(".studentOnly")
-.forEach(el=>
-el.classList.toggle(
-"hidden",
-currentUserRole!=="student"
-)
-);
-
-showPage("dashboard");
-
-renderAll();
-
+    renderAll();
 }
 
 function logout(){
+    currentUserRole = null;
+    currentUsername = "";
+    document.getElementById("app").classList.add("hidden");
+    document.getElementById("loginPage").classList.remove("hidden");
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("errorMsg").textContent = "";
+}
 
-currentUserRole=null;
+function applyRolePermissions(){
+    const isStudent = currentUserRole === "student";
+    const isTeamLead = currentUserRole === "teamlead";
+    const isMaintenance = currentUserRole === "maintenance";
+    const isAdmin = currentUserRole === "admin";
 
-document.getElementById("app")
-.classList.add("hidden");
+    // Dashboard, Map, Events available to all
+    document.querySelector(".nav-dashboard")?.classList.remove("hidden");
+    document.querySelector(".nav-map")?.classList.remove("hidden");
+    document.querySelector(".nav-events")?.classList.remove("hidden");
 
-document.getElementById("loginPage")
-.classList.remove("hidden");
+    // Venues: Available to Admin, TeamLead, Student (Student has view-only without request buttons)
+    document.querySelector(".nav-venues")?.classList.toggle("hidden", isMaintenance);
 
-document.getElementById("username").value="";
-document.getElementById("password").value="";
+    // My Requests & Create Event: TeamLead only
+    document.querySelector(".nav-mybookings")?.classList.toggle("hidden", !isTeamLead);
+    document.querySelector(".nav-createevent")?.classList.toggle("hidden", !isTeamLead);
 
+    // AI Recommender: Admin & TeamLead
+    document.querySelector(".nav-recommend")?.classList.toggle("hidden", isStudent || isMaintenance);
+
+    // Admin pages: Admin only
+    document.querySelector(".nav-adminbookings")?.classList.toggle("hidden", !isAdmin);
+    document.querySelector(".nav-adminvenues")?.classList.toggle("hidden", !isAdmin);
+
+    // Maintenance Hub: Maintenance Officer & Admin
+    document.querySelector(".nav-maintenance")?.classList.toggle("hidden", !(isMaintenance || isAdmin));
+
+    // Report Issue: Everyone can report
+    document.querySelector(".nav-report")?.classList.remove("hidden");
+
+    // Elements inside pages:
+    document.querySelectorAll(".teamLeadOnly").forEach(el => {
+        el.classList.toggle("hidden", !isTeamLead && !isAdmin);
+    });
 }
 
 
-/* ================================
-   PAGE NAVIGATION
-================================ */
+/* ================================================================
+   6. PAGE NAVIGATION
+================================================================ */
 
-function showPage(page,button){
+function showPage(page, button){
+    document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+    const target = document.getElementById(page + "Page");
+    if(target) target.classList.remove("hidden");
 
-document
-.querySelectorAll(".page")
-.forEach(p=>p.classList.add("hidden"));
+    document.querySelectorAll(".navButton").forEach(btn => btn.classList.remove("active"));
+    if(button){
+        button.classList.add("active");
+    } else {
+        const match = document.querySelector(`.nav-${page}`);
+        if(match) match.classList.add("active");
+    }
 
-const target=
-document.getElementById(page+"Page");
-
-if(target)
-target.classList.remove("hidden");
-
-document
-.querySelectorAll(".navButton")
-.forEach(btn=>btn.classList.remove("active"));
-
-if(button)
-button.classList.add("active");
-
-renderAll();
-
+    renderAll();
 }
 
 
-/* ================================
-   MAP
-================================ */
+/* ================================================================
+   7. DASHBOARD & DATE-FIRST QUICK AVAILABILITY
+================================================================ */
 
-function buildMap(container){
+function renderDashboard(){
+    document.getElementById("venueCount").textContent = venues.length;
+    document.getElementById("eventsCount").textContent = getEvents().length;
 
-container.innerHTML=`
-<div class="mapGrid"></div>
+    const pending = getBookings().filter(b => b.status === "Pending").length;
+    document.getElementById("pendingCount").textContent = pending;
 
-<div class="road road1"></div>
-<div class="road road2"></div>
-<div class="road road3"></div>
+    const openIssues = getMaintenanceReports().filter(r => r.status !== "Resolved").length;
+    document.getElementById("openIssuesCount").textContent = openIssues;
 
-${venues.map(v=>`
+    // Sidebar badges
+    const pBadge = document.getElementById("pendingNavBadge");
+    if(pBadge){
+        pBadge.textContent = pending;
+        pBadge.classList.toggle("hidden", pending === 0);
+    }
+    const mBadge = document.getElementById("maintNavBadge");
+    if(mBadge){
+        mBadge.textContent = openIssues;
+        mBadge.classList.toggle("hidden", openIssues === 0);
+    }
 
-<button
-class="venuePin ${v.available?"":"closed"}"
-style="left:${v.x}%;top:${v.y}%"
-onclick="openVenueDetails(${v.id})">
+    renderQuickAvailability();
+}
 
-📍 ${v.name}
+/**
+ * Requirement 2: Do NOT display "Available" or "Unavailable" for venues initially.
+ * Require the user to select/input a date first.
+ */
+function renderQuickAvailability(){
+    const box = document.getElementById("quickAvailability");
+    if(!box) return;
 
-</button>
+    const dateInput = document.getElementById("quickDate");
+    const selectedDate = dateInput ? dateInput.value : "";
+    const startTime = document.getElementById("quickStartTime")?.value || "09:00";
+    const endTime = document.getElementById("quickEndTime")?.value || "17:00";
 
-`).join("")}
+    // 1. If NO date is selected: show friendly instruction, NO availability text
+    if(!selectedDate){
+        box.innerHTML = `
+            <div style="text-align:center;padding:22px 14px;color:var(--muted);font-size:13px;border:1px dashed var(--border);border-radius:12px">
+                📅 <strong>Select a date</strong> above to check live venue availability across campus.
+            </div>
+        `;
+        return;
+    }
 
-<div class="mapLegend">
+    // 2. Date IS selected: Calculate dynamic availability from approved bookings
+    const venuesWithAvail = venues.map(v => {
+        const avail = isVenueAvailable(v.id, selectedDate, startTime, endTime);
+        const conflict = !avail ? getConflictingBooking(v.id, selectedDate, startTime, endTime) : null;
+        return { ...v, avail, conflict };
+    });
 
-<span class="dot green"></span>
-Available
-
-&nbsp;&nbsp;
-
-<span class="dot red"></span>
-Unavailable
-
-</div>
-`;
-
+    box.innerHTML = venuesWithAvail.slice(0, 6).map(v => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
+            <div>
+                <strong>${v.name}</strong>
+                <div style="font-size:11px;color:var(--muted)">${v.block}</div>
+            </div>
+            <div style="text-align:right">
+                <span class="status ${v.avail ? 'available' : 'unavailable'}">
+                    ${v.avail ? 'AVAILABLE' : 'UNAVAILABLE'}
+                </span>
+                ${v.conflict ? `<div style="font-size:10px;color:var(--red);margin-top:3px">${v.conflict.start}–${v.conflict.end} booked</div>` : ''}
+            </div>
+        </div>
+    `).join("") + `
+        <div style="margin-top:14px;text-align:center">
+            <button class="smallBtn secondary" style="width:100%" onclick="showPage('venues')">
+                View All Venues & Details →
+            </button>
+        </div>
+    `;
 }
 
 
-/* ================================
-   VENUES
-================================ */
+/* ================================================================
+   8. VENUE EXPLORER (SORTED BY AVAILABILITY FOR DATE/TIME)
+================================================================ */
 
 function renderVenues(){
+    const grid = document.getElementById("venueGrid");
+    if(!grid) return;
 
-const grid=
-document.getElementById("venueGrid");
+    const search = document.getElementById("venueSearch")?.value.toLowerCase() || "";
+    const block = document.getElementById("blockFilter")?.value || "";
+    const selectedDate = document.getElementById("venueDateFilter")?.value || "";
+    const startTime = document.getElementById("venueStartTimeFilter")?.value || "09:00";
+    const endTime = document.getElementById("venueEndTimeFilter")?.value || "17:00";
+    const availabilityFilter = document.getElementById("availabilityFilter")?.value || "";
 
-if(!grid)
-return;
+    // Calculate dynamic availability for each venue
+    let results = venues.map(v => {
+        const avail = isVenueAvailable(v.id, selectedDate, startTime, endTime);
+        const conflict = !avail ? getConflictingBooking(v.id, selectedDate, startTime, endTime) : null;
+        return { ...v, avail, conflict };
+    });
 
-const search=
-document.getElementById("venueSearch")
-?.value.toLowerCase() || "";
+    // Filters
+    results = results.filter(v => {
+        const searchMatch =
+            v.name.toLowerCase().includes(search) ||
+            v.block.toLowerCase().includes(search) ||
+            v.facilities.join(" ").toLowerCase().includes(search);
 
-const block=
-document.getElementById("blockFilter")
-?.value || "";
+        const blockMatch = !block || v.block === block;
 
-const availability=
-document.getElementById("availabilityFilter")
-?.value || "";
+        const availMatch = !availabilityFilter || (
+            availabilityFilter === "available" ? v.avail : !v.avail
+        );
 
-const results=venues.filter(v=>{
+        return searchMatch && blockMatch && availMatch;
+    });
 
-const searchMatch=
-v.name.toLowerCase().includes(search) ||
-v.block.toLowerCase().includes(search) ||
-v.facilities.join(" ").toLowerCase().includes(search);
+    // Requirement: Do NOT sort alphabetically as primary behavior.
+    // Sort by availability for selected date/time (available first, unavailable second).
+    results.sort((a, b) => {
+        if(a.avail === b.avail) {
+            return b.capacity - a.capacity;
+        }
+        return a.avail ? -1 : 1;
+    });
 
-const blockMatch=
-!block || v.block===block;
+    if(results.length === 0){
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted)">
+                No venues match your search and filter criteria.
+            </div>
+        `;
+        return;
+    }
 
-const availabilityMatch=
-!availability ||
-(
-availability==="available"
-? v.available
-: !v.available
-);
+    grid.innerHTML = results.map(v => `
+        <div class="venueCard">
+            <div>
+                <div class="venueTop">
+                    <div>
+                        <h3>${v.name}</h3>
+                        <div class="venueBlock">${v.block}</div>
+                    </div>
+                    <span class="status ${v.avail ? 'available' : 'unavailable'}">
+                        ${v.avail ? 'AVAILABLE' : 'UNAVAILABLE'}
+                    </span>
+                </div>
 
-return searchMatch &&
-blockMatch &&
-availabilityMatch;
+                <div class="venueMeta">
+                    <span>👥 Capacity ${v.capacity}</span>
+                    <span>🕒 ${v.time}</span>
+                </div>
 
-});
+                <div class="facilities">
+                    ${v.facilities.map(f => `<span class="facility">${f}</span>`).join("")}
+                </div>
 
-grid.innerHTML=
-results.map(v=>`
+                ${v.conflict ? `
+                    <div style="font-size:12px;color:var(--red);background:rgba(255,107,107,.12);padding:7px 10px;border-radius:8px;margin-bottom:14px;border:1px solid rgba(255,107,107,.25)">
+                        ⛔ Booked: <b>${v.conflict.event}</b> (${v.conflict.start} – ${v.conflict.end})
+                    </div>
+                ` : ''}
+            </div>
 
-<div class="venueCard">
+            <div class="actionBtns">
+                <button class="smallBtn secondary" onclick="openVenueDetails(${v.id})">
+                    View Details
+                </button>
 
-<div class="venueTop">
-
-<div>
-
-<h3>${v.name}</h3>
-
-<div class="venueBlock">
-${v.block}
-</div>
-
-</div>
-
-<span
-class="status ${v.available?"available":"unavailable"}">
-
-${v.available?"AVAILABLE":"UNAVAILABLE"}
-
-</span>
-
-</div>
-
-<div class="venueMeta">
-
-<span>
-👥 ${v.capacity}
-</span>
-
-<span>
-🕒 ${v.time}
-</span>
-
-</div>
-
-<div class="facilities">
-
-${v.facilities
-.map(f=>`
-<span class="facility">
-${f}
-</span>
-`)
-.join("")}
-
-</div>
-
-<br>
-
-<button
-class="smallBtn secondary"
-onclick="openVenueDetails(${v.id})">
-
-View Details
-
-</button>
-
-${currentUserRole==="student" && v.available
-?`
-
-<button
-class="smallBtn"
-onclick="openBooking(${v.id})">
-
-Request Booking
-
-</button>
-
-`
-:""}
-
-</div>
-
-`).join("");
-
+                ${currentUserRole === "teamlead" ? `
+                    <button class="smallBtn" onclick="handleVenueBookingClick(${v.id}, ${v.avail})">
+                        Request Booking
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `).join("");
 }
 
+function handleVenueBookingClick(venueId, isAvail){
+    const selectedDate = document.getElementById("venueDateFilter")?.value || "";
+    const startTime = document.getElementById("venueStartTimeFilter")?.value || "10:00";
+    const endTime = document.getElementById("venueEndTimeFilter")?.value || "12:00";
 
-/* ================================
-   VENUE DETAILS
-================================ */
+    // Requirement 12: If user attempts to select/request an unavailable venue, show "Sorry, already taken!"
+    if(!isAvail){
+        const v = venues.find(item => item.id === venueId);
+        const conflict = getConflictingBooking(venueId, selectedDate, startTime, endTime);
+        const detail = conflict ? `from ${conflict.start} to ${conflict.end} on ${conflict.date} for "${conflict.event}"` : "for the selected date and time";
+        alert(`Sorry, already taken!\n\n${v ? v.name : 'This venue'} is unavailable ${detail}. Please select another time or venue.`);
+        return;
+    }
+
+    openBooking(venueId, selectedDate, startTime, endTime);
+}
 
 function openVenueDetails(id){
+    const v = venues.find(v => v.id === id);
+    if(!v) return;
 
-const v=
-venues.find(v=>v.id===id);
+    const bookings = getBookings().filter(b => b.status === "Approved" && Number(b.venueId) === Number(id));
+    const scheduleStr = bookings.length
+        ? bookings.map(b => `• ${b.date}: ${b.start}–${b.end} (${b.event})`).join("\n")
+        : "No current approved bookings.";
 
-alert(
+    alert(
 `${v.name}
-
+────────────────────────────
 Block: ${v.block}
-
-Capacity: ${v.capacity}
-
-Available Time:
-${v.time}
+Capacity: ${v.capacity} people
+Standard Hours: ${v.time}
 
 Facilities:
 • ${v.facilities.join("\n• ")}
 
-Status:
-${v.available
-?"Available"
-:"Unavailable"}`
-);
-
+Approved Upcoming Schedule:
+${scheduleStr}`
+    );
 }
 
 
-/* ================================
-   SMART AI STYLE RECOMMENDER
-================================ */
+/* ================================================================
+   9. CAMPUS & INTER-COLLEGE EVENTS (VIEW-ONLY FOR STUDENTS)
+================================================================ */
 
-function recommendVenue(){
+function renderEvents(){
+    const grid = document.getElementById("eventGrid");
+    if(!grid) return;
 
-const people=
-Number(
-document.getElementById("reqCapacity").value
-);
+    const dateFilter = document.getElementById("eventDateFilter")?.value || "";
+    const collegeFilter = document.getElementById("eventCollegeFilter")?.value || "";
+    const categoryFilter = document.getElementById("eventCategoryFilter")?.value || "";
 
-const type=
-document.getElementById("eventType").value;
+    let events = getEvents();
 
-const requestedFacilities=
-[
-...document.querySelectorAll(
-".facilityReq:checked"
-)
-].map(c=>c.value);
+    if(dateFilter){
+        events = events.filter(e => e.date === dateFilter);
+    }
+    if(collegeFilter){
+        events = events.filter(e => e.college.toLowerCase().includes(collegeFilter.toLowerCase()));
+    }
+    if(categoryFilter){
+        events = events.filter(e => e.category === categoryFilter);
+    }
 
-let candidates=
-venues
-.filter(v=>
-v.available &&
-v.capacity>=people
-)
-.map(v=>{
+    // Requirement 7: Chronological ordering: Date -> Start Time as primary ordering!
+    events.sort((a, b) => {
+        const timeA = `${a.date}T${a.startTime || "00:00"}`;
+        const timeB = `${b.date}T${b.startTime || "00:00"}`;
+        return timeA.localeCompare(timeB);
+    });
 
-let score=60;
-let reasons=[];
+    if(events.length === 0){
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted)">
+                No events found matching your filter criteria.
+            </div>
+        `;
+        return;
+    }
 
-/* Capacity */
+    grid.innerHTML = events.map(e => `
+        <div class="eventCard">
+            ${e.posterUrl ? `
+                <img class="eventPoster" src="${e.posterUrl}" alt="${e.title}" onclick="viewFullPhoto('${e.posterUrl}')">
+            ` : `
+                <div class="eventPoster" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:32px">
+                    🎨
+                </div>
+            `}
 
-const unused=
-v.capacity-people;
+            <div class="eventBody">
+                <div class="collegeBadge">
+                    🏛 ${e.college}
+                </div>
 
-if(unused<=20){
-score+=18;
-reasons.push(
-"capacity closely matches your requirement"
-);
-}
-else if(
-v.capacity<=people*2
-){
-score+=12;
-reasons.push(
-"good capacity utilisation"
-);
-}
-else{
-score+=3;
-}
+                <h3>${e.title}</h3>
 
-/* Requested facilities */
+                <div class="eventSchedule">
+                    📅 ${formatDateStr(e.date)} • 🕒 ${e.startTime} – ${e.endTime}
+                </div>
 
-requestedFacilities.forEach(f=>{
+                <div class="eventVenue">
+                    📍 ${e.venue}
+                </div>
 
-if(v.tags.includes(f)){
-score+=7;
-}
-else{
-score-=8;
-}
+                <p class="eventDesc">
+                    ${e.description}
+                </p>
 
-});
+                <div class="eventLinks">
+                    ${e.registrationLink ? `
+                        <a href="${e.registrationLink}" target="_blank" class="linkBtn">
+                            🔗 Register
+                        </a>
+                    ` : ''}
 
-/* Event intelligence */
-
-if(type==="placement"){
-
-if(v.priority==="placement"){
-score+=35;
-reasons.push(
-"Placement Cell receives priority for placement-related activities"
-);
-}
-else{
-score-=12;
-}
-
-}
-
-if(type==="cultural"){
-
-if(v.name.includes("Open Air Theatre")){
-score+=35;
-reasons.push(
-"OAT is the main cultural-event destination"
-);
+                    ${e.googleFormLink ? `
+                        <a href="${e.googleFormLink}" target="_blank" class="linkBtn formBtn">
+                            📝 Google Form
+                        </a>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join("");
 }
 
-if(v.tags.includes("cultural"))
-score+=15;
-
+function clearEventFilters(){
+    document.getElementById("eventDateFilter").value = "";
+    document.getElementById("eventCollegeFilter").value = "";
+    document.getElementById("eventCategoryFilter").value = "";
+    renderEvents();
 }
 
-if(type==="concert"){
-
-if(v.name.includes("Open Air Theatre")){
-score+=40;
-reasons.push(
-"OAT is designed for concerts and large performances"
-);
-}
-
-if(v.tags.includes("audio"))
-score+=8;
-
-}
-
-if(type==="technical"){
-
-["wifi","projector","ac"]
-.forEach(f=>{
-
-if(v.tags.includes(f))
-score+=7;
-
-});
-
-}
-
-if(type==="pta"){
-
-if(v.name.includes("PTA")){
-score+=45;
-reasons.push(
-"specifically intended for PTA sessions"
-);
-}
-
-}
-
-if(type==="exam"){
-
-if(v.name.includes("Founders")){
-score+=45;
-reasons.push(
-"Founders Block functions as a major examination centre"
-);
-}
-
-}
-
-if(type==="practice"){
-
-if(v.tags.includes("practice")){
-score+=25;
-reasons.push(
-"dedicated practice space is available"
-);
-}
-
-}
-
-if(type==="meeting"){
-
-if(v.tags.includes("meeting")){
-score+=20;
-}
-
-}
-
-score=
-Math.max(
-1,
-Math.min(99,score)
-);
-
-return{
-...v,
-score,
-reasons
-};
-
-});
-
-candidates.sort(
-(a,b)=>b.score-a.score
-);
-
-const box=
-document.getElementById(
-"recommendationResult"
-);
-
-if(!candidates.length){
-
-box.innerHTML=`
-
-<div class="recommendation">
-
-<h3>⚠ No suitable venue available</h3>
-
-<p class="reason">
-No currently available venue can accommodate
-${people} people with the selected requirements.
-</p>
-
-</div>
-
-`;
-
-return;
-}
-
-const best=candidates[0];
-
-const missing=
-requestedFacilities.filter(
-f=>!best.tags.includes(f)
-);
-
-box.innerHTML=`
-
-<div class="recommendation">
-
-<div style="
-display:flex;
-justify-content:space-between;
-gap:20px;
-align-items:center">
-
-<div>
-
-<div style="
-color:#70e9b4;
-font-weight:700;
-font-size:12px;
-margin-bottom:6px">
-
-🏆 BEST MATCH
-
-</div>
-
-<h2>
-${best.name}
-</h2>
-
-<p style="
-color:#79baff;
-margin-top:5px">
-
-${best.block}
-
-</p>
-
-</div>
-
-<div>
-
-<div class="score">
-${best.score}%
-</div>
-
-<div style="
-font-size:11px;
-color:#8298ad">
-
-SUITABILITY
-
-</div>
-
-</div>
-
-</div>
-
-<div class="venueMeta">
-
-<span>
-👥 Capacity ${best.capacity}
-</span>
-
-<span>
-🕒 ${best.time}
-</span>
-
-</div>
-
-<div class="facilities">
-
-${best.facilities.map(f=>`
-<span class="facility">${f}</span>
-`).join("")}
-
-</div>
-
-<p class="reason">
-
-<b>Why this venue?</b><br>
-
-${best.reasons.length
-? best.reasons.join(
-". "
-)+"."
-:"It provides the strongest overall balance of capacity, facilities and availability."}
-
-${missing.length
-? `<br><br>⚠ Missing requested facilities:
-${missing.join(", ")}`
-:""}
-
-</p>
-
-${currentUserRole==="student"
-?`
-
-<button
-class="smallBtn"
-style="margin-top:16px"
-onclick="openBooking(${best.id})">
-
-Request This Venue
-
-</button>
-
-`
-:""}
-
-</div>
-`;
-
+function formatDateStr(dateStr){
+    if(!dateStr) return "";
+    try {
+        const d = new Date(dateStr + "T00:00:00");
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch(e) {
+        return dateStr;
+    }
 }
 
 
-/* ================================
-   BOOKINGS
-================================ */
+/* ================================================================
+   10. TEAM LEAD: CREATE EVENT & POSTER UPLOAD
+================================================================ */
 
-function getBookings(){
+let tempUploadedPoster = "";
 
-return JSON.parse(
-localStorage.getItem(
-"maceBookings"
-) || "[]"
-);
+function openCreateEventModal(){
+    tempUploadedPoster = "";
+    document.getElementById("newEventTitle").value = "";
+    document.getElementById("newEventDesc").value = "";
+    document.getElementById("newEventDate").value = new Date().toISOString().split("T")[0];
+    document.getElementById("newEventStartTime").value = "10:00";
+    document.getElementById("newEventEndTime").value = "13:00";
+    document.getElementById("newEventVenue").value = "";
+    document.getElementById("newEventRegLink").value = "";
+    document.getElementById("newEventFormLink").value = "";
+    document.getElementById("newEventPosterFile").value = "";
+    document.getElementById("newEventPosterUrl").value = "";
+    document.getElementById("posterPreviewContainer").classList.add("hidden");
 
+    document.getElementById("createEventModal").classList.remove("hidden");
 }
 
-function saveBookings(bookings){
-
-localStorage.setItem(
-"maceBookings",
-JSON.stringify(bookings)
-);
-
+function closeCreateEventModal(){
+    document.getElementById("createEventModal").classList.add("hidden");
 }
 
-function openBooking(id){
+function handlePosterUpload(event){
+    const file = event.target.files[0];
+    if(!file) return;
 
-const venue=
-venues.find(v=>v.id===id);
+    const reader = new FileReader();
+    reader.onload = function(e){
+        tempUploadedPoster = e.target.result;
+        updatePosterPreview(tempUploadedPoster);
+    };
+    reader.readAsDataURL(file);
+}
 
-document.getElementById(
-"bookingVenueId"
-).value=id;
+function updatePosterPreview(url){
+    const previewContainer = document.getElementById("posterPreviewContainer");
+    const previewImg = document.getElementById("posterPreviewImg");
+    if(url){
+        previewImg.src = url;
+        previewContainer.classList.remove("hidden");
+        tempUploadedPoster = url;
+    } else {
+        previewContainer.classList.add("hidden");
+    }
+}
 
-document.getElementById(
-"bookingVenueName"
-).textContent=
-`${venue.name} • Capacity ${venue.capacity}`;
+function submitNewEvent(){
+    const title = document.getElementById("newEventTitle").value.trim();
+    const college = document.getElementById("newEventCollege").value.trim();
+    const category = document.getElementById("newEventCategory").value;
+    const date = document.getElementById("newEventDate").value;
+    const venue = document.getElementById("newEventVenue").value.trim();
+    const startTime = document.getElementById("newEventStartTime").value;
+    const endTime = document.getElementById("newEventEndTime").value;
+    const regLink = document.getElementById("newEventRegLink").value.trim();
+    const formLink = document.getElementById("newEventFormLink").value.trim();
+    const desc = document.getElementById("newEventDesc").value.trim();
 
-document.getElementById(
-"bookingPeople"
-).max=venue.capacity;
+    if(!title || !college || !date || !venue || !desc){
+        alert("Please fill in all required event details (Title, College, Date, Venue, Description).");
+        return;
+    }
 
-document.getElementById(
-"bookingModal"
-).classList.remove("hidden");
+    const posterUrl = tempUploadedPoster || document.getElementById("newEventPosterUrl").value.trim();
 
+    const events = getEvents();
+    events.unshift({
+        id: "evt-" + Date.now(),
+        title,
+        college,
+        category,
+        date,
+        startTime,
+        endTime,
+        venue,
+        posterUrl,
+        registrationLink: regLink,
+        googleFormLink: formLink,
+        description: desc,
+        organizer: currentUsername || "Team Lead",
+        createdAt: new Date().toISOString()
+    });
+
+    saveEvents(events);
+    closeCreateEventModal();
+    alert("Event published successfully! It is now visible in the Student Event listing.");
+
+    showPage("events");
+}
+
+
+/* ================================================================
+   11. TEAM LEAD: VENUE REQUESTS & DOUBLE-BOOKING PREVENTION
+================================================================ */
+
+function openBooking(id, datePref = "", startPref = "", endPref = ""){
+    const venue = venues.find(v => v.id === id);
+    if(!venue) return;
+
+    document.getElementById("bookingVenueId").value = id;
+    document.getElementById("bookingVenueName").textContent =
+        `${venue.name} • Capacity: ${venue.capacity} • ${venue.block}`;
+
+    document.getElementById("bookingDate").value = datePref || new Date().toISOString().split("T")[0];
+    document.getElementById("bookingStart").value = startPref || "10:00";
+    document.getElementById("bookingEnd").value = endPref || "12:00";
+    document.getElementById("bookingPeople").max = venue.capacity;
+    document.getElementById("bookingPeople").value = "";
+    document.getElementById("bookingEvent").value = "";
+    document.getElementById("bookingPurpose").value = "";
+
+    checkBookingModalConflict();
+    document.getElementById("bookingModal").classList.remove("hidden");
 }
 
 function closeBooking(){
+    document.getElementById("bookingModal").classList.add("hidden");
+}
 
-document.getElementById(
-"bookingModal"
-).classList.add("hidden");
+function checkBookingModalConflict(){
+    const venueId = Number(document.getElementById("bookingVenueId").value);
+    const date = document.getElementById("bookingDate").value;
+    const start = document.getElementById("bookingStart").value;
+    const end = document.getElementById("bookingEnd").value;
+    const warn = document.getElementById("bookingConflictWarning");
+    const submitBtn = document.getElementById("submitBookingBtn");
 
+    if(!venueId || !date || !start || !end) return;
+
+    const conflict = getConflictingBooking(venueId, date, start, end);
+    if(conflict){
+        warn.innerHTML = `⚠️ <b>Sorry, already taken!</b> This venue is already booked from ${conflict.start} to ${conflict.end} for "${conflict.event}".`;
+        warn.classList.remove("hidden");
+        submitBtn.style.opacity = "0.6";
+    } else {
+        warn.classList.add("hidden");
+        submitBtn.style.opacity = "1";
+    }
 }
 
 function submitBooking(){
+    const venueId = Number(document.getElementById("bookingVenueId").value);
+    const venue = venues.find(v => v.id === venueId);
+    const event = document.getElementById("bookingEvent").value.trim();
+    const date = document.getElementById("bookingDate").value;
+    const people = Number(document.getElementById("bookingPeople").value);
+    const start = document.getElementById("bookingStart").value;
+    const end = document.getElementById("bookingEnd").value;
+    const purpose = document.getElementById("bookingPurpose").value.trim();
 
-const venueId=
-Number(
-document.getElementById(
-"bookingVenueId"
-).value
-);
+    if(!event || !date || !people || !start || !end){
+        alert("Please complete all required fields.");
+        return;
+    }
 
-const venue=
-venues.find(v=>v.id===venueId);
+    if(people > venue.capacity){
+        alert(`This venue can accommodate a maximum of ${venue.capacity} people.`);
+        return;
+    }
 
-const event=
-document.getElementById(
-"bookingEvent"
-).value.trim();
+    if(start >= end){
+        alert("Start time must be before end time.");
+        return;
+    }
 
-const date=
-document.getElementById(
-"bookingDate"
-).value;
+    // Double-booking check:
+    const conflict = getConflictingBooking(venueId, date, start, end);
+    if(conflict){
+        alert(`Sorry, already taken!\n\n${venue.name} is already booked on ${date} from ${conflict.start} to ${conflict.end} for "${conflict.event}".\n\nPlease select another time window or venue.`);
+        return;
+    }
 
-const people=
-Number(
-document.getElementById(
-"bookingPeople"
-).value
-);
+    const bookings = getBookings();
+    bookings.push({
+        id: Date.now(),
+        venueId,
+        venue: venue.name,
+        event,
+        date,
+        people,
+        start,
+        end,
+        purpose,
+        submittedBy: currentUsername || "Team Lead",
+        status: "Pending",
+        createdAt: new Date().toISOString()
+    });
 
-const start=
-document.getElementById(
-"bookingStart"
-).value;
+    saveBookings(bookings);
+    closeBooking();
+    alert("Venue booking request submitted successfully. Awaiting Administrator approval.");
 
-const end=
-document.getElementById(
-"bookingEnd"
-).value;
-
-const purpose=
-document.getElementById(
-"bookingPurpose"
-).value.trim();
-
-if(
-!event ||
-!date ||
-!people ||
-!start ||
-!end
-){
-
-alert(
-"Please complete all required fields."
-);
-
-return;
-}
-
-if(people>venue.capacity){
-
-alert(
-`This venue can accommodate only ${venue.capacity} people.`
-);
-
-return;
-}
-
-const bookings=
-getBookings();
-
-bookings.push({
-
-id:Date.now(),
-
-venueId,
-
-venue:venue.name,
-
-event,
-
-date,
-
-people,
-
-start,
-
-end,
-
-purpose,
-
-status:"Pending",
-
-createdAt:
-new Date().toISOString()
-
-});
-
-saveBookings(bookings);
-
-closeBooking();
-
-alert(
-"Booking request submitted successfully."
-);
-
-renderAll();
-
+    renderAll();
+    showPage("bookings");
 }
 
 
-/* ================================
-   RENDER BOOKINGS
-================================ */
+/* ================================================================
+   12. ADMIN: VENUE APPROVALS & REJECTIONS
+================================================================ */
+
+function updateBooking(id, status){
+    let bookings = getBookings();
+    const booking = bookings.find(b => b.id === id);
+    if(!booking) return;
+
+    if(status === "Approved"){
+        // Double Booking Conflict Validation
+        const conflict = getConflictingBooking(booking.venueId, booking.date, booking.start, booking.end, booking.id);
+        if(conflict){
+            alert(`Sorry, already taken!\n\nCannot approve this request because ${conflict.event} is already approved for this venue on ${booking.date} (${conflict.start} – ${conflict.end}).`);
+            return;
+        }
+    }
+
+    bookings = bookings.map(b => b.id === id ? { ...b, status } : b);
+    saveBookings(bookings);
+
+    renderAll();
+    alert(`Booking #${id} has been ${status}.`);
+}
 
 function renderBookings(){
+    const bookings = [...getBookings()].sort((a, b) => {
+        const aSch = `${a.date}T${a.start || "00:00"}`;
+        const bSch = `${b.date}T${b.start || "00:00"}`;
+        return aSch.localeCompare(bSch);
+    });
 
-const bookings=
-getBookings();
+    // Team Lead view: My Requests
+    const studentTable = document.getElementById("studentBookingsTable");
+    if(studentTable){
+        studentTable.innerHTML = bookings.length ? bookings.map(b => `
+            <tr>
+                <td><strong>${b.venue}</strong></td>
+                <td>${b.event}</td>
+                <td>${formatDateStr(b.date)}</td>
+                <td>${b.start} – ${b.end}</td>
+                <td>${b.people}</td>
+                <td>${statusBadge(b.status)}</td>
+                <td><span style="font-size:12px;color:var(--muted)">${b.purpose || "—"}</span></td>
+            </tr>
+        `).join("") : `
+            <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:35px">No booking requests submitted yet.</td></tr>
+        `;
+    }
 
-/* Student */
-
-const studentTable=
-document.getElementById(
-"studentBookingsTable"
-);
-
-if(studentTable){
-
-studentTable.innerHTML=
-bookings.length
-?
-bookings.map(b=>`
-
-<tr>
-
-<td>${b.venue}</td>
-
-<td>${b.event}</td>
-
-<td>${b.date}</td>
-
-<td>
-${b.start} – ${b.end}
-</td>
-
-<td>${b.people}</td>
-
-<td>
-${statusBadge(b.status)}
-</td>
-
-</tr>
-
-`).join("")
-
-:
-
-`
-
-<tr>
-<td colspan="6"
-style="
-text-align:center;
-color:#7f96ad;
-padding:30px">
-
-No booking requests yet.
-
-</td>
-</tr>
-
-`;
-
-}
-
-
-/* Admin */
-
-const adminTable=
-document.getElementById(
-"adminBookingsTable"
-);
-
-if(adminTable){
-
-adminTable.innerHTML=
-bookings.length
-?
-bookings.map(b=>`
-
-<tr>
-
-<td>${b.venue}</td>
-
-<td>${b.event}</td>
-
-<td>${b.date}</td>
-
-<td>
-${b.start} – ${b.end}
-</td>
-
-<td>${b.people}</td>
-
-<td>
-${statusBadge(b.status)}
-</td>
-
-<td>
-
-${b.status==="Pending"
-?`
-
-<button
-class="smallBtn approve"
-onclick="updateBooking(
-${b.id},
-'Approved'
-)">
-
-Approve
-
-</button>
-
-<button
-class="smallBtn reject"
-onclick="updateBooking(
-${b.id},
-'Rejected'
-)">
-
-Reject
-
-</button>
-
-`
-:"—"}
-
-</td>
-
-</tr>
-
-`).join("")
-
-:
-
-`
-
-<tr>
-<td colspan="7"
-style="
-text-align:center;
-color:#7f96ad;
-padding:30px">
-
-No booking requests.
-
-</td>
-</tr>
-
-`;
-
-}
-
+    // Admin view: Booking Requests
+    const adminTable = document.getElementById("adminBookingsTable");
+    if(adminTable){
+        adminTable.innerHTML = bookings.length ? bookings.map(b => `
+            <tr>
+                <td>${b.submittedBy || "Team Lead"}</td>
+                <td><strong>${b.venue}</strong></td>
+                <td>${b.event}</td>
+                <td>${formatDateStr(b.date)}</td>
+                <td>${b.start} – ${b.end}</td>
+                <td>${b.people}</td>
+                <td>${statusBadge(b.status)}</td>
+                <td>
+                    ${b.status === "Pending" ? `
+                        <button class="smallBtn approve" onclick="updateBooking(${b.id}, 'Approved')">Approve</button>
+                        <button class="smallBtn reject" onclick="updateBooking(${b.id}, 'Rejected')">Reject</button>
+                    ` : "—"}
+                </td>
+            </tr>
+        `).join("") : `
+            <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:35px">No booking requests to review.</td></tr>
+        `;
+    }
 }
 
 function statusBadge(status){
-
-let color=
-status==="Approved"
-?"#61e59b"
-:
-status==="Rejected"
-?"#ff8585"
-:
-"#ffd166";
-
-return `
-<span style="
-color:${color};
-font-weight:800">
-${status}
-</span>
-`;
-
-}
-
-function updateBooking(id,status){
-
-let bookings=
-getBookings();
-
-bookings=
-bookings.map(b=>
-b.id===id
-?
-{
-...b,
-status
-}
-:
-b
-);
-
-saveBookings(bookings);
-
-renderAll();
-
+    let cls = status === "Approved" ? "available" : status === "Rejected" ? "unavailable" : "pending";
+    return `<span class="status ${cls}">${status.toUpperCase()}</span>`;
 }
 
 
-/* ================================
-   ADMIN VENUE MANAGEMENT
-================================ */
+/* ================================================================
+   13. ADMIN: VENUE MANAGEMENT (DATE-FIRST)
+================================================================ */
 
+function setAdminDateToday(){
+    document.getElementById("adminVenueDate").value = new Date().toISOString().split("T")[0];
+    renderVenueManagement();
+}
+
+/**
+ * Requirement 1:
+ * In Admin Mode:
+ * 1. Admin should first select/input a date.
+ * 2. Only after date is entered should the venue availability list be displayed.
+ * 3. Based on selected date, show which venues are: Available, Unavailable.
+ * 4. Calculated from approved bookings for that date.
+ */
 function renderVenueManagement(){
+    const container = document.getElementById("adminVenuesContainer");
+    if(!container) return;
 
-const table=
-document.getElementById(
-"manageVenueTable"
-);
+    const dateInput = document.getElementById("adminVenueDate");
+    const selectedDate = dateInput ? dateInput.value : "";
 
-if(!table)
-return;
+    // 1. If NO date entered: prompt admin to pick date first
+    if(!selectedDate){
+        container.innerHTML = `
+            <div style="text-align:center;padding:50px 20px;color:var(--muted);font-size:14px;border:1px dashed var(--border);border-radius:14px">
+                📅 <strong>Please select a date above</strong> to inspect and manage venue availability.
+            </div>
+        `;
+        return;
+    }
 
-table.innerHTML=
-venues.map(v=>`
+    // 2. Date IS entered: calculate availability from approved bookings on this date
+    const allBookings = getBookings();
 
-<tr>
+    container.innerHTML = `
+        <div class="tableWrap">
+        <table>
+        <thead>
+        <tr>
+            <th>VENUE</th>
+            <th>BLOCK</th>
+            <th>CAPACITY</th>
+            <th>OPERATING HOURS</th>
+            <th>AVAILABILITY ON ${formatDateStr(selectedDate).toUpperCase()}</th>
+            <th>APPROVED SCHEDULE / CONFLICTS</th>
+        </tr>
+        </thead>
+        <tbody>
+        ${venues.map(v => {
+            const approvedOnDate = allBookings.filter(b =>
+                b.status === "Approved" &&
+                Number(b.venueId) === Number(v.id) &&
+                b.date === selectedDate
+            );
 
-<td>
-<strong>${v.name}</strong>
-</td>
+            const isAvailable = approvedOnDate.length === 0;
 
-<td>${v.block}</td>
-
-<td>${v.capacity}</td>
-
-<td>${v.time}</td>
-
-<td>
-
-<span class="
-status
-${v.available
-?"available"
-:"unavailable"}">
-
-${v.available
-?"AVAILABLE"
-:"UNAVAILABLE"}
-
-</span>
-
-</td>
-
-<td>
-
-<button
-class="
-smallBtn
-${v.available
-?"reject"
-:"approve"}"
-
-onclick="
-toggleVenue(${v.id})
-">
-
-${v.available
-?"Mark Unavailable"
-:"Mark Available"}
-
-</button>
-
-</td>
-
-</tr>
-
-`).join("");
-
-}
-
-function toggleVenue(id){
-
-const v=
-venues.find(v=>v.id===id);
-
-v.available=
-!v.available;
-
-renderAll();
-
+            return `
+                <tr>
+                    <td><strong>${v.name}</strong></td>
+                    <td>${v.block}</td>
+                    <td>👥 ${v.capacity}</td>
+                    <td>🕒 ${v.time}</td>
+                    <td>
+                        <span class="status ${isAvailable ? 'available' : 'unavailable'}">
+                            ${isAvailable ? 'AVAILABLE ALL DAY' : 'UNAVAILABLE (BOOKED)'}
+                        </span>
+                    </td>
+                    <td>
+                        ${approvedOnDate.length > 0 ? approvedOnDate.map(b => `
+                            <div style="font-size:12px;color:var(--red);margin:2px 0">
+                                ⛔ <b>${b.start}–${b.end}</b>: ${b.event} (${b.people} ppl)
+                            </div>
+                        `).join("") : `
+                            <span style="color:var(--green);font-size:12px">✓ No bookings scheduled on this date</span>
+                        `}
+                    </td>
+                </tr>
+            `;
+        }).join("")}
+        </tbody>
+        </table>
+        </div>
+    `;
 }
 
 
-/* ================================
-   QUICK DASHBOARD
-================================ */
+/* ================================================================
+   14. MAINTENANCE OFFICER MODE & ISSUE REPORTING
+================================================================ */
 
-function renderDashboard(){
+let tempIssuePhoto = "";
 
-const available=
-venues.filter(
-v=>v.available
-).length;
-
-document.getElementById(
-"availableCount"
-).textContent=available;
-
-document.getElementById(
-"pendingCount"
-).textContent=
-getBookings()
-.filter(
-b=>b.status==="Pending"
-).length;
-
-const quick=
-document.getElementById(
-"quickAvailability"
-);
-
-if(quick){
-
-quick.innerHTML=
-venues
-.slice(0,5)
-.map(v=>`
-
-<div style="
-display:flex;
-justify-content:space-between;
-padding:10px 0;
-border-bottom:1px solid #203348;
-font-size:13px">
-
-<span>
-${v.name}
-</span>
-
-<span style="
-color:${v.available
-?"#61e59b"
-:"#ff8585"}">
-
-${v.available
-?"Available"
-:"Unavailable"}
-
-</span>
-
-</div>
-
-`).join("");
-
+function openReportIssueModal(){
+    tempIssuePhoto = "";
+    document.getElementById("newIssueTitle").value = "";
+    document.getElementById("newIssueDesc").value = "";
+    document.getElementById("newIssuePhotoFile").value = "";
+    document.getElementById("issuePhotoPreviewContainer").classList.add("hidden");
+    document.getElementById("reportIssueModal").classList.remove("hidden");
 }
 
+function closeReportIssueModal(){
+    document.getElementById("reportIssueModal").classList.add("hidden");
+}
+
+function handleIssuePhotoUpload(event){
+    const file = event.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+        tempIssuePhoto = e.target.result;
+        document.getElementById("issuePhotoPreviewImg").src = tempIssuePhoto;
+        document.getElementById("issuePhotoPreviewContainer").classList.remove("hidden");
+    };
+    reader.readAsDataURL(file);
+}
+
+function submitMaintenanceIssue(){
+    const title = document.getElementById("newIssueTitle").value.trim();
+    const category = document.getElementById("newIssueCategory").value;
+    const location = document.getElementById("newIssueLocation").value;
+    const desc = document.getElementById("newIssueDesc").value.trim();
+
+    if(!title || !desc){
+        alert("Please provide both an issue title and description.");
+        return;
+    }
+
+    const reports = getMaintenanceReports();
+    reports.unshift({
+        id: "rep-" + Date.now(),
+        title,
+        category,
+        location,
+        dateTime: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        reporter: currentUsername || (currentUserRole === "student" ? "Student" : "Team Lead"),
+        status: "Reported",
+        description: desc,
+        photoUrl: tempIssuePhoto
+    });
+
+    saveMaintenanceReports(reports);
+    closeReportIssueModal();
+    alert("Maintenance report submitted to the campus facilities team.");
+
+    renderAll();
+    if(currentUserRole === "maintenance" || currentUserRole === "admin"){
+        showPage("maintenance");
+    }
+}
+
+function updateMaintenanceStatus(reportId, newStatus){
+    let reports = getMaintenanceReports();
+    reports = reports.map(r => r.id === reportId ? { ...r, status: newStatus } : r);
+    saveMaintenanceReports(reports);
+    renderAll();
+}
+
+function renderMaintenanceReports(){
+    const grid = document.getElementById("maintGrid");
+    if(!grid) return;
+
+    const statusFilter = document.getElementById("maintStatusFilter")?.value || "";
+    const categoryFilter = document.getElementById("maintCategoryFilter")?.value || "";
+    const search = document.getElementById("maintSearch")?.value.toLowerCase() || "";
+
+    const allReports = getMaintenanceReports();
+
+    // Counts
+    document.getElementById("maintTotalCount").textContent = allReports.length;
+    document.getElementById("maintReportedCount").textContent = allReports.filter(r => r.status === "Reported").length;
+    document.getElementById("maintInProgressCount").textContent = allReports.filter(r => r.status === "In Progress").length;
+    document.getElementById("maintResolvedCount").textContent = allReports.filter(r => r.status === "Resolved").length;
+
+    let filtered = allReports.filter(r => {
+        const matchStatus = !statusFilter || r.status === statusFilter;
+        const matchCat = !categoryFilter || r.category === categoryFilter;
+        const matchSearch = !search ||
+            r.title.toLowerCase().includes(search) ||
+            r.location.toLowerCase().includes(search) ||
+            r.description.toLowerCase().includes(search);
+        return matchStatus && matchCat && matchSearch;
+    });
+
+    if(filtered.length === 0){
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted)">
+                No maintenance reports found matching current filters.
+            </div>
+        `;
+        return;
+    }
+
+    const isOfficer = currentUserRole === "maintenance" || currentUserRole === "admin";
+
+    grid.innerHTML = filtered.map(r => {
+        let badgeCls = r.status === "Resolved" ? "available" : r.status === "In Progress" ? "inprogress" : "pending";
+
+        return `
+            <div class="maintCard">
+                <div class="maintTop">
+                    <div>
+                        <span class="maintCategory">${r.category}</span>
+                        <h3 style="margin-top:6px;font-size:16px">${r.title}</h3>
+                        <div style="font-size:12px;color:var(--primary);margin-top:2px">📍 ${r.location}</div>
+                    </div>
+
+                    <span class="status ${badgeCls}">
+                        ${r.status.toUpperCase()}
+                    </span>
+                </div>
+
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                    ${r.photoUrl ? `
+                        <img src="${r.photoUrl}" class="maintPhotoThumb" alt="Issue photo" onclick="viewFullPhoto('${r.photoUrl}')">
+                    ` : ''}
+                    <p style="font-size:13px;color:var(--muted);line-height:1.6;flex:1">
+                        ${r.description}
+                    </p>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)">
+                    <span>Reported by: <b>${r.reporter}</b></span>
+                    <span>🕒 ${r.dateTime}</span>
+                </div>
+
+                ${isOfficer ? `
+                    <div style="display:flex;gap:8px;margin-top:4px">
+                        ${r.status === "Reported" ? `
+                            <button class="smallBtn" onclick="updateMaintenanceStatus('${r.id}', 'In Progress')">
+                                Mark In Progress
+                            </button>
+                            <button class="smallBtn approve" onclick="updateMaintenanceStatus('${r.id}', 'Resolved')">
+                                Mark Resolved
+                            </button>
+                        ` : ''}
+
+                        ${r.status === "In Progress" ? `
+                            <button class="smallBtn approve" onclick="updateMaintenanceStatus('${r.id}', 'Resolved')">
+                                ✓ Resolve Issue
+                            </button>
+                        ` : ''}
+
+                        ${r.status === "Resolved" ? `
+                            <button class="smallBtn secondary" onclick="updateMaintenanceStatus('${r.id}', 'Reported')">
+                                Reopen Report
+                            </button>
+                        ` : ''}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join("");
+}
+
+function viewFullPhoto(url){
+    document.getElementById("photoViewerImg").src = url;
+    document.getElementById("photoViewerModal").classList.remove("hidden");
+}
+
+function closePhotoViewer(){
+    document.getElementById("photoViewerModal").classList.add("hidden");
 }
 
 
-/* ================================
-   GLOBAL RENDER
-================================ */
+/* ================================================================
+   15. MAP RENDERING
+================================================================ */
+
+function buildMap(container){
+    const selectedDate = document.getElementById("venueDateFilter")?.value || "";
+    const startTime = document.getElementById("venueStartTimeFilter")?.value || "";
+    const endTime = document.getElementById("venueEndTimeFilter")?.value || "";
+
+    container.innerHTML = `
+        <div class="mapGrid"></div>
+        <div class="road road1"></div>
+        <div class="road road2"></div>
+        <div class="road road3"></div>
+
+        ${venues.map(v => {
+            const avail = isVenueAvailable(v.id, selectedDate, startTime, endTime);
+            return `
+                <button
+                    class="venuePin ${avail ? "" : "closed"}"
+                    style="left:${v.x}%;top:${v.y}%"
+                    onclick="openVenueDetails(${v.id})">
+                    📍 ${v.name}
+                </button>
+            `;
+        }).join("")}
+
+        <div class="mapLegend">
+            <span class="dot green"></span> Available
+            &nbsp;&nbsp;
+            <span class="dot red"></span> Unavailable / Booked
+        </div>
+    `;
+}
+
+
+/* ================================================================
+   16. SMART AI STYLE RECOMMENDER
+================================================================ */
+
+function recommendVenue(){
+    const people = Number(document.getElementById("reqCapacity").value);
+    const type = document.getElementById("eventType").value;
+    const requestedFacilities = [...document.querySelectorAll(".facilityReq:checked")].map(c => c.value);
+
+    // Candidates must fit capacity
+    let candidates = venues.filter(v => v.capacity >= people).map(v => {
+        let score = 60;
+        let reasons = [];
+
+        const unused = v.capacity - people;
+        if(unused <= 20){
+            score += 18;
+            reasons.push("Capacity closely matches requirement");
+        } else if(v.capacity <= people * 2){
+            score += 12;
+            reasons.push("Good capacity utilization");
+        } else {
+            score += 3;
+        }
+
+        requestedFacilities.forEach(f => {
+            if(v.tags.includes(f)){
+                score += 7;
+            } else {
+                score -= 8;
+            }
+        });
+
+        if(type === "placement"){
+            if(v.priority === "placement"){
+                score += 35;
+                reasons.push("Placement Cell receives priority for placement activities");
+            }
+        }
+        if(type === "cultural" && v.name.includes("Open Air Theatre")){
+            score += 35;
+            reasons.push("OAT is the primary cultural event space");
+        }
+        if(type === "concert" && v.name.includes("Open Air Theatre")){
+            score += 40;
+            reasons.push("OAT is designed for live concerts");
+        }
+        if(type === "pta" && v.name.includes("PTA")){
+            score += 45;
+            reasons.push("Dedicated PTA conference hall");
+        }
+        if(type === "exam" && v.name.includes("Founders")){
+            score += 45;
+            reasons.push("Founders Block functions as main examination hall");
+        }
+
+        score = Math.max(1, Math.min(99, score));
+        return { ...v, score, reasons };
+    });
+
+    candidates.sort((a, b) => b.score - a.score);
+
+    const box = document.getElementById("recommendationResult");
+    if(!candidates.length){
+        box.innerHTML = `
+            <div class="recommendation">
+                <h3>⚠️ No suitable venue found</h3>
+                <p class="reason">No campus venue can accommodate ${people} people with selected criteria.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const best = candidates[0];
+    const missing = requestedFacilities.filter(f => !best.tags.includes(f));
+
+    box.innerHTML = `
+        <div class="recommendation">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <div style="color:var(--green);font-weight:700;font-size:12px;margin-bottom:4px">🏆 BEST AI MATCH</div>
+                    <h2>${best.name}</h2>
+                    <p style="color:var(--primary);margin-top:3px">${best.block}</p>
+                </div>
+                <div style="text-align:right">
+                    <div class="score">${best.score}%</div>
+                    <div style="font-size:11px;color:var(--muted)">SUITABILITY</div>
+                </div>
+            </div>
+
+            <div class="venueMeta">
+                <span>👥 Capacity ${best.capacity}</span>
+                <span>🕒 ${best.time}</span>
+            </div>
+
+            <div class="facilities">
+                ${best.facilities.map(f => `<span class="facility">${f}</span>`).join("")}
+            </div>
+
+            <p class="reason">
+                <b>Match Reasoning:</b><br>
+                ${best.reasons.length ? best.reasons.join(". ") + "." : "Optimal balance of capacity and amenities."}
+                ${missing.length ? `<br><br>⚠️ Missing requested facilities: ${missing.join(", ")}` : ''}
+            </p>
+
+            ${currentUserRole === "teamlead" ? `
+                <button class="smallBtn" style="margin-top:16px" onclick="openBooking(${best.id})">
+                    Request This Venue →
+                </button>
+            ` : ''}
+        </div>
+    `;
+}
+
+
+/* ================================================================
+   17. GLOBAL RENDER
+================================================================ */
 
 function renderAll(){
+    renderDashboard();
+    renderVenues();
+    renderEvents();
+    renderBookings();
+    renderVenueManagement();
+    renderMaintenanceReports();
 
-renderDashboard();
-renderVenues();
-renderBookings();
-renderVenueManagement();
+    const dMap = document.getElementById("dashboardMap");
+    if(dMap) buildMap(dMap);
 
-const dashboardMap=
-document.getElementById(
-"dashboardMap"
-);
-
-if(dashboardMap)
-buildMap(dashboardMap);
-
-const mainMap=
-document.getElementById(
-"mainMap"
-);
-
-if(mainMap)
-buildMap(mainMap);
-
+    const mMap = document.getElementById("mainMap");
+    if(mMap) buildMap(mMap);
 }
 
 
-/* ================================
-   INITIALIZATION
-================================ */
+/* ================================================================
+   18. INITIALIZATION
+================================================================ */
 
-document.getElementById(
-"bookingDate"
-).min=
-new Date()
-.toISOString()
-.split("T")[0];
+initTheme();
+
+// Set default booking date constraint
+const todayStr = new Date().toISOString().split("T")[0];
+const bDate = document.getElementById("bookingDate");
+if(bDate) bDate.min = todayStr;
 
 </script>
-
 </body>
 </html>
