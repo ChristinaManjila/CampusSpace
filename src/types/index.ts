@@ -51,9 +51,65 @@ export type FacilityItem =
   | 'Whiteboard'
   | 'Computer systems';
 
+export type VenueStatus = 'available' | 'booked' | 'maintenance' | 'unavailable' | 'pending';
+
+export interface RouteStep {
+  instruction: string;
+  distanceMeters: number;
+  durationMinutes: number;
+  icon?: 'straight' | 'turn-left' | 'turn-right' | 'enter';
+}
+
+export interface NavigationRoute {
+  destination: Venue;
+  totalDistanceMeters: number;
+  totalWalkingMinutes: number;
+  waypoints: [number, number][];
+  steps: RouteStep[];
+}
+
 export interface Coordinates {
   lat: number;
   lng: number;
+}
+
+export interface CampusLocation {
+  id: string;
+  name: string;
+  shortName?: string;
+  type: 'building' | 'landmark' | 'facility' | 'entrance';
+  coordinates: Coordinates;
+  floors?: Floor[];
+  description?: string;
+}
+
+export interface Floor {
+  id: string;
+  level: number;
+  name: string;
+  rooms: Room[];
+}
+
+export interface Room {
+  id: string;
+  number: string;
+  name: string;
+  type: 'lab' | 'faculty' | 'hod' | 'toilet' | 'library' | 'classroom' | 'other';
+  floor: number;
+  buildingId: string;
+}
+
+export interface SearchResult {
+  type: 'location' | 'room';
+  item: CampusLocation | Room;
+  matchScore: number;
+}
+
+export interface UserLocation {
+  coordinates: Coordinates;
+  accuracy: number;
+  timestamp: number;
+  nearbyBuilding?: string;
 }
 
 export interface VenueTimeSlot {

@@ -1,9 +1,9 @@
 import { Venue, FacilityItem, VenueTimeSlot } from '../types';
 
 export const CAMPUS_CENTER = {
-  lat: 19.1334,
-  lng: 72.9133,
-  name: 'Central Campus Plaza'
+  lat: 10.0538,
+  lng: 76.6192,
+  name: 'MACE Campus Center'
 };
 
 export const STANDARD_TIME_SLOTS = [
@@ -33,12 +33,12 @@ export const generateVenueSlots = (seed: number): VenueTimeSlot[] => {
 export const INITIAL_VENUES: Venue[] = [
   {
     id: 'venue-1',
-    name: 'Seminar Hall A',
-    building: 'Academic Block 1',
+    name: 'Seminar Hall 2',
+    building: 'Main Block',
     category: 'hall',
     capacity: 150,
     floor: '1st Floor',
-    coordinates: { lat: 19.1338, lng: 72.9125 },
+    coordinates: { lat: 10.0539, lng: 76.6191 },
     facilities: [
       'Projector',
       'Air conditioning',
@@ -74,11 +74,11 @@ export const INITIAL_VENUES: Venue[] = [
   {
     id: 'venue-2',
     name: 'Main Auditorium',
-    building: 'Convention Complex',
+    building: 'Main Block',
     category: 'auditorium',
     capacity: 850,
     floor: 'Ground Floor',
-    coordinates: { lat: 19.1347, lng: 72.9142 },
+    coordinates: { lat: 10.0538, lng: 76.6192 },
     facilities: [
       'Projector',
       'Air conditioning',
@@ -112,12 +112,12 @@ export const INITIAL_VENUES: Venue[] = [
   },
   {
     id: 'venue-3',
-    name: 'Innovation Lab',
-    building: 'Technology Center',
+    name: 'Intelligence & Hardware Lab L206',
+    building: 'CS Block',
     category: 'lab',
     capacity: 60,
     floor: '2nd Floor',
-    coordinates: { lat: 19.1352, lng: 72.9112 },
+    coordinates: { lat: 10.0524, lng: 76.6186 },
     facilities: [
       'Computer systems',
       'Wi-Fi',
@@ -151,12 +151,12 @@ export const INITIAL_VENUES: Venue[] = [
   },
   {
     id: 'venue-4',
-    name: 'Conference Room B',
-    building: 'Management Block',
+    name: 'PTA Seminar Hall',
+    building: 'Main Block',
     category: 'hall',
     capacity: 45,
-    floor: '2nd Floor',
-    coordinates: { lat: 19.1322, lng: 72.9118 },
+    floor: 'Ground Floor',
+    coordinates: { lat: 10.0537, lng: 76.6193 },
     facilities: [
       'Projector',
       'Air conditioning',
@@ -190,12 +190,12 @@ export const INITIAL_VENUES: Venue[] = [
   },
   {
     id: 'venue-5',
-    name: 'Open Amphitheatre',
-    building: 'Campus Center Green',
+    name: 'Open Air Theatre (OAT)',
+    building: 'Open Air Theatre',
     category: 'outdoor',
-    capacity: 400,
+    capacity: 2500,
     floor: 'Ground / Open Air',
-    coordinates: { lat: 19.1325, lng: 72.9155 },
+    coordinates: { lat: 10.0544, lng: 76.6181 },
     facilities: [
       'Stage',
       'Sound system',
@@ -228,12 +228,12 @@ export const INITIAL_VENUES: Venue[] = [
   },
   {
     id: 'venue-6',
-    name: 'Computer Systems Lab 3',
-    building: 'IT Wing',
+    name: 'Seminar Hall 4',
+    building: 'ECE Department Block',
     category: 'lab',
     capacity: 80,
-    floor: '3rd Floor',
-    coordinates: { lat: 19.1343, lng: 72.9165 },
+    floor: '1st Floor',
+    coordinates: { lat: 10.0540, lng: 76.6190 },
     facilities: [
       'Computer systems',
       'Air conditioning',
@@ -266,12 +266,12 @@ export const INITIAL_VENUES: Venue[] = [
   },
   {
     id: 'venue-7',
-    name: 'Indoor Sports Arena',
-    building: 'Athletics Complex',
+    name: 'Placement Hall 1 & 2',
+    building: 'Placement Cell',
     category: 'sports',
-    capacity: 300,
+    capacity: 150,
     floor: 'Ground Floor',
-    coordinates: { lat: 19.136, lng: 72.914 },
+    coordinates: { lat: 10.0542, lng: 76.6196 },
     facilities: [
       'Sound system',
       'Microphone',

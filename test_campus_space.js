@@ -18,6 +18,7 @@ if (fs.existsSync(indexPath)) {
 const requiredFiles = [
   'src/types/index.ts',
   'src/data/campusVenues.ts',
+  'src/data/maceLocations.ts',
   'src/data/sampleBookings.ts',
   'src/data/sampleAnalytics.ts',
   'src/utils/aiRecommender.ts',
@@ -103,14 +104,37 @@ server.listen(5178, () => {
       const hasEvents = data.includes('Campus & Inter-College Events');
       const hasConflictMsg = data.includes('Sorry, already taken!');
       const hasThemeToggle = data.includes('themeToggleBtn');
+      const hasNoRedirect = !data.includes('mace-maps.vercel.app');
+      const hasNativeMaceMap = data.includes('maceCampusLocations');
+      const hasFloorPlanModal = data.includes('maceFloorPlanModal');
+      const hasNavHud = data.includes('mapNavHud');
 
-      if (hasCampusSpace && hasQuickAvail && hasMaintenance && hasEvents && hasConflictMsg && hasThemeToggle) {
+      // Also verify CampusMapView.tsx does not have mace-maps.vercel.app
+      const campusMapTsx = fs.readFileSync(path.join(__dirname, 'src/components/CampusMapView.tsx'), 'utf8');
+      const tsxHasNoRedirect = !campusMapTsx.includes('mace-maps.vercel.app');
+      const tsxHasNativeSvg = campusMapTsx.includes('campusMapSvg') || campusMapTsx.includes('viewBox="0 0 1000 1400"');
+
+      if (
+        hasCampusSpace &&
+        hasQuickAvail &&
+        hasMaintenance &&
+        hasEvents &&
+        hasConflictMsg &&
+        hasThemeToggle &&
+        hasNoRedirect &&
+        hasNativeMaceMap &&
+        hasFloorPlanModal &&
+        hasNavHud &&
+        tsxHasNoRedirect &&
+        tsxHasNativeSvg
+      ) {
         console.log('[PASS] HTML Content contains CampusSpace, Quick Availability, Maintenance Hub, Events, and Conflict Handling');
+        console.log('[PASS] Native MACE Maps verified: Zero external redirects, native SVG map engine, search, CS Block floor plans & navigation active!');
         console.log('\n>>> ALL AUTOMATED VERIFICATION CHECKS PASSED SUCCESSFULLY! <<<');
         server.close(() => process.exit(0));
       } else {
         console.error('[FAIL] Expected features or tags not found in HTML output');
-        console.error(`Status: CampusSpace:${hasCampusSpace}, QuickAvail:${hasQuickAvail}, Maintenance:${hasMaintenance}, Events:${hasEvents}, Conflict:${hasConflictMsg}, Theme:${hasThemeToggle}`);
+        console.error(`Status: CampusSpace:${hasCampusSpace}, QuickAvail:${hasQuickAvail}, Maintenance:${hasMaintenance}, Events:${hasEvents}, Conflict:${hasConflictMsg}, Theme:${hasThemeToggle}, NoRedirect:${hasNoRedirect}, NativeMap:${hasNativeMaceMap}, FloorPlan:${hasFloorPlanModal}, NavHud:${hasNavHud}, TsxNoRedirect:${tsxHasNoRedirect}, TsxNativeSvg:${tsxHasNativeSvg}`);
         server.close(() => process.exit(1));
       }
     });

@@ -50,8 +50,8 @@ export const LiveNavigationView: React.FC<LiveNavigationViewProps> = ({
       (error) => {
         setIsLocating(false);
         setGpsStatus(`Simulated Campus Lock (${error.message || 'fallback'})`);
-        // Fallback to campus center
-        onUpdateUserLocation({ lat: 19.1334, lng: 72.9133 });
+        // Fallback to MACE campus center
+        onUpdateUserLocation({ lat: 10.0538, lng: 76.6192 });
       },
       { enableHighAccuracy: true, timeout: 6000 }
     );

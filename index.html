@@ -607,18 +607,20 @@ body.light-mode .roleChip{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:12px 18px;
-    background:linear-gradient(135deg, rgba(13,27,42,.96), rgba(19,36,58,.96));
+    padding:10px 16px;
+    background:linear-gradient(135deg, rgba(13,27,42,.97), rgba(19,36,58,.97));
     border-bottom:1px solid rgba(255,255,255,.075);
-    gap:12px;
+    gap:10px;
     flex-wrap:wrap;
-    z-index:3;
+    z-index:20;
+    position:relative;
 }
 
 .mapTitleArea{
     display:flex;
     align-items:center;
     gap:10px;
+    flex-wrap:wrap;
 }
 
 .mapLiveTag{
@@ -656,23 +658,154 @@ body.light-mode .roleChip{
     font-weight:500;
 }
 
-.mapControls{
+/* Integrated Search */
+.mapSearchWrapper{
+    position:relative;
+    width:280px;
+}
+
+@media(max-width:650px){
+    .mapSearchWrapper{
+        width:100%;
+        order:3;
+    }
+}
+
+.mapSearchInput{
+    width:100%;
+    background:var(--input-bg);
+    border:1px solid var(--input-border);
+    border-radius:11px;
+    padding:7px 28px 7px 32px;
+    font-size:12px;
+    color:var(--text);
+    outline:none;
+    transition:border-color .2s;
+}
+
+.mapSearchInput:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(79,163,255,.18);
+}
+
+.mapSearchIcon{
+    position:absolute;
+    left:10px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:12px;
+    color:var(--muted);
+    pointer-events:none;
+}
+
+.mapSearchClear{
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform:translateY(-50%);
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:14px;
+    cursor:pointer;
+    padding:0 4px;
+}
+
+.mapSearchResults{
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    right:0;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    max-height:280px;
+    overflow-y:auto;
+    box-shadow:0 18px 45px rgba(0,0,0,.6);
+    z-index:100;
+    display:none;
+}
+
+.mapSearchResults.visible{
+    display:block;
+}
+
+.mapSearchItem{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 12px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    cursor:pointer;
+    transition:background .15s;
+    font-size:12px;
+    gap:8px;
+}
+
+.mapSearchItem:hover{
+    background:rgba(79,163,255,.12);
+}
+
+.mapSearchItem:last-child{
+    border-bottom:none;
+}
+
+.mapSearchItemLeft{
     display:flex;
     align-items:center;
     gap:8px;
+    min-width:0;
+}
+
+.mapSearchItemTitle{
+    font-weight:700;
+    color:var(--text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.mapSearchItemSubtitle{
+    font-size:10px;
+    color:var(--primary);
+}
+
+.mapSearchNavBtn{
+    flex-shrink:0;
+    padding:4px 9px;
+    font-size:10px;
+    font-weight:800;
+    border-radius:8px;
+    background:rgba(79,163,255,.18);
+    border:1px solid rgba(79,163,255,.35);
+    color:var(--primary);
+    cursor:pointer;
+    transition:all .15s;
+}
+
+.mapSearchNavBtn:hover{
+    background:var(--primary);
+    color:#fff;
+}
+
+.mapControls{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
 }
 
 .mapBtn{
     display:inline-flex;
     align-items:center;
-    gap:6px;
-    padding:7px 13px;
-    font-size:12px;
+    gap:5px;
+    padding:6px 11px;
+    font-size:11px;
     font-weight:700;
     color:var(--text);
     background:var(--facility-bg);
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:9px;
     cursor:pointer;
     text-decoration:none;
     transition:background .2s, border-color .2s, transform .15s, box-shadow .2s;
@@ -698,68 +831,231 @@ body.light-mode .roleChip{
     transform:translateY(-1px);
 }
 
-.mapFrameWrapper{
+.mapBtn.active{
+    background:rgba(46,213,115,.18);
+    border-color:#2ed573;
+    color:#2ed573;
+    box-shadow:0 0 12px rgba(46,213,115,.3);
+}
+
+.mapCanvasWrapper{
     flex:1;
     position:relative;
     width:100%;
     height:100%;
-    background:#07111f;
+    background:#071322;
     min-height:0;
     overflow:hidden;
+    cursor:grab;
 }
 
-.mapIframe{
+.mapCanvasWrapper:active{
+    cursor:grabbing;
+}
+
+body.light-mode .mapCanvasWrapper{
+    background:#e6eef8;
+}
+
+.campusMapSvg{
     width:100%;
     height:100%;
-    border:0;
     display:block;
-    background:#07111f;
-    filter:contrast(1.02) brightness(0.97);
+    transition:transform 70ms ease-out;
+    transform-origin:50% 50%;
 }
 
-/* Subtle edge-blending treatment that softens harsh white iframe borders into CampusSpace navy theme */
-.mapBlendEdge{
+/* In-Map Navigation HUD */
+.mapNavHud{
     position:absolute;
-    inset:0;
-    pointer-events:none; /* NEVER blocks clicks or navigation */
-    box-shadow:inset 0 0 22px rgba(7,17,31,.65), inset 0 0 1px rgba(79,163,255,.2);
-    border-radius:0 0 22px 22px;
-    z-index:2;
+    top:16px;
+    left:16px;
+    max-width:360px;
+    width:calc(100% - 32px);
+    background:rgba(8,20,36,.94);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(79,163,255,.35);
+    border-radius:18px;
+    padding:14px 16px;
+    box-shadow:0 20px 45px rgba(0,0,0,.6), 0 0 25px rgba(79,163,255,.15);
+    z-index:30;
+    animation:mapFadeIn .2s ease;
 }
 
-.mapFallbackOverlay{
-    position:absolute;
-    inset:0;
-    display:none;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
+body.light-mode .mapNavHud{
+    background:rgba(255,255,255,.95);
+    border-color:rgba(79,163,255,.4);
+}
+
+.mapNavMetrics{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin:10px 0;
+}
+
+.mapNavMetric{
+    background:rgba(14,31,49,.75);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px;
     text-align:center;
-    background:radial-gradient(circle at center, #0f253e 0%, #07111f 100%);
+}
+
+body.light-mode .mapNavMetric{
+    background:#f1f5f9;
+}
+
+.mapNavMetricValue{
+    font-size:14px;
+    font-weight:900;
     color:var(--text);
-    z-index:4;
 }
 
-.mapFallbackIcon{
-    font-size:42px;
-    margin-bottom:10px;
-    filter:drop-shadow(0 4px 12px rgba(79,163,255,.4));
-}
-
-.mapFallbackTitle{
-    font-size:18px;
-    font-weight:700;
-    color:var(--text);
-    margin-bottom:6px;
-}
-
-.mapFallbackDesc{
+.mapNavMetricLabel{
+    font-size:10px;
     color:var(--muted);
-    font-size:13px;
+    text-transform:uppercase;
+    margin-top:2px;
+}
+
+/* Selected Location Slide-Up Card */
+.mapLocationCard{
+    position:absolute;
+    bottom:16px;
+    left:16px;
+    right:16px;
     max-width:440px;
-    line-height:1.5;
-    margin-bottom:18px;
+    background:rgba(8,20,36,.94);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(79,163,255,.3);
+    border-radius:20px;
+    padding:16px;
+    box-shadow:0 20px 45px rgba(0,0,0,.6);
+    z-index:30;
+    animation:mapSlideUp .25s ease;
+}
+
+body.light-mode .mapLocationCard{
+    background:rgba(255,255,255,.96);
+}
+
+@keyframes mapSlideUp{
+    from{ transform:translateY(25px); opacity:0; }
+    to{ transform:translateY(0); opacity:1; }
+}
+
+@keyframes mapFadeIn{
+    from{ opacity:0; }
+    to{ opacity:1; }
+}
+
+/* Map Toast Alerts */
+.mapToast{
+    position:absolute;
+    top:16px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(9,23,39,.95);
+    border:1px solid rgba(79,163,255,.4);
+    color:var(--text);
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    box-shadow:0 12px 30px rgba(0,0,0,.5);
+    z-index:40;
+    pointer-events:none;
+    animation:mapFadeIn .2s ease;
+}
+
+/* CS Block Floor Plan Modal */
+.floorTabs{
+    display:flex;
+    gap:6px;
+    background:var(--role-switcher-bg);
+    padding:4px;
+    border-radius:12px;
+    margin-bottom:14px;
+}
+
+.floorTabBtn{
+    flex:1;
+    padding:8px 14px;
+    font-size:12px;
+    font-weight:700;
+    border-radius:9px;
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    cursor:pointer;
+    transition:all .2s;
+}
+
+.floorTabBtn.active{
+    background:var(--role-btn-active-bg);
+    color:var(--text);
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+
+.floorRoomGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(135px, 1fr));
+    gap:8px;
+    max-height:360px;
+    overflow-y:auto;
+    padding-right:4px;
+}
+
+.floorRoomCard{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px;
+    cursor:pointer;
+    transition:all .18s;
+}
+
+.floorRoomCard:hover{
+    border-color:var(--primary);
+    transform:translateY(-2px);
+}
+
+.floorRoomCard.selected{
+    border-color:var(--primary);
+    background:rgba(79,163,255,.14);
+    box-shadow:0 0 14px rgba(79,163,255,.25);
+}
+
+.floorRoomNumber{
+    font-family:monospace;
+    font-weight:900;
+    font-size:13px;
+    color:var(--primary);
+}
+
+.floorRoomName{
+    font-size:11px;
+    color:var(--text);
+    font-weight:600;
+    margin-top:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.floorRoomType{
+    display:inline-block;
+    font-size:9px;
+    font-weight:700;
+    text-transform:uppercase;
+    padding:2px 6px;
+    border-radius:6px;
+    background:var(--facility-bg);
+    color:var(--muted);
+    margin-top:4px;
 }
 
 .mapContainer:fullscreen{
@@ -2276,9 +2572,36 @@ Submit Issue Report
 <div style="position:relative;max-width:min(700px,95vw);max-height:90vh" onclick="event.stopPropagation()">
 <button class="closeModal" style="position:absolute;top:-35px;right:0;color:white" onclick="closePhotoViewer()">×</button>
 <img id="photoViewerImg" style="width:100%;max-height:80vh;object-fit:contain;border-radius:14px;border:1px solid var(--border)">
-</div>
-</div>
+<!-- MODAL: CS BLOCK FLOOR PLANS -->
+<div id="maceFloorPlanModal" class="modalOverlay hidden" onclick="closeFloorPlanModal()">
+<div class="modal" style="max-width:min(860px,96vw)" onclick="event.stopPropagation()">
+    <button class="closeModal" onclick="closeFloorPlanModal()">×</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:22px">📐</span>
+        <div>
+            <h2>CS Department Block Floor Plans</h2>
+            <p style="color:var(--muted);font-size:12px">Interactive blueprint, labs, faculty rooms, and room navigation</p>
+        </div>
+    </div>
 
+    <div class="floorTabs">
+        <button class="floorTabBtn active" id="tabFloor2" onclick="switchFloor(2)">Level 2 (L2XX)</button>
+        <button class="floorTabBtn" id="tabFloor3" onclick="switchFloor(3)">Level 3 (L3XX)</button>
+    </div>
+
+    <div class="floorRoomGrid" id="floorRoomGrid"></div>
+
+    <div id="floorRoomDetailBar" style="display:none;margin-top:14px;padding:12px 16px;border-radius:14px;background:var(--venue-card-bg);border:1px solid var(--border);align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+            <h4 id="floorDetailTitle" style="color:var(--text);font-size:14px"></h4>
+            <p id="floorDetailSub" style="color:var(--muted);font-size:11px"></p>
+        </div>
+        <button class="smallBtn" id="floorDetailNavBtn" onclick="navigateFromFloorPlan()">
+            Walk to Room 🧭
+        </button>
+    </div>
+</div>
+</div>
 
 <script>
 
@@ -3805,104 +4128,864 @@ function closePhotoViewer(){
 
 
 /* ================================================================
-   15. MACE MAPS INTEGRATION
+   15. NATIVE MACE CAMPUS MAP & NAVIGATION ENGINE
 ================================================================ */
 
+const MACE_CAMPUS_BOUNDS = { minLat: 10.0510, maxLat: 10.0560, minLng: 76.6170, maxLng: 76.6220 };
+const MACE_CAMPUS_CENTER = { lat: 10.0538, lng: 76.6192, name: "MACE Main Campus" };
+
+const maceCampusLocations = [
+    { id: 'main-entrance', name: 'Main Entrance', type: 'entrance', coordinates: { lat: 10.055167, lng: 76.619167 }, description: 'Main college entrance gate, security checkpoint, and vehicle driveway on NH-85.' },
+    { id: 'main-block', name: 'Main Block', shortName: "Principal's Office", type: 'building', coordinates: { lat: 10.0538, lng: 76.6192 }, venueId: 1, description: "Principal's Office, Administration, Main Auditorium, Seminar Hall 2, and PTA Seminar Hall." },
+    { id: 'ece-block', name: 'ECE Block', shortName: 'ECE Dept', type: 'building', coordinates: { lat: 10.0540, lng: 76.6190 }, venueId: 4, description: 'Electronics & Communication Engineering Department, Seminar Hall 4, Advanced Labs.' },
+    { id: 'cs-block', name: 'CS Block', shortName: 'CS Dept', type: 'building', coordinates: { lat: 10.052444, lng: 76.618639 }, hasFloors: true, description: 'Computer Science & Engineering Department with multi-level hardware, networks, and AI research labs.' },
+    { id: 'mech-block', name: 'Mechanical Engineering Block', shortName: 'MECH Dept', type: 'building', coordinates: { lat: 10.0540, lng: 76.6200 }, description: 'Mechanical Engineering Department, CAD/CAM design studios, and research laboratories.' },
+    { id: 'civil-block', name: 'Civil Engineering Block', shortName: 'CIVIL Dept', type: 'building', coordinates: { lat: 10.0532, lng: 76.6185 }, description: 'Civil Engineering Department, Structural Analysis and Environmental test labs.' },
+    { id: 'mca-block', name: 'MCA Block', shortName: 'MCA Dept', type: 'building', coordinates: { lat: 10.0550, lng: 76.6198 }, description: 'Master of Computer Applications department, dedicated computing centre, and lecture halls.' },
+    { id: 'pg-block', name: 'PG Block', shortName: 'PG Wing', type: 'building', coordinates: { lat: 10.052111, lng: 76.6195 }, description: 'Postgraduate research wing, specialized seminar halls, and project labs.' },
+    { id: 'placement-cell', name: 'Placement Cell', shortName: 'Placement Wing', type: 'building', coordinates: { lat: 10.0542, lng: 76.6196 }, venueId: 5, description: 'Training and Placement Cell, Interview Suites, Placement Halls 1 & 2.' },
+    { id: 'oat-stage', name: 'OAT Stage', shortName: 'OAT Stage', type: 'landmark', coordinates: { lat: 10.0541, lng: 76.6183 }, description: 'Official performance stage for cultural fests, music concerts, and award functions.' },
+    { id: 'oat', name: 'Open Air Theatre (OAT)', shortName: 'OAT Amphitheatre', type: 'landmark', coordinates: { lat: 10.0544, lng: 76.6181 }, venueId: 7, description: 'Grand amphitheatre accommodating 2,500+ spectators with tiered gallery seating.' },
+    { id: 'canteen', name: 'Campus Canteen', shortName: 'Canteen', type: 'facility', coordinates: { lat: 10.0528, lng: 76.6198 }, venueId: 9, description: 'Multi-cuisine campus dining facility, student cafeteria, and Canteen Conference Hall.' },
+    { id: 'central-library', name: 'Central Library', shortName: 'Library', type: 'facility', coordinates: { lat: 10.053667, lng: 76.619694 }, description: 'Central campus library holding 80,000+ volumes, digital journal portals, and study cubicles.' },
+    { id: 'foundry-smithy', name: 'Foundry & Smithy Workshop', shortName: 'Foundry Shop', type: 'facility', coordinates: { lat: 10.053361, lng: 76.619806 }, description: 'Mechanical foundry, casting, and metallurgical fabrication shop.' },
+    { id: 'machine-shops', name: 'Machine Shops', shortName: 'Machine Shop', type: 'facility', coordinates: { lat: 10.053000, lng: 76.619806 }, description: 'Industrial lathe bays, milling, shaping, and precision CNC equipment.' },
+    { id: 'hydraulics-lab', name: 'Hydraulics Lab', shortName: 'Hydraulics', type: 'facility', coordinates: { lat: 10.052667, lng: 76.619639 }, description: 'Fluid mechanics, open flumes, Pelton wheels, and hydraulic test benches.' },
+    { id: 'heat-engines-lab', name: 'Heat Engines Lab', shortName: 'Heat Engines', type: 'facility', coordinates: { lat: 10.052583, lng: 76.619361 }, description: 'Internal combustion engines, dynamometers, and thermodynamic test setups.' },
+    { id: 'eee-workshop', name: 'EEE Workshop', shortName: 'EEE Workshop', type: 'facility', coordinates: { lat: 10.052528, lng: 76.618889 }, description: 'Electrical engineering workshops, machine testing, and transformer bays.' },
+    { id: 'nss-park', name: 'NSS Park', shortName: 'NSS Green Zone', type: 'landmark', coordinates: { lat: 10.053500, lng: 76.618917 }, description: 'Landscaped open-air green commons maintained by the National Service Scheme unit.' }
+];
+
+const maceCSBlockRooms = [
+    // Second Floor
+    { id: 'l201', number: 'L201', name: 'Classroom', type: 'classroom', floor: 2 },
+    { id: 'l202', number: 'L202', name: 'Electronics Workshop', type: 'lab', floor: 2 },
+    { id: 'l203', number: 'L203', name: 'Network Systems Lab', type: 'lab', floor: 2 },
+    { id: 'l204', number: 'L204', name: 'Classroom', type: 'classroom', floor: 2 },
+    { id: 'l205', number: 'L205', name: 'Faculty Room', type: 'faculty', floor: 2 },
+    { id: 'l206', number: 'L206', name: 'Computer Hardware & Intelligence Lab', type: 'lab', floor: 2 },
+    { id: 'l207', number: 'L207', name: 'Faculty Room', type: 'faculty', floor: 2 },
+    { id: 'l208', number: 'L208', name: 'HOD Room', type: 'hod', floor: 2 },
+    { id: 'l209', number: 'L209', name: 'Seminar Room', type: 'other', floor: 2 },
+    { id: 'l210', number: 'L210', name: 'Restroom (M)', type: 'toilet', floor: 2 },
+    { id: 'l211', number: 'L211', name: 'Tutorial Room', type: 'other', floor: 2 },
+    { id: 'l212', number: 'L212', name: 'Research Scholar Room', type: 'other', floor: 2 },
+    { id: 'l213', number: 'L213', name: 'Restroom (F)', type: 'toilet', floor: 2 },
+    { id: 'l214', number: 'L214', name: 'Research Lab / V-Lab', type: 'lab', floor: 2 },
+    { id: 'l215', number: 'L215', name: 'Conference Room', type: 'other', floor: 2 },
+    { id: 'l216', number: 'L216', name: 'CS Department Library', type: 'library', floor: 2 },
+    { id: 'l217', number: 'L217', name: 'Project Development Lab', type: 'other', floor: 2 },
+    { id: 'l218', number: 'L218', name: 'PG Computing Centre', type: 'other', floor: 2 },
+    { id: 'l219', number: 'L219', name: 'Staff Common Room', type: 'other', floor: 2 },
+
+    // Third Floor
+    { id: 'l301', number: 'L301', name: 'Smart Classroom', type: 'classroom', floor: 3 },
+    { id: 'l302', number: 'L302', name: 'Advanced Lab for ECE', type: 'lab', floor: 3 },
+    { id: 'l303', number: 'L303', name: 'Faculty Room', type: 'faculty', floor: 3 },
+    { id: 'l304', number: 'L304', name: 'ECE Project Lab', type: 'lab', floor: 3 },
+    { id: 'l305', number: 'L305', name: 'Embedded Systems Lab', type: 'lab', floor: 3 },
+    { id: 'l306', number: 'L306', name: 'Robotics Workshop', type: 'other', floor: 3 },
+    { id: 'l307', number: 'L307', name: 'Faculty Room', type: 'faculty', floor: 3 },
+    { id: 'l308', number: 'L308', name: 'Restroom (F)', type: 'toilet', floor: 3 },
+    { id: 'l309', number: 'L309', name: 'Faculty Room', type: 'faculty', floor: 3 },
+    { id: 'l310', number: 'L310', name: 'Faculty Room', type: 'faculty', floor: 3 },
+    { id: 'l311', number: 'L311', name: 'Restroom (M)', type: 'toilet', floor: 3 },
+    { id: 'l312', number: 'L312', name: 'Data Analytics & Cloud Lab', type: 'lab', floor: 3 },
+    { id: 'l313', number: 'L313', name: 'High-Performance Programming Lab', type: 'lab', floor: 3 },
+    { id: 'l314', number: 'L314', name: 'Systems Seminar Room', type: 'other', floor: 3 },
+    { id: 'l315', number: 'L315', name: 'Student Innovation Cell', type: 'other', floor: 3 },
+    { id: 'l316', number: 'L316', name: 'Faculty Meeting Room', type: 'faculty', floor: 3 }
+];
+
+// Global Map Engine State
+let maceMapState = {
+    userGps: { lat: 10.0538, lng: 76.6192 },
+    isTracking: false,
+    watchId: null,
+    gpsAccuracy: 15,
+    activeNavigation: null, // { name, coordinates, floor, room }
+    selectedLocation: null,
+    zoom: 1,
+    pan: { x: 0, y: 0 },
+    isDragging: false,
+    dragStart: { x: 0, y: 0 },
+    searchResults: [],
+    floorPlanCurrentFloor: 2,
+    floorPlanSelectedRoom: null
+};
+
+// Coordinate mapping: Geographic -> SVG (1000 x 1400)
+function maceGeoToSvg(coords){
+    const x = ((coords.lng - MACE_CAMPUS_BOUNDS.minLng) / (MACE_CAMPUS_BOUNDS.maxLng - MACE_CAMPUS_BOUNDS.minLng)) * 1000;
+    const y = 1400 - ((coords.lat - MACE_CAMPUS_BOUNDS.minLat) / (MACE_CAMPUS_BOUNDS.maxLat - MACE_CAMPUS_BOUNDS.minLat)) * 1400;
+    return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+}
+
+// Haversine distance in meters
+function maceHaversine(from, to){
+    const R = 6371000;
+    const rad = Math.PI / 180;
+    const dLat = (to.lat - from.lat) * rad;
+    const dLng = (to.lng - from.lng) * rad;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(from.lat * rad) * Math.cos(to.lat * rad) * Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round(R * c);
+}
+
+// Compass bearing in degrees
+function maceBearing(from, to){
+    const rad = Math.PI / 180;
+    const y = Math.sin((to.lng - from.lng) * rad) * Math.cos(to.lat * rad);
+    const x = Math.cos(from.lat * rad) * Math.sin(to.lat * rad) - Math.sin(from.lat * rad) * Math.cos(to.lat * rad) * Math.cos((to.lng - from.lng) * rad);
+    const deg = (Math.atan2(y, x) * 180) / Math.PI;
+    return Math.round((deg + 360) % 360);
+}
+
+function maceBearingLabel(bearing){
+    const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+    const idx = Math.round(bearing / 45) % 8;
+    return directions[idx];
+}
+
+// Master Map Builder
 function buildMap(container){
     if(!container) return;
 
-    // Prevent reloading iframe if already initialized in this container
-    if(container.querySelector('.mapIframe')){
-        return;
-    }
-
+    const isDashboard = container.id === "dashboardMap";
     const containerId = container.id || ('map-' + Math.random().toString(36).substring(2, 9));
-    const mapUrl = "https://mace-maps.vercel.app/";
 
-    container.innerHTML = `
-        <div class="mapHeaderBar">
-            <div class="mapTitleArea">
-                <span class="mapLiveTag"><span class="mapPulseDot"></span> MACE Maps</span>
-                <span class="mapSubtext">Interactive Campus Structure & Live Navigation</span>
-            </div>
-            <div class="mapControls">
-                <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="mapBtn primary" title="Open MACE Maps in new tab">
-                    🧭 Open Navigation ↗
-                </a>
-                <button type="button" class="mapBtn" onclick="toggleMapFullscreen('${containerId}')" title="Toggle full screen">
-                    ⛶ Fullscreen
-                </button>
-                <button type="button" class="mapBtn" onclick="reloadMapFrame('${containerId}')" title="Reload map">
-                    🔄 Reload
-                </button>
-            </div>
-        </div>
-        <div class="mapFrameWrapper">
-            <iframe
-                id="${containerId}-frame"
-                class="mapIframe"
-                src="${mapUrl}"
-                title="MACE Campus Map & Navigation"
-                allow="geolocation *; camera; microphone; fullscreen; clipboard-read; clipboard-write"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-            <div class="mapBlendEdge"></div>
-            <div id="${containerId}-fallback" class="mapFallbackOverlay">
-                <div class="mapFallbackIcon">🗺️</div>
-                <h3 class="mapFallbackTitle">MACE Campus Navigation</h3>
-                <p class="mapFallbackDesc">
-                    Official interactive campus map for Mar Athanasius College of Engineering with GPS tracking, building floor plans, and navigation.
-                </p>
-                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-                    <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="mapBtn primary" style="padding:10px 20px;font-size:14px;">
-                        🧭 Open Navigation
-                    </a>
-                    <button type="button" class="mapBtn" onclick="reloadMapFrame('${containerId}')" style="padding:10px 16px;font-size:14px;">
-                        🔄 Retry
+    // For Dashboard: Clean Campus Overview Map
+    if(isDashboard){
+        container.innerHTML = `
+            <div class="mapHeaderBar">
+                <div class="mapTitleArea">
+                    <span class="mapLiveTag"><span class="mapPulseDot"></span> MACE Smart Map</span>
+                    <span class="mapSubtext">Campus Overview</span>
+                </div>
+                <div class="mapControls">
+                    <button type="button" class="mapBtn primary" onclick="showPage('map', document.querySelector('.nav-map'))">
+                        Open Full Map 🗺
                     </button>
                 </div>
             </div>
+            <div class="mapCanvasWrapper" id="${containerId}-wrapper" style="height:320px;min-height:280px">
+                ${generateCampusSvgHtml(containerId, true)}
+            </div>
+        `;
+        setupSvgInteractions(`${containerId}-svg`, `${containerId}-wrapper`, true);
+        return;
+    }
+
+    // For Main Map: Full Interactive Navigation System
+    container.innerHTML = `
+        <div class="mapHeaderBar">
+            <div class="mapTitleArea">
+                <span class="mapLiveTag"><span class="mapPulseDot"></span> MACE Smart Map</span>
+                <span class="mapSubtext hidden sm:inline">Interactive Campus Navigation</span>
+            </div>
+
+            <!-- Integrated Search Bar -->
+            <div class="mapSearchWrapper">
+                <span class="mapSearchIcon">🔍</span>
+                <input
+                    type="text"
+                    id="mapSearchInput"
+                    class="mapSearchInput"
+                    placeholder="Search buildings, labs, rooms (e.g. L206)..."
+                    oninput="handleMapSearch(this.value)"
+                    onfocus="handleMapSearch(this.value)"
+                    autocomplete="off"
+                />
+                <button type="button" id="mapSearchClearBtn" class="mapSearchClear" style="display:none" onclick="clearMapSearch()">×</button>
+                <div id="mapSearchResults" class="mapSearchResults"></div>
+            </div>
+
+            <!-- Toolbar Controls -->
+            <div class="mapControls">
+                <button type="button" id="mapGpsBtn" class="mapBtn" onclick="toggleMapGps()" title="Toggle live GPS location">
+                    <span>🛰️</span>
+                    <span id="mapGpsBtnText">My Location</span>
+                </button>
+                <button type="button" class="mapBtn" onclick="openFloorPlanModal(2)" title="View CS Department Floor Plans">
+                    <span>📐</span>
+                    <span>CS Floor Plans</span>
+                </button>
+                <button type="button" class="mapBtn" onclick="zoomMap(0.25)" title="Zoom In">+</button>
+                <button type="button" class="mapBtn" onclick="zoomMap(-0.25)" title="Zoom Out">-</button>
+                <button type="button" class="mapBtn" onclick="resetMapTransform()" title="Reset Campus View">⌖</button>
+                <button type="button" class="mapBtn" onclick="toggleMapFullscreen('${containerId}')" title="Fullscreen">⛶</button>
+            </div>
+        </div>
+
+        <div class="mapCanvasWrapper" id="${containerId}-wrapper">
+            ${generateCampusSvgHtml(containerId, false)}
+
+            <!-- Live Navigation HUD -->
+            <div id="mapNavHud" class="mapNavHud" style="display:none"></div>
+
+            <!-- Selected Location Card -->
+            <div id="mapLocationCard" class="mapLocationCard" style="display:none"></div>
+
+            <!-- Floating Map Toast -->
+            <div id="mapToast" class="mapToast" style="display:none"></div>
         </div>
     `;
 
-    const frame = document.getElementById(`${containerId}-frame`);
-    const fallback = document.getElementById(`${containerId}-fallback`);
+    setupSvgInteractions(`${containerId}-svg`, `${containerId}-wrapper`, false);
 
-    if(frame && fallback){
-        frame.addEventListener("error", () => {
-            frame.style.display = "none";
-            fallback.style.display = "flex";
-        });
+    // Global click listener to close search dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const searchWrap = document.querySelector('.mapSearchWrapper');
+        if(searchWrap && !searchWrap.contains(e.target)){
+            const drop = document.getElementById('mapSearchResults');
+            if(drop) drop.classList.remove('visible');
+        }
+    });
+}
+
+// Generate the SVG Canvas string
+function generateCampusSvgHtml(containerId, isOverview){
+    const userPos = maceGeoToSvg(maceMapState.userGps);
+    const nav = maceMapState.activeNavigation;
+    let navRouteSvg = '';
+
+    if(nav){
+        const destPos = maceGeoToSvg(nav.coordinates);
+        navRouteSvg = `
+            <g id="${containerId}-navRoute">
+                <line x1="${userPos.x}" y1="${userPos.y}" x2="${destPos.x}" y2="${destPos.y}" stroke="#38bdf8" stroke-width="6" stroke-dasharray="12 6" stroke-linecap="round" />
+                <g transform="translate(${destPos.x}, ${destPos.y})">
+                    <circle cx="0" cy="0" r="18" fill="#ef4444" stroke="#ffffff" stroke-width="2.5" />
+                    <text x="0" y="5" text-anchor="middle" fill="#ffffff" font-size="13">🏁</text>
+                </g>
+            </g>
+        `;
     }
+
+    // Positions for main roads
+    const pEntrance = maceGeoToSvg({ lat: 10.055167, lng: 76.619167 });
+    const pMain = maceGeoToSvg({ lat: 10.0538, lng: 76.6192 });
+    const pCs = maceGeoToSvg({ lat: 10.052444, lng: 76.618639 });
+    const pCanteen = maceGeoToSvg({ lat: 10.0528, lng: 76.6198 });
+    const pOat = maceGeoToSvg({ lat: 10.0544, lng: 76.6181 });
+    const pLib = maceGeoToSvg({ lat: 10.053667, lng: 76.619694 });
+
+    const roadPathD = `
+        M ${pEntrance.x} ${pEntrance.y}
+        L ${pMain.x} ${pMain.y}
+        L ${pMain.x + 60} ${pMain.y + 70}
+        L ${pCanteen.x} ${pCanteen.y}
+        M ${pMain.x} ${pMain.y}
+        L ${pMain.x - 40} ${pMain.y + 110}
+        L ${pCs.x} ${pCs.y}
+        L ${pCanteen.x} ${pCanteen.y}
+        M ${pMain.x} ${pMain.y}
+        L ${pOat.x} ${pOat.y}
+        M ${pMain.x + 60} ${pMain.y + 70}
+        L ${pLib.x} ${pLib.y}
+    `;
+
+    return `
+        <svg id="${containerId}-svg" class="campusMapSvg" viewBox="0 0 1000 1400">
+            <defs>
+                <pattern id="${containerId}-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1" />
+                </pattern>
+                <filter id="${containerId}-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#38bdf8" flood-opacity="0.3" />
+                </filter>
+                <filter id="${containerId}-bldgShadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.5" />
+                </filter>
+            </defs>
+
+            <!-- Ground Base -->
+            <rect width="1000" height="1400" fill="#071322" />
+            <rect width="1000" height="1400" fill="url(#${containerId}-grid)" />
+
+            <!-- Perimeter Boundary -->
+            <rect x="40" y="40" width="920" height="1320" rx="24" fill="none" stroke="rgba(79, 163, 255, 0.12)" stroke-width="2" stroke-dasharray="8 6" />
+
+            <!-- Green Commons & NSS Park -->
+            <g id="${containerId}-greens">
+                <ellipse cx="440" cy="700" rx="90" ry="70" fill="rgba(16, 185, 129, 0.14)" stroke="rgba(52, 211, 153, 0.3)" stroke-width="2" />
+                <text x="440" y="705" text-anchor="middle" fill="#6ee7b7" font-size="13" font-weight="bold" opacity="0.85">🌳 NSS Park</text>
+
+                <!-- Campus Center Lawn -->
+                <ellipse cx="500" cy="550" rx="70" ry="50" fill="rgba(16, 185, 129, 0.10)" stroke="rgba(52, 211, 153, 0.2)" stroke-width="1" />
+
+                <!-- Tree Clusters -->
+                <circle cx="240" cy="480" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+                <circle cx="280" cy="520" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+                <circle cx="720" cy="560" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+                <circle cx="760" cy="600" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+                <circle cx="350" cy="920" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+                <circle cx="640" cy="940" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+                <circle cx="480" cy="260" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+                <circle cx="520" cy="260" r="14" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(52, 211, 153, 0.4)" />
+            </g>
+
+            <!-- Road Network -->
+            <g id="${containerId}-roads">
+                <path d="${roadPathD}" fill="none" stroke="#17283c" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="${roadPathD}" fill="none" stroke="rgba(79, 163, 255, 0.25)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="${roadPathD}" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="10 10" stroke-linecap="round" opacity="0.8" />
+            </g>
+
+            <!-- Buildings & Landmarks -->
+            <g id="${containerId}-buildings">
+                ${maceCampusLocations.map(loc => {
+                    const pos = maceGeoToSvg(loc.coordinates);
+                    const isSelected = maceMapState.selectedLocation?.id === loc.id;
+
+                    if(loc.type === 'entrance'){
+                        return `
+                            <g onclick="selectMapLocation('${loc.id}')" style="cursor:pointer">
+                                <circle cx="${pos.x}" cy="${pos.y}" r="18" fill="#0284c7" stroke="#ffffff" stroke-width="2.5" />
+                                <text x="${pos.x}" y="${pos.y + 5}" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">🚪</text>
+                                <rect x="${pos.x - 55}" y="${pos.y + 24}" width="110" height="22" rx="6" fill="rgba(15, 23, 42, 0.92)" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+                                <text x="${pos.x}" y="${pos.y + 39}" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="bold">${loc.name}</text>
+                            </g>
+                        `;
+                    }
+
+                    if(loc.type === 'landmark'){
+                        const icon = loc.id.includes('stage') ? '🎤' : '🎭';
+                        return `
+                            <g onclick="selectMapLocation('${loc.id}')" style="cursor:pointer">
+                                <circle cx="${pos.x}" cy="${pos.y}" r="20" fill="${isSelected ? '#f59e0b' : '#0d9488'}" stroke="#ffffff" stroke-width="2" filter="url(#${containerId}-glow)" />
+                                <text x="${pos.x}" y="${pos.y + 6}" text-anchor="middle" fill="#ffffff" font-size="14">${icon}</text>
+                                <rect x="${pos.x - 65}" y="${pos.y + 25}" width="130" height="22" rx="6" fill="rgba(15, 23, 42, 0.92)" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+                                <text x="${pos.x}" y="${pos.y + 40}" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="bold">${loc.name}</text>
+                            </g>
+                        `;
+                    }
+
+                    // Departmental Building
+                    const width = loc.id === 'main-block' ? 120 : (loc.id === 'cs-block' ? 105 : 90);
+                    const height = loc.id === 'main-block' ? 70 : (loc.id === 'cs-block' ? 65 : 55);
+                    const roofColor = loc.id === 'cs-block' ? '#0284c7' : (loc.id === 'main-block' ? '#3b82f6' : (loc.id === 'ece-block' ? '#8b5cf6' : '#10b981'));
+
+                    return `
+                        <g onclick="selectMapLocation('${loc.id}')" style="cursor:pointer" class="mapBuildingGroup">
+                            <rect
+                                x="${pos.x - width/2}"
+                                y="${pos.y - height/2}"
+                                width="${width}"
+                                height="${height}"
+                                rx="12"
+                                fill="${isSelected ? '#1e3a8a' : '#0f2744'}"
+                                stroke="${isSelected ? '#38bdf8' : '#334155'}"
+                                stroke-width="${isSelected ? '3.5' : '2'}"
+                                filter="url(#${containerId}-bldgShadow)"
+                            />
+                            <rect x="${pos.x - width/2 + 4}" y="${pos.y - height/2 + 4}" width="${width - 8}" height="10" rx="4" fill="${roofColor}" opacity="0.85" />
+                            <text x="${pos.x}" y="${pos.y + 2}" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="800" letter-spacing="0.5">
+                                ${loc.shortName ? loc.shortName.split(' ')[0] : loc.name.split(' ')[0]}
+                            </text>
+                            ${loc.hasFloors ? `
+                                <g transform="translate(${pos.x + width/2 - 20}, ${pos.y - height/2 - 8})">
+                                    <circle cx="10" cy="10" r="10" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+                                    <text x="10" y="14" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="bold">3F</text>
+                                </g>
+                            ` : ''}
+                            <rect
+                                x="${pos.x - (loc.name.length * 4.2)}"
+                                y="${pos.y + height/2 + 8}"
+                                width="${loc.name.length * 8.4}"
+                                height="20"
+                                rx="6"
+                                fill="rgba(8, 20, 36, 0.95)"
+                                stroke="${isSelected ? '#38bdf8' : 'rgba(255, 255, 255, 0.12)'}"
+                                stroke-width="1"
+                            />
+                            <text x="${pos.x}" y="${pos.y + height/2 + 22}" text-anchor="middle" fill="#f1f5f9" font-size="10.5" font-weight="bold">
+                                ${loc.name}
+                            </text>
+                        </g>
+                    `;
+                }).join('')}
+            </g>
+
+            <!-- Navigation Polyline -->
+            ${navRouteSvg}
+
+            <!-- Live User Marker -->
+            <g id="${containerId}-userPin" transform="translate(${userPos.x}, ${userPos.y})">
+                <circle cx="0" cy="0" r="${maceMapState.gpsAccuracy * 1.5}" fill="rgba(56, 189, 248, 0.12)" stroke="rgba(56, 189, 248, 0.3)" stroke-width="1" />
+                <circle cx="0" cy="0" r="22" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.7">
+                    <animate attributeName="r" values="14;28;14" dur="2.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.8;0;0.8" dur="2.5s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="0" cy="0" r="9" fill="#0284c7" stroke="#ffffff" stroke-width="2.5" />
+                <circle cx="0" cy="0" r="4" fill="#ffffff" />
+            </g>
+        </svg>
+    `;
+}
+
+// Setup SVG Drag, Pan, and Wheel zoom
+function setupSvgInteractions(svgId, wrapperId, isOverview){
+    const wrapper = document.getElementById(wrapperId);
+    const svg = document.getElementById(svgId);
+    if(!wrapper || !svg) return;
+
+    let isDrag = false;
+    let startX = 0, startY = 0;
+
+    wrapper.addEventListener('mousedown', (e) => {
+        if(e.button !== 0) return;
+        isDrag = true;
+        startX = e.clientX - maceMapState.pan.x;
+        startY = e.clientY - maceMapState.pan.y;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if(!isDrag) return;
+        maceMapState.pan.x = e.clientX - startX;
+        maceMapState.pan.y = e.clientY - startY;
+        applyMapTransform();
+    });
+
+    window.addEventListener('mouseup', () => { isDrag = false; });
+
+    wrapper.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.15 : 0.15;
+        maceMapState.zoom = Math.max(0.6, Math.min(3.2, maceMapState.zoom + delta));
+        applyMapTransform();
+    }, { passive: false });
+}
+
+function applyMapTransform(){
+    const svgs = document.querySelectorAll('.campusMapSvg');
+    svgs.forEach(svg => {
+        svg.style.transform = `translate(${maceMapState.pan.x}px, ${maceMapState.pan.y}px) scale(${maceMapState.zoom})`;
+    });
+}
+
+function zoomMap(delta){
+    maceMapState.zoom = Math.max(0.6, Math.min(3.2, maceMapState.zoom + delta));
+    applyMapTransform();
+}
+
+function resetMapTransform(){
+    maceMapState.zoom = 1;
+    maceMapState.pan = { x: 0, y: 0 };
+    applyMapTransform();
+    maceMapState.selectedLocation = null;
+    hideMapLocationCard();
+    refreshMapSvgs();
+}
+
+function refreshMapSvgs(){
+    const mainWrap = document.getElementById('mainMap-wrapper');
+    if(mainWrap) mainWrap.innerHTML = generateCampusSvgHtml('mainMap', false);
+    const dashWrap = document.getElementById('dashboardMap-wrapper');
+    if(dashWrap) dashWrap.innerHTML = generateCampusSvgHtml('dashboardMap', true);
+    applyMapTransform();
+}
+
+// Center/focus on coordinates
+function focusMapCoordinates(coords, customZoom = 1.3){
+    const svgPt = maceGeoToSvg(coords);
+    maceMapState.zoom = customZoom;
+    maceMapState.pan = {
+        x: (500 - svgPt.x) * customZoom,
+        y: (700 - svgPt.y) * customZoom
+    };
+    applyMapTransform();
+}
+
+// Select building or location on Map
+function selectMapLocation(locId){
+    const loc = maceCampusLocations.find(l => l.id === locId);
+    if(!loc) return;
+
+    maceMapState.selectedLocation = loc;
+    focusMapCoordinates(loc.coordinates);
+    refreshMapSvgs();
+
+    const card = document.getElementById('mapLocationCard');
+    if(!card) return;
+
+    const matchedVenue = venues.find(v => v.id === loc.venueId || v.name.toLowerCase().includes(loc.name.toLowerCase()));
+
+    card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px">
+            <div>
+                <span class="facility" style="text-transform:uppercase">${loc.type}</span>
+                <h3 style="font-size:16px;color:var(--text);margin-top:4px">${loc.name}</h3>
+                ${loc.shortName ? `<p style="font-size:11px;color:var(--primary)">${loc.shortName}</p>` : ''}
+            </div>
+            <button class="closeModal" onclick="hideMapLocationCard()" style="font-size:20px">×</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">${loc.description || ''}</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="smallBtn" onclick="startMapNavigation({ name: '${loc.name.replace(/'/g, "\\'")}', coordinates: { lat: ${loc.coordinates.lat}, lng: ${loc.coordinates.lng} } })">
+                Navigate 🧭
+            </button>
+            ${loc.hasFloors ? `
+                <button class="smallBtn secondary" onclick="openFloorPlanModal(2)">
+                    Floor Plans 📐
+                </button>
+            ` : ''}
+            ${matchedVenue ? `
+                <button class="smallBtn approve" onclick="openBooking(${matchedVenue.id})">
+                    Book This Venue →
+                </button>
+            ` : ''}
+        </div>
+    `;
+    card.style.display = 'block';
+}
+
+function hideMapLocationCard(){
+    const card = document.getElementById('mapLocationCard');
+    if(card) card.style.display = 'none';
+}
+
+// Search Logic
+function handleMapSearch(query){
+    const q = (query || '').trim().toLowerCase();
+    const drop = document.getElementById('mapSearchResults');
+    const clearBtn = document.getElementById('mapSearchClearBtn');
+    if(!drop) return;
+
+    if(q.length === 0){
+        if(clearBtn) clearBtn.style.display = 'none';
+        drop.classList.remove('visible');
+        drop.innerHTML = '';
+        return;
+    }
+
+    if(clearBtn) clearBtn.style.display = 'block';
+    if(q.length < 2){
+        drop.classList.remove('visible');
+        return;
+    }
+
+    const results = [];
+
+    maceCampusLocations.forEach(loc => {
+        if(loc.name.toLowerCase().includes(q) || (loc.shortName && loc.shortName.toLowerCase().includes(q))){
+            results.push({ type: 'location', item: loc });
+        }
+    });
+
+    maceCSBlockRooms.forEach(room => {
+        if(room.number.toLowerCase().includes(q) || room.name.toLowerCase().includes(q)){
+            results.push({ type: 'room', item: room });
+        }
+    });
+
+    maceMapState.searchResults = results.slice(0, 10);
+
+    if(!results.length){
+        drop.innerHTML = `<div style="padding:12px;text-align:center;color:var(--muted);font-size:12px">No campus locations or rooms found.</div>`;
+        drop.classList.add('visible');
+        return;
+    }
+
+    drop.innerHTML = results.map((res, i) => {
+        const isLoc = res.type === 'location';
+        const loc = isLoc ? res.item : null;
+        const room = !isLoc ? res.item : null;
+        const title = isLoc ? loc.name : `${room.number} • ${room.name}`;
+        const sub = isLoc ? (loc.shortName || loc.type) : `CS Block • Floor ${room.floor}`;
+        const icon = isLoc ? (loc.type === 'building' ? '🏛' : loc.type === 'facility' ? '🍽' : '📍') : '🔬';
+
+        return `
+            <div class="mapSearchItem" onclick="selectMapSearchResult(${i}, false)">
+                <div class="mapSearchItemLeft">
+                    <span>${icon}</span>
+                    <div>
+                        <div class="mapSearchItemTitle">${title}</div>
+                        <div class="mapSearchItemSubtitle">${sub}</div>
+                    </div>
+                </div>
+                <button class="mapSearchNavBtn" onclick="event.stopPropagation(); selectMapSearchResult(${i}, true)">
+                    Navigate 🧭
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    drop.classList.add('visible');
+}
+
+function clearMapSearch(){
+    const inp = document.getElementById('mapSearchInput');
+    if(inp) inp.value = '';
+    handleMapSearch('');
+}
+
+function selectMapSearchResult(idx, navigateNow){
+    const res = maceMapState.searchResults[idx];
+    if(!res) return;
+
+    const drop = document.getElementById('mapSearchResults');
+    if(drop) drop.classList.remove('visible');
+
+    if(res.type === 'location'){
+        selectMapLocation(res.item.id);
+        if(navigateNow){
+            startMapNavigation({ name: res.item.name, coordinates: res.item.coordinates });
+        }
+    } else {
+        const room = res.item;
+        const csLoc = maceCampusLocations.find(l => l.id === 'cs-block');
+        if(csLoc){
+            selectMapLocation(csLoc.id);
+        }
+        if(navigateNow){
+            startMapNavigation({
+                name: `${room.number} (${room.name})`,
+                coordinates: csLoc ? csLoc.coordinates : MACE_CAMPUS_CENTER,
+                floor: room.floor,
+                room: room.number
+            });
+        } else {
+            openFloorPlanModal(room.floor);
+            setTimeout(() => selectFloorRoom(room.id), 200);
+        }
+    }
+}
+
+// GPS Location Tracking ("My Location")
+function toggleMapGps(){
+    const btn = document.getElementById('mapGpsBtn');
+    const text = document.getElementById('mapGpsBtnText');
+
+    if(maceMapState.isTracking){
+        if(maceMapState.watchId !== null){
+            navigator.geolocation.clearWatch(maceMapState.watchId);
+            maceMapState.watchId = null;
+        }
+        maceMapState.isTracking = false;
+        if(btn) btn.classList.remove('active');
+        if(text) text.textContent = 'My Location';
+        showMapToast('GPS tracking turned off');
+    } else {
+        if(!navigator.geolocation){
+            showMapToast('Geolocation is not supported by your browser');
+            return;
+        }
+        if(text) text.textContent = 'Acquiring GPS...';
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                maceMapState.userGps = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                maceMapState.gpsAccuracy = Math.min(pos.coords.accuracy, 30);
+                maceMapState.isTracking = true;
+                if(btn) btn.classList.add('active');
+                if(text) text.textContent = 'GPS Active';
+                showMapToast('📍 Live GPS location locked');
+                focusMapCoordinates(maceMapState.userGps);
+                refreshMapSvgs();
+                updateMapNavHud();
+            },
+            (err) => {
+                showMapToast('Location access disabled. You can still explore and plan routes from Campus Center.');
+                if(text) text.textContent = 'My Location';
+                maceMapState.isTracking = false;
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+
+        maceMapState.watchId = navigator.geolocation.watchPosition(
+            (pos) => {
+                maceMapState.userGps = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                maceMapState.gpsAccuracy = Math.min(pos.coords.accuracy, 30);
+                refreshMapSvgs();
+                updateMapNavHud();
+            },
+            () => {},
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
+        );
+    }
+}
+
+function showMapToast(msg){
+    const toast = document.getElementById('mapToast');
+    if(!toast) return;
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3500);
+}
+
+// Navigation Engine
+function startMapNavigation(target){
+    maceMapState.activeNavigation = target;
+    hideMapLocationCard();
+    focusMapCoordinates(target.coordinates, 1.25);
+    refreshMapSvgs();
+    updateMapNavHud();
+
+    // Ensure we are on the Map page
+    showPage('map', document.querySelector('.nav-map'));
+}
+
+function stopMapNavigation(){
+    maceMapState.activeNavigation = null;
+    const hud = document.getElementById('mapNavHud');
+    if(hud) hud.style.display = 'none';
+    refreshMapSvgs();
+}
+
+function updateMapNavHud(){
+    const hud = document.getElementById('mapNavHud');
+    if(!hud) return;
+
+    const nav = maceMapState.activeNavigation;
+    if(!nav){
+        hud.style.display = 'none';
+        return;
+    }
+
+    const distMeters = maceHaversine(maceMapState.userGps, nav.coordinates);
+    const bearing = maceBearing(maceMapState.userGps, nav.coordinates);
+    const walkMins = Math.max(1, Math.round(distMeters / 83.3));
+    const bearingLabel = maceBearingLabel(bearing);
+    const isClose = distMeters < 15;
+
+    hud.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div>
+                <span class="mapLiveTag" style="font-size:10px;padding:2px 8px">Live Navigation</span>
+                <h4 style="font-size:15px;color:var(--text);margin-top:4px">🏁 ${nav.name}</h4>
+                ${nav.floor ? `<p style="font-size:11px;color:var(--primary)">CS Block • Floor ${nav.floor}</p>` : ''}
+            </div>
+            <button class="smallBtn reject" onclick="stopMapNavigation()" style="padding:5px 10px;font-size:11px">
+                Stop
+            </button>
+        </div>
+
+        <div class="mapNavMetrics">
+            <div class="mapNavMetric">
+                <div class="mapNavMetricValue">${distMeters} m</div>
+                <div class="mapNavMetricLabel">Distance</div>
+            </div>
+            <div class="mapNavMetric">
+                <div class="mapNavMetricValue">~${walkMins} min</div>
+                <div class="mapNavMetricLabel">Walk Time</div>
+            </div>
+            <div class="mapNavMetric">
+                <div class="mapNavMetricValue">${bearingLabel}</div>
+                <div class="mapNavMetricLabel">Bearing</div>
+            </div>
+        </div>
+
+        <p style="font-size:11px;color:var(--muted);background:rgba(255,255,255,.05);padding:7px 10px;border-radius:8px">
+            🧭 ${isClose ? "🎉 <b>You have arrived at your destination!</b>" : `Head <b>${bearingLabel}</b> along the central campus pedestrian avenue.`}
+        </p>
+    `;
+    hud.style.display = 'block';
+}
+
+// CS Block Floor Plan Modal Functions
+function openFloorPlanModal(floor = 2){
+    maceMapState.floorPlanCurrentFloor = floor;
+    renderFloorRooms();
+
+    const modal = document.getElementById('maceFloorPlanModal');
+    if(modal) modal.classList.remove('hidden');
+}
+
+function closeFloorPlanModal(){
+    const modal = document.getElementById('maceFloorPlanModal');
+    if(modal) modal.classList.add('hidden');
+    maceMapState.floorPlanSelectedRoom = null;
+    const bar = document.getElementById('floorRoomDetailBar');
+    if(bar) bar.style.display = 'none';
+}
+
+function switchFloor(floor){
+    maceMapState.floorPlanCurrentFloor = floor;
+    const tab2 = document.getElementById('tabFloor2');
+    const tab3 = document.getElementById('tabFloor3');
+    if(tab2) tab2.classList.toggle('active', floor === 2);
+    if(tab3) tab3.classList.toggle('active', floor === 3);
+    renderFloorRooms();
+}
+
+function renderFloorRooms(){
+    const grid = document.getElementById('floorRoomGrid');
+    if(!grid) return;
+
+    const floorRooms = maceCSBlockRooms.filter(r => r.floor === maceMapState.floorPlanCurrentFloor);
+
+    grid.innerHTML = floorRooms.map(room => {
+        const isSel = maceMapState.floorPlanSelectedRoom?.id === room.id;
+        return `
+            <div class="floorRoomCard ${isSel ? 'selected' : ''}" onclick="selectFloorRoom('${room.id}')">
+                <div class="floorRoomNumber">${room.number}</div>
+                <div class="floorRoomName" title="${room.name}">${room.name}</div>
+                <span class="floorRoomType">${room.type}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function selectFloorRoom(roomId){
+    const room = maceCSBlockRooms.find(r => r.id === roomId);
+    if(!room) return;
+
+    maceMapState.floorPlanSelectedRoom = room;
+    renderFloorRooms();
+
+    const bar = document.getElementById('floorRoomDetailBar');
+    const title = document.getElementById('floorDetailTitle');
+    const sub = document.getElementById('floorDetailSub');
+
+    if(bar && title && sub){
+        title.textContent = `${room.number} — ${room.name}`;
+        sub.textContent = `CS Department Block • Floor ${room.floor} • Category: ${room.type.toUpperCase()}`;
+        bar.style.display = 'flex';
+    }
+}
+
+function navigateFromFloorPlan(){
+    const room = maceMapState.floorPlanSelectedRoom;
+    if(!room) return;
+
+    closeFloorPlanModal();
+    const csLoc = maceCampusLocations.find(l => l.id === 'cs-block');
+
+    startMapNavigation({
+        name: `${room.number} (${room.name})`,
+        coordinates: csLoc ? csLoc.coordinates : MACE_CAMPUS_CENTER,
+        floor: room.floor,
+        room: room.number
+    });
 }
 
 function toggleMapFullscreen(containerId){
     const el = document.getElementById(containerId);
     if(!el) return;
     if(!document.fullscreenElement){
-        if(el.requestFullscreen){
-            el.requestFullscreen();
-        } else if(el.webkitRequestFullscreen){
-            el.webkitRequestFullscreen();
-        }
+        if(el.requestFullscreen) el.requestFullscreen();
+        else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     } else {
-        if(document.exitFullscreen){
-            document.exitFullscreen();
-        }
+        if(document.exitFullscreen) document.exitFullscreen();
     }
 }
 
-function reloadMapFrame(containerId){
-    const frame = document.getElementById(containerId + "-frame");
-    const fallback = document.getElementById(containerId + "-fallback");
-    if(fallback) fallback.style.display = "none";
-    if(frame){
-        frame.style.display = "block";
-        const src = frame.src;
-        frame.src = "";
-        setTimeout(() => { frame.src = src; }, 50);
-    }
+// Helper to trigger navigation directly from Venue Explorer
+function navigateToCampusVenue(venueId){
+    const v = venues.find(item => item.id === venueId);
+    if(!v) return;
+
+    const loc = maceCampusLocations.find(l =>
+        l.id === 'cs-block' && v.block.includes('CS') ||
+        l.id === 'main-block' && v.block.includes('Main') ||
+        l.id === 'ece-block' && v.block.includes('ECE') ||
+        l.id === 'oat' && v.block.includes('Open Air') ||
+        l.id === 'placement-cell' && v.block.includes('Placement') ||
+        l.id === 'canteen' && v.block.includes('Canteen')
+    ) || maceCampusLocations[1];
+
+    startMapNavigation({ name: v.name, coordinates: loc.coordinates });
 }
 
 
