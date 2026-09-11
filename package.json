@@ -1,0 +1,30 @@
+{
+  "name": "campus-space",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CampusSpace — AI-Powered Campus Venue Booking & Optimization Platform",
+  "scripts": {
+    "dev": "agy-node dev-server.js",
+    "start": "agy-node dev-server.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "lucide-react": "^0.344.0",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.2"
+  },
+  "keywords": [
+    "campus",
+    "venue-booking",
+    "ai-recommendations",
+    "hackathon",
+    "leaflet",
+    "osm",
+    "resource-optimization"
+  ],
+  "author": "CampusSpace Team",
+  "license": "MIT"
+}

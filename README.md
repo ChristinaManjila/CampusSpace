@@ -45,14 +45,6 @@ CampusSpace shifts the focus from simple scheduling to **intelligent venue match
 5. No-shows are detected automatically, and the venue is released back into the booking pool.
 6. Administrators monitor usage trends and space efficiency through the utilization dashboard.
 
-## Tech Stack
-
-> _Update this section with your actual stack._
-
-- **Frontend:** _e.g. React / Next.js_
-- **Backend:** _e.g. Node.js / Express_
-- **Database:** _e.g. PostgreSQL / MongoDB_
-- **Other:** QR code generation/scanning library, scheduling/analytics logic
 
 ## Getting Started
 
@@ -87,14 +79,3 @@ npm run dev
 - [ ] Auto-approval rules engine
 - [ ] Mobile-friendly organizer interface
 
-## Contributing
-
-Contributions are welcome. Please open an issue to discuss any major changes before submitting a pull request.
-
-## License
-
-_Specify your license here (e.g. MIT)._
-
-## Contact
-
-_Add your name/team and contact info here._
