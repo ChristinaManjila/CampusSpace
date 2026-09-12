@@ -1356,6 +1356,38 @@ body.light-mode .mapLocationCard{
     background:#10b981;
 }
 
+.likeHeartBtn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:rgba(11,20,35,.85);
+    border:1px solid rgba(255,255,255,.2);
+    color:#cbd5e1;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    backdrop-filter:blur(8px);
+    transition:all .15s ease;
+    z-index:2;
+}
+
+.likeHeartBtn:hover{
+    transform:scale(1.15);
+    color:#ff6b6b;
+    border-color:#ff6b6b;
+}
+
+.likeHeartBtn.liked{
+    background:rgba(220,38,38,.2);
+    border-color:#ff6b6b;
+    color:#ff6b6b;
+}
+
 /* MAINTENANCE ISSUES */
 
 .maintGrid{
@@ -1644,55 +1676,14 @@ and physical campus infrastructure maintenance portal for Mar Athanasius College
 
 <div class="loginCard">
 
-<h2>Welcome</h2>
-<p>Select your user mode to enter CampusSpace.</p>
+<h2>Sign In</h2>
+<p>Enter your username or email address and password to access CampusSpace.</p>
 
-<div class="roleSwitcher">
-
-<button
-class="roleBtn active"
-id="roleBtn_student"
-onclick="setLoginRole('student')">
-🎓 Student
-</button>
-
-<button
-class="roleBtn"
-id="roleBtn_teamlead"
-onclick="setLoginRole('teamlead')">
-👥 Team Lead
-</button>
-
-<button
-class="roleBtn"
-id="roleBtn_maintenance"
-onclick="setLoginRole('maintenance')">
-🔧 Maintenance
-</button>
-
-<button
-class="roleBtn"
-id="roleBtn_admin"
-onclick="setLoginRole('admin')">
-🛡 Admin
-</button>
-
-</div>
-
-<!-- Demo Quick-Fill Pills -->
-<div class="demoPills">
-<span style="font-size:11px;color:var(--muted);align-self:center">Quick test:</span>
-<span class="demoPill" onclick="autoFillLogin('student')">Student</span>
-<span class="demoPill" onclick="autoFillLogin('teamlead')">Team Lead</span>
-<span class="demoPill" onclick="autoFillLogin('maintenance')">Maintenance</span>
-<span class="demoPill" onclick="autoFillLogin('admin')">Admin</span>
-</div>
-
-<div class="inputGroup">
-<label>Username</label>
+<div class="inputGroup" style="margin-top:10px">
+<label>Username or Email</label>
 <input
 id="username"
-placeholder="Enter username"
+placeholder="e.g. student@campus.edu or admin"
 onkeydown="if(event.key==='Enter'){ event.preventDefault(); document.getElementById('password').focus(); }">
 </div>
 
@@ -1778,6 +1769,11 @@ onclick="showPage('map',this)">
 <button class="navButton nav-mybookings"
 onclick="showPage('bookings',this)">
 📅 My Venue Requests
+</button>
+
+<button class="navButton nav-likedevents"
+onclick="showPage('likedevents',this)">
+❤️ Liked Events
 </button>
 
 <button class="navButton nav-createevent"
@@ -2044,6 +2040,26 @@ Reset Filters
 </div>
 
 <div class="eventGrid" id="eventGrid"></div>
+
+</section>
+
+
+<!-- 4B. STUDENT: LIKED EVENTS -->
+
+<section id="likedeventsPage" class="page hidden">
+
+<div class="pageTitle" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:15px">
+<div>
+<h1>❤️ My Liked Events</h1>
+<p>Saved campus events and technical symposiums favorited for quick map access and scheduling.</p>
+</div>
+
+<button class="smallBtn secondary" onclick="showPage('events')">
+Explore Campus Events →
+</button>
+</div>
+
+<div class="eventGrid" id="likedEventsGrid"></div>
 
 </section>
 
@@ -3077,72 +3093,106 @@ function updateThemeButtonText(){
 
 
 /* ================================================================
-   5. AUTHENTICATION & ROLES
-   Supported: 'student' | 'teamlead' | 'maintenance' | 'admin'
+   5. AUTHENTICATION, ROLES & LIKED EVENTS
+   Strictly Supported 4 Roles: 'admin' | 'student' | 'team_lead' | 'maintenance'
 ================================================================ */
 
-let selectedLoginRole = "student";
 let currentUserRole = null;
 let currentUsername = "";
+let currentAuthToken = localStorage.getItem("campusspace_auth_token") || null;
+let currentUserId = "";
+let likedEventIds = new Set();
 
 const PRESET_CREDS = {
-    student: { user: "student", pass: "student@123", name: "Student Explorer" },
-    teamlead: { user: "teamlead", pass: "teamlead@123", name: "Team Lead" },
-    maintenance: { user: "maintenance", pass: "maintenance@123", name: "Maintenance Officer" },
-    admin: { user: "admin", pass: "admin@123", name: "Campus Administrator" }
+    student: { user: "student", email: "student@campus.edu", pass: "Student@123", name: "Student Explorer", role: "student" },
+    team_lead: { user: "teamlead", email: "teamlead@campus.edu", pass: "TeamLead@123", name: "Team Lead", role: "team_lead" },
+    maintenance: { user: "maintenance", email: "maintenance@campus.edu", pass: "Maintenance@123", name: "Maintenance Officer", role: "maintenance" },
+    admin: { user: "admin", email: "admin@campus.edu", pass: "Admin@123", name: "Campus Administrator", role: "admin" }
 };
 
-function setLoginRole(role){
-    selectedLoginRole = role;
-    ["student","teamlead","maintenance","admin"].forEach(r => {
-        const btn = document.getElementById(`roleBtn_${r}`);
-        if(btn) btn.classList.toggle("active", r === role);
-    });
-    const c = PRESET_CREDS[role];
-    if(c){
-        document.getElementById("username").value = c.user;
-        document.getElementById("password").value = c.pass;
-    }
-    document.getElementById("errorMsg").textContent = "";
-}
-
-function autoFillLogin(role){
-    setLoginRole(role);
-}
-
-function login(){
-    const user = document.getElementById("username").value.trim().toLowerCase();
+async function login(){
+    const userInput = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value;
-    const creds = PRESET_CREDS[selectedLoginRole];
+    const errorEl = document.getElementById("errorMsg");
 
-    let valid = false;
-    if(creds && user === creds.user && pass === creds.pass){
-        valid = true;
-    }
-
-    if(!valid){
-        document.getElementById("errorMsg").textContent =
-            `Invalid username or password for ${selectedLoginRole.toUpperCase()}.`;
+    if(!userInput || !pass){
+        errorEl.textContent = "Please enter both username/email and password.";
         return;
     }
 
-    currentUserRole = selectedLoginRole;
-    currentUsername = creds.name;
+    errorEl.textContent = "Authenticating with server...";
+
+    let authenticatedUser = null;
+    let token = null;
+
+    // 1. Attempt backend API login
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: userInput, password: pass })
+        });
+
+        if(response.ok){
+            const data = await response.json();
+            authenticatedUser = data.user;
+            token = data.token;
+        }
+    } catch (e) {
+        console.warn('API authentication fetch unavailable, falling back to local verification:', e);
+    }
+
+    // 2. Offline / local fallback for the 4 verified accounts
+    if(!authenticatedUser){
+        const userLower = userInput.toLowerCase();
+        for(const key of Object.keys(PRESET_CREDS)){
+            const cred = PRESET_CREDS[key];
+            if((userLower === cred.user.toLowerCase() || userLower === cred.email.toLowerCase()) && pass === cred.pass){
+                authenticatedUser = {
+                    id: `usr-${cred.role}`,
+                    username: cred.user,
+                    email: cred.email,
+                    role: cred.role,
+                    name: cred.name
+                };
+                token = `token-${cred.role}-${Date.now()}`;
+                break;
+            }
+        }
+    }
+
+    if(!authenticatedUser){
+        errorEl.textContent = "Invalid username/email or password.";
+        return;
+    }
+
+    errorEl.textContent = "";
+    currentUserRole = authenticatedUser.role;
+    currentUsername = authenticatedUser.name;
+    currentUserId = authenticatedUser.id;
+    currentAuthToken = token;
+    localStorage.setItem("campusspace_auth_token", token);
+    localStorage.setItem("campusspace_user_role", currentUserRole);
 
     document.getElementById("loginPage").classList.add("hidden");
     document.getElementById("app").classList.remove("hidden");
 
-    // Header role label
+    // Header role chip
     const roleLabels = {
         student: "🎓 STUDENT",
-        teamlead: "👥 TEAM LEAD",
+        team_lead: "👥 TEAM LEAD",
         maintenance: "🔧 MAINTENANCE OFFICER",
         admin: "🛡 ADMIN"
     };
-    document.getElementById("currentRole").textContent = roleLabels[currentUserRole];
+    document.getElementById("currentRole").textContent = roleLabels[currentUserRole] || currentUserRole.toUpperCase();
 
     // Configure role-based sidebar visibility
     applyRolePermissions();
+
+    // Load student liked events if student
+    if(currentUserRole === "student"){
+        await loadLikedEvents();
+    }
 
     // Default landing page per role
     if(currentUserRole === "maintenance"){
@@ -3157,6 +3207,10 @@ function login(){
 function logout(){
     currentUserRole = null;
     currentUsername = "";
+    currentUserId = "";
+    currentAuthToken = null;
+    localStorage.removeItem("campusspace_auth_token");
+    localStorage.removeItem("campusspace_user_role");
     document.getElementById("app").classList.add("hidden");
     document.getElementById("loginPage").classList.remove("hidden");
     document.getElementById("username").value = "";
@@ -3166,24 +3220,33 @@ function logout(){
 
 function applyRolePermissions(){
     const isStudent = currentUserRole === "student";
-    const isTeamLead = currentUserRole === "teamlead";
+    const isTeamLead = currentUserRole === "team_lead";
     const isMaintenance = currentUserRole === "maintenance";
     const isAdmin = currentUserRole === "admin";
 
-    // Dashboard, Map, Events available to all
-    document.querySelector(".nav-dashboard")?.classList.remove("hidden");
-    document.querySelector(".nav-map")?.classList.remove("hidden");
-    document.querySelector(".nav-events")?.classList.remove("hidden");
+    // Dashboard: Student, TeamLead, Admin
+    document.querySelector(".nav-dashboard")?.classList.toggle("hidden", isMaintenance);
 
-    // Venues: Available to Admin, TeamLead, Student (Student has view-only without request buttons)
-    document.querySelector(".nav-venues")?.classList.toggle("hidden", isMaintenance);
+    // Map: Student, TeamLead, Admin
+    document.querySelector(".nav-map")?.classList.toggle("hidden", isMaintenance);
 
-    // My Requests & Create Event: TeamLead only
-    document.querySelector(".nav-mybookings")?.classList.toggle("hidden", !isTeamLead);
-    document.querySelector(".nav-createevent")?.classList.toggle("hidden", !isTeamLead);
+    // Campus Events: Student, TeamLead, Admin
+    document.querySelector(".nav-events")?.classList.toggle("hidden", isMaintenance);
 
-    // AI Recommender: Admin & TeamLead
-    document.querySelector(".nav-recommend")?.classList.toggle("hidden", isStudent || isMaintenance);
+    // Venue Explorer: Available to all
+    document.querySelector(".nav-venues")?.classList.remove("hidden");
+
+    // My Requests: Student, TeamLead, Admin (can view own bookings)
+    document.querySelector(".nav-mybookings")?.classList.toggle("hidden", isMaintenance);
+
+    // Liked Events: Strictly STUDENT only
+    document.querySelector(".nav-likedevents")?.classList.toggle("hidden", !isStudent);
+
+    // Create Event: TeamLead & Admin
+    document.querySelector(".nav-createevent")?.classList.toggle("hidden", !(isTeamLead || isAdmin));
+
+    // Smart Match (AI Recommendations): Student, TeamLead, Admin
+    document.querySelector(".nav-recommend")?.classList.toggle("hidden", isMaintenance);
 
     // Admin pages: Admin only
     document.querySelector(".nav-adminbookings")?.classList.toggle("hidden", !isAdmin);
@@ -3199,6 +3262,156 @@ function applyRolePermissions(){
     document.querySelectorAll(".teamLeadOnly").forEach(el => {
         el.classList.toggle("hidden", !isTeamLead && !isAdmin);
     });
+}
+
+// Student Liked Events Lifecycle (PostgreSQL backed)
+async function loadLikedEvents(){
+    try {
+        if(currentAuthToken){
+            const res = await fetch('/api/liked-events', {
+                headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+            });
+            if(res.ok){
+                const data = await res.json();
+                likedEventIds = new Set((data.likedEvents || []).map(e => String(e.bookingId)));
+                localStorage.setItem("maceLikedEvents", JSON.stringify([...likedEventIds]));
+                return;
+            }
+        }
+    } catch(e) {
+        console.warn('Failed to fetch liked events from API:', e);
+    }
+    const saved = localStorage.getItem("maceLikedEvents");
+    if(saved){
+        try { likedEventIds = new Set(JSON.parse(saved)); } catch(e){}
+    }
+}
+
+async function toggleLikeEvent(eventId, ev){
+    if(ev && ev.stopPropagation) ev.stopPropagation();
+
+    if(currentUserRole !== "student"){
+        alert("Liking events is reserved for Student accounts.");
+        return;
+    }
+
+    const idStr = String(eventId);
+    const isLiked = likedEventIds.has(idStr);
+
+    if(isLiked){
+        likedEventIds.delete(idStr);
+        if(currentAuthToken){
+            fetch(`/api/liked-events/${idStr}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+            }).catch(console.error);
+        }
+    } else {
+        likedEventIds.add(idStr);
+        if(currentAuthToken){
+            fetch(`/api/liked-events/${idStr}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${currentAuthToken}` }
+            }).catch(console.error);
+        }
+    }
+
+    localStorage.setItem("maceLikedEvents", JSON.stringify([...likedEventIds]));
+    renderEvents();
+    renderLikedEvents();
+}
+
+function renderLikedEvents(){
+    const grid = document.getElementById("likedEventsGrid");
+    if(!grid) return;
+
+    if(currentUserRole !== "student"){
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted)">
+                Liked Events is available for Student accounts.
+            </div>
+        `;
+        return;
+    }
+
+    const events = getEvents();
+    const likedList = events.filter(e => likedEventIds.has(String(e.id)));
+
+    if(likedList.length === 0){
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:60px 20px;background:var(--card-bg);border:1px dashed var(--border);border-radius:20px">
+                <div style="font-size:44px;margin-bottom:10px">🤍</div>
+                <h3 style="font-size:18px;font-weight:800;margin-bottom:6px">No Liked Events Yet</h3>
+                <p style="color:var(--muted);font-size:13px;max-width:420px;margin:0 auto 18px">
+                    Explore campus events and click the heart button (♡) to favorite them for instant access, map navigation, and quick venue bookings.
+                </p>
+                <button class="smallBtn" onclick="showPage('events')">
+                    Explore Campus Events →
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = likedList.map(e => `
+        <div class="eventCard" style="position:relative">
+            <div style="position:relative">
+                ${e.posterUrl ? `
+                    <img class="eventPoster" src="${e.posterUrl}" alt="${e.title}" onclick="viewFullPhoto('${e.posterUrl}')">
+                ` : `
+                    <div class="eventPoster" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:32px">
+                        🎨
+                    </div>
+                `}
+                <button class="likeHeartBtn liked" onclick="toggleLikeEvent('${e.id}', event)" title="Unlike this event">
+                    ♥
+                </button>
+            </div>
+
+            <div class="eventBody">
+                <div class="collegeBadge">
+                    🏛 ${e.college}
+                </div>
+
+                <h3>${e.title}</h3>
+
+                <div class="eventSchedule">
+                    📅 ${formatDateStr(e.date)} • 🕒 ${e.startTime} – ${e.endTime}
+                </div>
+
+                <div class="eventVenue">
+                    📍 ${e.venue}
+                </div>
+
+                <p class="eventDesc">
+                    ${e.description}
+                </p>
+
+                <div class="actionBtns" style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="smallBtn" onclick="showPage('map'); focusVenueByName('${e.venue}')">
+                        Quickly access on Map 🧭
+                    </button>
+                    <button class="smallBtn secondary" onclick="continueToBookingForEvent('${e.venue}')">
+                        Continue to Booking 📅
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+function focusVenueByName(venueName){
+    showPage('map');
+    alert(`📍 Campus Map focused on venue: ${venueName}`);
+}
+
+function continueToBookingForEvent(venueName){
+    showPage('venues');
+    const searchInp = document.getElementById('venueSearch');
+    if(searchInp){
+        searchInp.value = venueName;
+        renderVenues();
+    }
 }
 
 
@@ -3395,7 +3608,7 @@ function renderVenues(){
                     View Details
                 </button>
 
-                ${currentUserRole === "teamlead" ? `
+                ${(currentUserRole === "team_lead" || currentUserRole === "student" || currentUserRole === "admin") ? `
                     <button class="smallBtn" onclick="handleVenueBookingClick(${v.id}, ${v.avail})">
                         Request Booking
                     </button>
@@ -3487,15 +3700,22 @@ function renderEvents(){
         return;
     }
 
-    grid.innerHTML = events.map(e => `
-        <div class="eventCard">
-            ${e.posterUrl ? `
-                <img class="eventPoster" src="${e.posterUrl}" alt="${e.title}" onclick="viewFullPhoto('${e.posterUrl}')">
-            ` : `
-                <div class="eventPoster" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:32px">
-                    🎨
-                </div>
-            `}
+    grid.innerHTML = events.map(e => {
+        const isLiked = likedEventIds.has(String(e.id));
+        return `
+        <div class="eventCard" style="position:relative">
+            <div style="position:relative">
+                ${e.posterUrl ? `
+                    <img class="eventPoster" src="${e.posterUrl}" alt="${e.title}" onclick="viewFullPhoto('${e.posterUrl}')">
+                ` : `
+                    <div class="eventPoster" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:32px">
+                        🎨
+                    </div>
+                `}
+                <button class="likeHeartBtn ${isLiked ? 'liked' : ''}" onclick="toggleLikeEvent('${e.id}', event)" title="${isLiked ? 'Unlike this event' : 'Like this event'}">
+                    ${isLiked ? '♥' : '♡'}
+                </button>
+            </div>
 
             <div class="eventBody">
                 <div class="collegeBadge">
@@ -3531,7 +3751,7 @@ function renderEvents(){
                 </div>
             </div>
         </div>
-    `).join("");
+    `; }).join("");
 }
 
 function clearEventFilters(){
@@ -5094,7 +5314,7 @@ function recommendVenue(){
                 ${missing.length ? `<br><br>⚠️ Missing requested facilities: ${missing.join(", ")}` : ''}
             </p>
 
-            ${currentUserRole === "teamlead" ? `
+            ${(currentUserRole === "team_lead" || currentUserRole === "student" || currentUserRole === "admin") ? `
                 <button class="smallBtn" style="margin-top:16px" onclick="openBooking(${best.id})">
                     Request This Venue →
                 </button>
@@ -5112,6 +5332,7 @@ function renderAll(){
     renderDashboard();
     renderVenues();
     renderEvents();
+    renderLikedEvents();
     renderBookings();
     renderVenueManagement();
     renderMaintenanceReports();
@@ -5129,7 +5350,32 @@ function renderAll(){
 ================================================================ */
 
 initTheme();
-setLoginRole('student');
+
+// Check existing session
+const savedToken = localStorage.getItem("campusspace_auth_token");
+const savedRole = localStorage.getItem("campusspace_user_role");
+if(savedToken && savedRole && PRESET_CREDS[savedRole]){
+    const cred = PRESET_CREDS[savedRole];
+    currentUserRole = savedRole;
+    currentUsername = cred.name;
+    currentUserId = `usr-${savedRole}`;
+    currentAuthToken = savedToken;
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    const roleLabels = {
+        student: "🎓 STUDENT",
+        team_lead: "👥 TEAM LEAD",
+        maintenance: "🔧 MAINTENANCE OFFICER",
+        admin: "🛡 ADMIN"
+    };
+    document.getElementById("currentRole").textContent = roleLabels[currentUserRole] || currentUserRole.toUpperCase();
+    applyRolePermissions();
+    if(currentUserRole === "student"){
+        loadLikedEvents().then(renderAll);
+    } else {
+        renderAll();
+    }
+}
 
 // Set default booking date constraint
 const todayStr = new Date().toISOString().split("T")[0];

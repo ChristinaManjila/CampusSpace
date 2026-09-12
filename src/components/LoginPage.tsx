@@ -12,37 +12,65 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAutofill = (type: 'admin' | 'organizer') => {
-    const creds = PRESET_CREDENTIALS[type];
-    setUsername(creds.username);
-    setPassword(creds.password);
-    setErrorMessage(null);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const trimmedUser = username.trim().toLowerCase();
+    const trimmedUser = username.trim();
 
     if (!trimmedUser || !password) {
-      setErrorMessage('Please enter both username and password.');
+      setErrorMessage('Please enter both username or email and password.');
       return;
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // 1. Attempt API server authentication
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: trimmedUser, password })
+      });
 
-      if (trimmedUser === 'admin' && password === 'admin123') {
-        onLogin(PRESET_CREDENTIALS.admin);
-      } else if (trimmedUser === 'organizer' && password === '12345') {
-        onLogin(PRESET_CREDENTIALS.organizer);
-      } else {
-        setErrorMessage('Invalid username or password. Please use admin/admin123 or organizer/12345.');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('campusspace_auth_token', data.token);
+        }
+        setIsLoading(false);
+        onLogin(data.user);
+        return;
       }
-    }, 350);
+    } catch (err) {
+      console.warn('API login request failed, attempting local credentials match:', err);
+    }
+
+    // 2. Offline / Local fallback for 4 exact roles
+    const userLower = trimmedUser.toLowerCase();
+    const credsList = Object.values(PRESET_CREDENTIALS);
+    const matched = credsList.find(
+      (c) =>
+        (c.username.toLowerCase() === userLower || (c.email && c.email.toLowerCase() === userLower)) &&
+        c.password === password
+    );
+
+    setIsLoading(false);
+
+    if (matched) {
+      onLogin({
+        id: matched.id,
+        username: matched.username,
+        email: matched.email,
+        role: matched.role,
+        name: matched.name,
+        department: matched.department,
+        avatar: matched.avatar,
+        badge: matched.badge
+      });
+    } else {
+      setErrorMessage('Invalid username/email or password. Please check your credentials.');
+    }
   };
 
   return (
@@ -64,7 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 CampusSpace
               </span>
               <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-700/60">
-                Portal Access
+                Secure Access
               </span>
             </div>
             <p className="text-[11px] text-slate-400 hidden sm:block">
@@ -75,7 +103,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
         <div className="text-xs text-slate-400 flex items-center gap-1.5 bg-slate-900/80 px-3.5 py-1.5 rounded-xl border border-slate-800">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>System Online</span>
+          <span>PostgreSQL Auth Online</span>
         </div>
       </header>
 
@@ -84,60 +112,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         {/* Banner Pill */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-6 shadow-lg shadow-cyan-500/5">
           <span>🏛️</span>
-          <span>Unified Access for Organizers & Administrators</span>
-        </div>
-
-        {/* Demo Credentials Quick-Fill Pill Boxes */}
-        <div className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl">
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <span>⚡</span>
-              <span>Preset Demo Credentials</span>
-            </span>
-            <span className="text-[11px] text-cyan-400 font-medium">Click to autofill</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-            {/* Admin Creds */}
-            <div
-              onClick={() => handleAutofill('admin')}
-              className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/60 transition cursor-pointer flex flex-col justify-between group"
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-bold text-rose-400 flex items-center gap-1">
-                  <span>🛡️</span>
-                  <span>Admin</span>
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-rose-950/80 text-rose-300 border border-rose-800/60 font-semibold group-hover:bg-rose-900 transition">
-                  Fill
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-400 space-y-0.5">
-                <div>User: <strong className="text-slate-200">admin</strong></div>
-                <div>Pass: <strong className="text-slate-200">admin123</strong></div>
-              </div>
-            </div>
-
-            {/* Organizer Creds */}
-            <div
-              onClick={() => handleAutofill('organizer')}
-              className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/60 transition cursor-pointer flex flex-col justify-between group"
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-bold text-cyan-400 flex items-center gap-1">
-                  <span>📅</span>
-                  <span>Organizer</span>
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 font-semibold group-hover:bg-cyan-900 transition">
-                  Fill
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-400 space-y-0.5">
-                <div>User: <strong className="text-slate-200">organizer</strong></div>
-                <div>Pass: <strong className="text-slate-200">12345</strong></div>
-              </div>
-            </div>
-          </div>
+          <span>Unified Access for Students, Team Leads, Maintenance & Admins</span>
         </div>
 
         {/* Primary Login Card */}
@@ -146,7 +121,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
           <h2 className="text-2xl font-black text-white tracking-tight mb-1">Sign In to CampusSpace</h2>
           <p className="text-xs text-slate-400 mb-6">
-            Enter your credentials to manage venue reservations and access capacity analytics.
+            Enter your credentials to access your personalized campus dashboard.
           </p>
 
           {/* Error Message Box */}
@@ -158,10 +133,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username Input */}
+            {/* Username / Email Input */}
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Username
+                Username or Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">
@@ -174,7 +149,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     setUsername(e.target.value);
                     setErrorMessage(null);
                   }}
-                  placeholder="e.g. admin or organizer"
+                  placeholder="e.g. student@campus.edu or admin"
                   className="w-full bg-slate-950 border border-slate-700/80 rounded-2xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 transition font-medium"
                   required
                 />
@@ -223,7 +198,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               {isLoading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying Credentials...</span>
+                  <span>Verifying Database Account...</span>
                 </>
               ) : (
                 <>
@@ -238,7 +213,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         {/* Security / System Footer Note */}
         <p className="mt-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
           <span>🔒</span>
-          <span>Role-Aware Campus Gatekeeper • Admin & Organizer Demo Ready</span>
+          <span>Automatic Role Resolution • Admin, Student, Team Lead & Maintenance</span>
         </p>
       </main>
     </div>

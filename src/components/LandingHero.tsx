@@ -34,10 +34,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onEnterApp, onOpenLogi
             Student View
           </button>
           <button
-            onClick={() => onEnterApp('organizer')}
+            onClick={() => onEnterApp('team_lead')}
             className="text-xs font-semibold px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-md shadow-cyan-500/20 transition"
           >
-            Launch Demo
+            Team Lead Demo
           </button>
         </div>
       </nav>
@@ -67,10 +67,10 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onEnterApp, onOpenLogi
         {/* Hackathon CTA Group */}
         <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
           <button
-            onClick={() => onEnterApp('organizer')}
+            onClick={() => onEnterApp('team_lead')}
             className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 font-bold text-base shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all"
           >
-            Explore Demo (Organizer) →
+            Explore Demo (Team Lead) →
           </button>
           {onOpenLogin && (
             <button

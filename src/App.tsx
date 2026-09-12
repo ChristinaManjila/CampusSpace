@@ -29,6 +29,7 @@ import { AdminApprovalView } from './components/AdminApprovalView';
 import { BookingModal } from './components/BookingModal';
 import { NotificationsDrawer } from './components/NotificationsDrawer';
 import { SettingsView } from './components/SettingsView';
+import { LikedEventsView } from './components/LikedEventsView';
 
 const LOCAL_STORAGE_KEY_VENUES = 'campusspace_venues_v2';
 const LOCAL_STORAGE_KEY_BOOKINGS = 'campusspace_bookings_v2';
@@ -39,7 +40,7 @@ export const App: React.FC = () => {
   const [isLandingPage, setIsLandingPage] = useState<boolean>(false);
   const [isLoginPage, setIsLoginPage] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
-  const [currentRole, setCurrentRole] = useState<UserRole>('organizer');
+  const [currentRole, setCurrentRole] = useState<UserRole>('student');
 
   // User Profile State
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
@@ -51,7 +52,7 @@ export const App: React.FC = () => {
         console.error(e);
       }
     }
-    return DEFAULT_USERS['organizer'];
+    return DEFAULT_USERS['student'];
   });
 
   useEffect(() => {
@@ -367,6 +368,25 @@ export const App: React.FC = () => {
                   setNavigationTargetVenue(found);
                   setActiveTab('navigation');
                 }
+              }}
+            />
+          {activeTab === 'liked-events' && (
+            <LikedEventsView
+              onNavigateToVenue={(venueName) => {
+                const found = venues.find((v) => v.name.toLowerCase().includes(venueName.toLowerCase()));
+                if (found) {
+                  setSelectedMapVenue(found);
+                  setActiveTab('map');
+                }
+              }}
+              onBookVenue={(venueName) => {
+                const found = venues.find((v) => v.name.toLowerCase().includes(venueName.toLowerCase()));
+                if (found) {
+                  setBookingModalVenue({ venue: found });
+                }
+              }}
+              onExploreEvents={() => {
+                setActiveTab('dashboard');
               }}
             />
           )}

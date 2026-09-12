@@ -36,10 +36,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [eventName, setEventName] = useState<string>('Campus Technical Keynote');
   const [eventType, setEventType] = useState<EventType>('Seminar');
   const [organizerName, setOrganizerName] = useState<string>(
-    currentRole === 'admin' ? 'Campus Admin' : 'Prof. Sarah Jenkins'
+    currentRole === 'admin' ? 'Campus Admin' : (currentRole === 'student' ? 'Student Explorer' : 'Team Lead')
   );
   const [organizerEmail, setOrganizerEmail] = useState<string>(
-    currentRole === 'admin' ? 'admin@campus.edu' : 'organizer@campus.edu'
+    currentRole === 'admin' ? 'admin@campus.edu' : (currentRole === 'student' ? 'student@campus.edu' : 'teamlead@campus.edu')
   );
   const [attendance, setAttendance] = useState<number>(Math.min(venue.capacity, 25));
   const [date, setDate] = useState<string>('2026-09-16');

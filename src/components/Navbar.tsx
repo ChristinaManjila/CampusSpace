@@ -108,21 +108,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="font-semibold">{isSimulatingLocation ? 'Campus Central' : 'Locate'}</span>
         </button>
 
-        {/* Role Switcher */}
-        <div className="flex items-center bg-slate-900/90 border border-slate-700/80 rounded-xl p-1 text-xs">
-          {(['organizer', 'admin'] as UserRole[]).map((role) => (
-            <button
-              key={role}
-              onClick={() => onRoleChange(role)}
-              className={`capitalize px-3 py-1 rounded-lg font-bold transition text-xs ${
-                currentRole === role
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {role}
-            </button>
-          ))}
+        {/* Role Chip Indicator */}
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-xs font-bold">
+          <span className="w-2 h-2 rounded-full bg-cyan-400" />
+          <span className="text-cyan-300 uppercase tracking-wider text-[10px]">
+            {currentRole.replace('_', ' ')}
+          </span>
         </div>
 
         {/* Notifications Icon */}

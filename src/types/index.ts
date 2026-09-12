@@ -1,4 +1,12 @@
-export type UserRole = 'admin' | 'maintenance' | 'teamlead' | 'student' | 'organizer';
+export type UserRole = 'admin' | 'student' | 'team_lead' | 'maintenance';
+
+export interface LikedEvent {
+  id: string | number;
+  userId: string;
+  bookingId: string;
+  createdAt: string;
+  event?: CampusEvent;
+}
 
 export interface MaintenanceReport {
   id: string;
@@ -208,6 +216,7 @@ export interface NotificationItem {
 export interface UserProfile {
   id: string;
   username: string;
+  email?: string;
   name: string;
   role: UserRole;
   department: string;
@@ -217,26 +226,55 @@ export interface UserProfile {
 
 export const PRESET_CREDENTIALS = {
   admin: {
+    id: 'usr-admin',
     username: 'admin',
-    password: 'admin123',
+    email: 'admin@campus.edu',
+    password: 'Admin@123',
     role: 'admin' as UserRole,
     name: 'Campus Facilities Administrator',
     department: 'Office of Campus Administration',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
     badge: 'Senior Admin'
   },
-  organizer: {
-    username: 'organizer',
-    password: '12345',
-    role: 'organizer' as UserRole,
-    name: 'Event Organizer',
-    department: 'University Event & Club Council',
+  student: {
+    id: 'usr-student',
+    username: 'student',
+    email: 'student@campus.edu',
+    password: 'Student@123',
+    role: 'student' as UserRole,
+    name: 'Student Explorer',
+    department: 'Computer Science & Engineering',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    badge: 'Active Student'
+  },
+  team_lead: {
+    id: 'usr-teamlead',
+    username: 'teamlead',
+    email: 'teamlead@campus.edu',
+    password: 'TeamLead@123',
+    role: 'team_lead' as UserRole,
+    name: 'Team Lead',
+    department: 'Robotics & FOSS Council',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
-    badge: 'Faculty / Club Convener'
+    badge: 'Club Convener'
+  },
+  maintenance: {
+    id: 'usr-maintenance',
+    username: 'maintenance',
+    email: 'maintenance@campus.edu',
+    password: 'Maintenance@123',
+    role: 'maintenance' as UserRole,
+    name: 'Maintenance Officer',
+    department: 'Campus Facilities & Estate Office',
+    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
+    badge: 'Field Ops Lead'
   }
 };
 
 export const DEFAULT_USERS = {
   admin: PRESET_CREDENTIALS.admin,
-  organizer: PRESET_CREDENTIALS.organizer
+  student: PRESET_CREDENTIALS.student,
+  team_lead: PRESET_CREDENTIALS.team_lead,
+  maintenance: PRESET_CREDENTIALS.maintenance
 };
+

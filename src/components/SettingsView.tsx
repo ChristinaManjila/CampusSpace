@@ -39,11 +39,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             Switch your profile persona to test role-specific workflows across CampusSpace.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { role: 'student', title: 'Student', desc: 'Book rooms, view smart pass, walk navigation' },
-              { role: 'organizer', title: 'Organizer', desc: 'AI venue matcher, multi-criteria recommendations' },
-              { role: 'admin', title: 'Administrator', desc: 'Approval queue, conflict manager, auto-release rules' }
+              { role: 'student', title: 'Student', desc: 'Book rooms, liked events, AI recommendations, live map navigation' },
+              { role: 'team_lead', title: 'Team Lead', desc: 'Team reservations, campus events, smart venue matchmaker' },
+              { role: 'maintenance', title: 'Maintenance', desc: 'Campus facilities hub, task inspections, status management' },
+              { role: 'admin', title: 'Administrator', desc: 'Approval queue, conflict engine, venue management, analytics' }
             ].map((p) => (
               <button
                 key={p.role}

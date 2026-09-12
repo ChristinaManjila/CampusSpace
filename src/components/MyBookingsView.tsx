@@ -26,7 +26,7 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({
         <div>
           <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
             <span>📅</span>
-            <span>Organizer Bookings & Reservations</span>
+            <span>My Bookings & Reservations</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             Track your reserved campus spaces, approval statuses, and schedule details.

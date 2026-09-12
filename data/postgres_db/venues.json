@@ -1,0 +1,101 @@
+[
+  {
+    "id": "1",
+    "name": "Main Auditorium",
+    "block": "Convention Complex",
+    "capacity": 1200,
+    "time": "8:00 AM – 8:00 PM",
+    "facilities": "[\"Stage\",\"Sound System\",\"AC\",\"Balcony Seating\",\"Green Rooms\",\"Wi-Fi\"]",
+    "tags": "[\"auditorium\",\"large\",\"stage\",\"ac\"]",
+    "x": 50,
+    "y": 55
+  },
+  {
+    "id": "2",
+    "name": "Seminar Hall 1",
+    "block": "CS Block",
+    "capacity": 180,
+    "time": "8:30 AM – 6:00 PM",
+    "facilities": "[\"Projector\",\"Sound System\",\"Podium Mic\",\"AC\",\"Wi-Fi\"]",
+    "tags": "[\"seminar\",\"ac\",\"projector\",\"audio\"]",
+    "x": 38,
+    "y": 35
+  },
+  {
+    "id": "3",
+    "name": "Seminar Hall 2",
+    "block": "CS Block",
+    "capacity": 150,
+    "time": "8:30 AM – 6:00 PM",
+    "facilities": "[\"Smart Board\",\"Projector\",\"AC\",\"Wi-Fi\",\"Stepped Seating\"]",
+    "tags": "[\"seminar\",\"ac\",\"projector\",\"smartboard\"]",
+    "x": 42,
+    "y": 33
+  },
+  {
+    "id": "4",
+    "name": "Seminar Hall 4",
+    "block": "Mechanical Block",
+    "capacity": 120,
+    "time": "9:00 AM – 5:00 PM",
+    "facilities": "[\"Projector\",\"Audio System\",\"Wi-Fi\"]",
+    "tags": "[\"seminar\",\"projector\",\"audio\"]",
+    "x": 62,
+    "y": 65
+  },
+  {
+    "id": "5",
+    "name": "Placement Hall 1",
+    "block": "Placement Cell",
+    "capacity": 120,
+    "time": "9:00 AM – 5:00 PM",
+    "facilities": "[\"Attached Table Chairs\",\"AC\",\"Wi-Fi\",\"Projector\"]",
+    "tags": "[\"wifi\",\"ac\",\"projector\",\"tables\"]",
+    "x": 69,
+    "y": 48
+  },
+  {
+    "id": "6",
+    "name": "Placement Hall 2",
+    "block": "Placement Cell",
+    "capacity": 100,
+    "time": "9:00 AM – 4:00 PM",
+    "facilities": "[\"Attached Table Chairs\",\"AC\",\"Wi-Fi\",\"Projector\"]",
+    "tags": "[\"wifi\",\"ac\",\"projector\",\"tables\"]",
+    "x": 76,
+    "y": 44
+  },
+  {
+    "id": "7",
+    "name": "Open Air Theatre (OAT)",
+    "block": "Open Air Theatre",
+    "capacity": 3000,
+    "time": "6:00 AM – 9:00 PM",
+    "facilities": "[\"Concert Venue\",\"Tiered Open Theatre\",\"Sound System\",\"Practice Area\"]",
+    "tags": "[\"concert\",\"cultural\",\"audio\",\"practice\"]",
+    "x": 56,
+    "y": 71
+  },
+  {
+    "id": "8",
+    "name": "Founders Block",
+    "block": "Founders Block",
+    "capacity": 250,
+    "time": "9:00 AM – 7:00 PM",
+    "facilities": "[\"Top Floor Practice Area\",\"Exam Centre\",\"Tables\",\"Chairs\"]",
+    "tags": "[\"practice\",\"tables\",\"exam\"]",
+    "x": 32,
+    "y": 72
+  },
+  {
+    "id": "9",
+    "name": "Canteen",
+    "block": "Canteen",
+    "capacity": 250,
+    "time": "9:00 AM – 6:30 PM",
+    "facilities": "[\"Small Music Band Events\",\"Informal Event Space\"]",
+    "tags": "[\"music\",\"cultural\"]",
+    "x": 80,
+    "y": 70
+  }
+]

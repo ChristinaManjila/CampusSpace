@@ -6,6 +6,7 @@ export type NavTab =
   | 'map'
   | 'recommendations'
   | 'bookings'
+  | 'liked-events'
   | 'navigation'
   | 'analytics'
   | 'forecast'
@@ -31,19 +32,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenLogin,
   onLogout
 }) => {
-  const navItems: { id: NavTab; label: string; icon: string; badge?: number; adminOnly?: boolean }[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
-    { id: 'map', label: 'Campus Map', icon: '🗺️' },
-    { id: 'recommendations', label: 'AI Recommendations', icon: '🤖' },
-    { id: 'bookings', label: 'My Bookings', icon: '📅' },
-    { id: 'navigation', label: 'Live Navigation', icon: '📍' },
-    { id: 'analytics', label: 'Analytics', icon: '📊' },
-    { id: 'forecast', label: 'Demand Forecast', icon: '🔮' },
-    { id: 'admin', label: 'Admin Approvals', icon: '🛡️', badge: pendingApprovalsCount, adminOnly: true },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
+  const navItems: {
+    id: NavTab;
+    label: string;
+    icon: string;
+    badge?: number;
+    roles?: UserRole[];
+  }[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: '🏠', roles: ['admin', 'student', 'team_lead', 'maintenance'] },
+    { id: 'map', label: 'Campus Map', icon: '🗺️', roles: ['admin', 'student', 'team_lead'] },
+    { id: 'recommendations', label: 'AI Recommendations', icon: '🤖', roles: ['admin', 'student', 'team_lead'] },
+    { id: 'bookings', label: 'My Bookings', icon: '📅', roles: ['admin', 'student', 'team_lead'] },
+    { id: 'liked-events', label: 'Liked Events', icon: '❤️', roles: ['student'] },
+    { id: 'navigation', label: 'Live Navigation', icon: '📍', roles: ['admin', 'student'] },
+    { id: 'analytics', label: 'Analytics', icon: '📊', roles: ['admin'] },
+    { id: 'forecast', label: 'Demand Forecast', icon: '🔮', roles: ['admin'] },
+    { id: 'admin', label: 'Admin Approvals', icon: '🛡️', badge: pendingApprovalsCount, roles: ['admin'] },
+    { id: 'settings', label: 'Settings', icon: '⚙️', roles: ['admin', 'student', 'team_lead', 'maintenance'] }
   ];
 
-  const visibleItems = navItems.filter(item => !item.adminOnly || currentRole === 'admin');
+  const visibleItems = navItems.filter(item => !item.roles || item.roles.includes(currentRole));
 
   return (
     <aside className="w-64 bg-[#070e1e] border-r border-slate-800/80 flex flex-col justify-between py-5 px-3 select-none flex-shrink-0">

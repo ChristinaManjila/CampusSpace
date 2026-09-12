@@ -1,0 +1,42 @@
+[
+  {
+    "id": "usr-admin",
+    "email": "admin@campus.edu",
+    "username": "admin",
+    "password": "Admin@123",
+    "role": "admin",
+    "name": "Campus Facilities Administrator",
+    "department": "Office of Campus Administration",
+    "created_at": "2026-09-12T01:18:06.342Z"
+  },
+  {
+    "id": "usr-student",
+    "email": "student@campus.edu",
+    "username": "student",
+    "password": "Student@123",
+    "role": "student",
+    "name": "Student Explorer",
+    "department": "Computer Science & Engineering",
+    "created_at": "2026-09-12T01:18:06.343Z"
+  },
+  {
+    "id": "usr-teamlead",
+    "email": "teamlead@campus.edu",
+    "username": "teamlead",
+    "password": "TeamLead@123",
+    "role": "team_lead",
+    "name": "Team Lead",
+    "department": "Robotics & FOSS Council",
+    "created_at": "2026-09-12T01:18:06.344Z"
+  },
+  {
+    "id": "usr-maintenance",
+    "email": "maintenance@campus.edu",
+    "username": "maintenance",
+    "password": "Maintenance@123",
+    "role": "maintenance",
+    "name": "Maintenance Officer",
+    "department": "Campus Facilities & Estate Office",
+    "created_at": "2026-09-12T01:18:06.345Z"
+  }
+]

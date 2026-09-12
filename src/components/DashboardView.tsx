@@ -210,7 +210,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-700/60 text-cyan-300 text-xs font-semibold mb-3">
               <span>📅</span>
-              <span>Organizer Venue Allocation & Booking Console</span>
+              <span>Campus Venue Allocation & Booking Console</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               Find & Reserve the Ideal Campus Space
